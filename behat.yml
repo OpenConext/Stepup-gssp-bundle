@@ -1,0 +1,10 @@
+default:
+    formatters:
+        progress:
+            paths: false
+    extensions: []
+    suites:
+        bundle:
+            contexts:
+                - Surfnet\GsspBundle\Features\Context\GsspContext:
+            paths:    [ %paths.base%/src/Features ]

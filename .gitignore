@@ -1,0 +1,22 @@
+# IDE files #
+#############
+.idea
+
+# Vagrant files #
+#################
+vagrant.retry
+.vagrant
+
+# Code coverage reports #
+#################
+/coverage/*
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+
+
+# Application files #
+######################
+/vendor/
