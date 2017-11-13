@@ -19,6 +19,7 @@ namespace Surfnet\GsspBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class GsspBundle extends Bundle
+class SurfnetGsspBundle extends Bundle
 {
+
 }
