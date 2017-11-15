@@ -15,15 +15,8 @@
  * limitations under the License.
  */
 
-namespace Surfnet\GsspBundle;
+namespace Surfnet\GsspBundle\Exception;
 
-use PHPUnit_Framework_TestCase;
-
-final class TestUnitTest extends PHPUnit_Framework_TestCase
+interface Exception
 {
-
-    public function testItWorks()
-    {
-        $this->assertTrue(true);
-    }
 }

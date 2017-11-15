@@ -49,7 +49,14 @@ surfnet_saml:
             certificate_file: "%saml_remote_idp_certificate%" 
 ```
 
-See [Saml bundle documentation](https://github.com/OpenConext/Stepup-saml-bundle) for more information about this configuration
+See [Saml bundle documentation](https://github.com/OpenConext/Stepup-saml-bundle) for more information about the configuration above
+
+```yaml
+assetic:
+    ...
+    bundles:
+      - SurfnetGsspBundle
+```
 
 **routing.yml**
 
@@ -75,6 +82,8 @@ This is example idp configuration that works with [pieter.aai.surfnet.nl](https:
 
 Development environment
 ======================
+
+The purpose of the development environment is only for running the different test and metric tools.
 
 To get started, first setup the development environment. The dev. env. is a virtual machine. Every task described is run
 from that machine.  
