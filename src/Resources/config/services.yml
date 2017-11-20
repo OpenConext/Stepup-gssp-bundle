@@ -1,0 +1,8 @@
+services:
+    surfnet_gssp.saml.metadata_controller:
+        class: Surfnet\GsspBundle\Controller\MetadataController
+        arguments:
+          - '@surfnet_saml.metadata_factory'
+
+    surfnet_gssp.saml.service_provider_repository:
+        class: Surfnet\GsspBundle\GsspServiceProviderRepository

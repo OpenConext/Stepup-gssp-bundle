@@ -1,0 +1,3 @@
+gssp_saml:
+    resource: "@SurfnetGsspBundle/Controller/"
+    type:     annotation
