@@ -36,8 +36,8 @@ final class ConfigurationContainer
      */
     public function __construct($configuration)
     {
-//        Assertion::keyExists($configuration, 'registration_route');
-//        Assertion::string($configuration['registration_route']);
+        Assertion::keyExists($configuration, 'registration_route');
+        Assertion::string($configuration['registration_route']);
         $this->registrationRoute = $configuration['registration_route'];
     }
 

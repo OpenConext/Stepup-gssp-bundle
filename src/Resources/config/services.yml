@@ -30,13 +30,16 @@ services:
           - '@surfnet_saml.remote.service_providers'
           - '@surfnet_gssp.saml.state_handler'
 
+    surfnet_gssp.service.datetime:
+        class: Surfnet\GsspBundle\Service\DateTime\SystemDateTimeService
+
     surfnet_gssp.service.response:
         class: Surfnet\GsspBundle\Service\ResponseService
         arguments:
           - '@surfnet_saml.hosted.identity_provider'
           - '@surfnet_gssp.saml.reponse_context'
           - '@surfnet_gssp.saml.signing_service'
-          - '@surfnet_saml.saml.attribute_dictionary'
+          - '@surfnet_gssp.service.datetime'
 
     surfnet_gssp.service.authentication_registration:
         class: Surfnet\GsspBundle\Service\AuthenticationRegistrationService

@@ -18,7 +18,7 @@
 namespace Surfnet\GsspBundle\Service;
 
 use SAML2_Assertion;
-use Surfnet\GsspBundle\Saml\AssertionSigningService;
+use Surfnet\GsspBundle\Saml\AssertionSigningServiceInterface;
 use Surfnet\GsspBundle\Saml\ResponseContextInterface;
 use Surfnet\SamlBundle\Entity\IdentityProvider;
 
@@ -27,27 +27,28 @@ final class ResponseService implements ResponseServiceInterface
 
     private $hostedIdentityProvider;
     private $responseContext;
-    private $currentTime;
     private $assertionSigningService;
+    private $dateTimeService;
 
     public function __construct(
         IdentityProvider $hostedIdentityProvider,
         ResponseContextInterface $responseContext,
-        AssertionSigningService $assertionSigningService
+        AssertionSigningServiceInterface $assertionSigningService,
+        DateTimeService $dateTimeService
     ) {
         $this->hostedIdentityProvider = $hostedIdentityProvider;
         $this->responseContext = $responseContext;
         $this->assertionSigningService = $assertionSigningService;
-        $this->currentTime = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->dateTimeService = $dateTimeService;
     }
 
     public function createResponse()
     {
         $assertion = new SAML2_Assertion();
-        $assertion->setNotBefore($this->currentTime->getTimestamp());
-        $assertion->setNotOnOrAfter($this->getTimestamp('PT5M'));
+        $assertion->setNotBefore($this->dateTimeService->getCurrent()->getTimestamp());
+        $assertion->setNotOnOrAfter($this->dateTimeService->interval('PT5M')->getTimestamp());
         $assertion->setIssuer($this->hostedIdentityProvider->getEntityId());
-        $assertion->setIssueInstant($this->getTimestamp());
+        $assertion->setIssueInstant($this->dateTimeService->getCurrent()->getTimestamp());
 
         $this->assertionSigningService->signAssertion($assertion);
         $targetServiceProvider = $this->responseContext->getServiceProvider();
@@ -72,7 +73,7 @@ final class ResponseService implements ResponseServiceInterface
         $confirmationData = new \SAML2_XML_saml_SubjectConfirmationData();
         $confirmationData->InResponseTo = $this->responseContext->getRequestId();
         $confirmationData->Recipient = $this->responseContext->getServiceProvider()->getAssertionConsumerUrl();
-        $confirmationData->NotOnOrAfter = $this->getTimestamp('PT8H');
+        $confirmationData->NotOnOrAfter = $this->dateTimeService->interval('PT8H')->getTimestamp();
 
         $confirmation->SubjectConfirmationData = $confirmationData;
 
@@ -81,7 +82,7 @@ final class ResponseService implements ResponseServiceInterface
 
     private function addAuthenticationStatementTo(SAML2_Assertion $assertion)
     {
-        $assertion->setAuthnInstant($this->getTimestamp());
+        $assertion->setAuthnInstant($this->dateTimeService->getCurrent()->getTimestamp());
         $assertion->setAuthnContextClassRef('urn:oasis:names:tc:SAML:2.0:ac:classes:MobileTwoFactorUnregistered');
 
         $authority = $assertion->getAuthenticatingAuthority();
@@ -99,25 +100,9 @@ final class ResponseService implements ResponseServiceInterface
         $response = new \SAML2_Response();
         $response->setAssertions([$assertion]);
         $response->setIssuer($this->hostedIdentityProvider->getEntityId());
-        $response->setIssueInstant($this->getTimestamp());
+        $response->setIssueInstant($this->dateTimeService->getCurrent()->getTimestamp());
         $response->setDestination($this->responseContext->getServiceProvider()->getAssertionConsumerUrl());
         $response->setInResponseTo($this->responseContext->getRequestId());
         return $response;
-    }
-
-    /**
-     * @param string $interval a \DateInterval compatible interval to skew the time with
-     * @return int
-     * @throws \Exception
-     */
-    private function getTimestamp($interval = null)
-    {
-        $time = clone $this->currentTime;
-
-        if ($interval) {
-            $time->add(new \DateInterval($interval));
-        }
-
-        return $time->getTimestamp();
     }
 }

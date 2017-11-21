@@ -37,6 +37,7 @@ use Surfnet\GsspBundle\Saml\StateHandler\MemoryStateHandler;
 use Surfnet\GsspBundle\Service\StateBasedAuthenticationRegistrationService;
 use Surfnet\GsspBundle\Service\AuthenticationRegistrationService;
 use Surfnet\GsspBundle\Service\ConfigurationContainer;
+use Surfnet\GsspBundle\Service\DateTime\SystemDateTimeService;
 use Surfnet\GsspBundle\Service\ResponseService;
 use Surfnet\SamlBundle\Entity\IdentityProvider;
 use Surfnet\SamlBundle\Entity\ServiceProvider;
@@ -54,6 +55,10 @@ use Symfony\Component\Routing\RouterInterface;
 use Twig_Environment;
 use XMLSecurityKey;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 final class GsspContext implements Context
 {
     /**
@@ -173,7 +178,8 @@ final class GsspContext implements Context
         $responseService = new ResponseService(
             $this->identityProvider,
             $this->responseContext,
-            $signingService
+            $signingService,
+            new SystemDateTimeService()
         );
         $this->controller = new IdentityController(
             $redirectBinding,
@@ -188,9 +194,7 @@ final class GsspContext implements Context
         $this->twigEnvironment = \Mockery::mock(Twig_Environment::class);
         $this->twigEnvironment->shouldReceive('render')->andReturnUsing(function (
             $template,
-            $parameters = [],
-            /** The response will be assigned by the step definitions */
-            $response = null
+            $parameters = []
         ) {
             $this->twigParameters = $parameters;
             $this->twigTemplate = $template;

@@ -24,7 +24,7 @@ use SAML2_Configuration_PrivateKey;
 use Surfnet\SamlBundle\Entity\IdentityProvider;
 use XMLSecurityKey;
 
-final class AssertionSigningService
+final class AssertionSigningService implements AssertionSigningServiceInterface
 {
     /**
      * @var \Surfnet\SamlBundle\Entity\IdentityProvider
