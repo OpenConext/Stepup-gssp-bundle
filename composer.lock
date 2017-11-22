@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "3e7499f8f04c98a5c419ce4ce0f5932b",
+    "content-hash": "13465e678f28190935da96146fa490c7",
     "packages": [
         {
             "name": "beberlei/assert",
@@ -1248,16 +1248,16 @@
         },
         {
             "name": "surfnet/stepup-saml-bundle",
-            "version": "dev-feature/remote-service-providers",
+            "version": "2.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/OpenConext/Stepup-saml-bundle.git",
-                "reference": "12cad4051defd83e992b372bf35a735e38a18e14"
+                "reference": "e639966e2a80cf7f416e07b86455f1eae1a22aab"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/OpenConext/Stepup-saml-bundle/zipball/12cad4051defd83e992b372bf35a735e38a18e14",
-                "reference": "12cad4051defd83e992b372bf35a735e38a18e14",
+                "url": "https://api.github.com/repos/OpenConext/Stepup-saml-bundle/zipball/e639966e2a80cf7f416e07b86455f1eae1a22aab",
+                "reference": "e639966e2a80cf7f416e07b86455f1eae1a22aab",
                 "shasum": ""
             },
             "require": {
@@ -1292,7 +1292,7 @@
                 "stepup",
                 "surfnet"
             ],
-            "time": "2017-11-20T15:24:21+00:00"
+            "time": "2017-11-22T15:34:58+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -4234,9 +4234,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "surfnet/stepup-saml-bundle": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
