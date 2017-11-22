@@ -1,0 +1,15 @@
+{% extends '::base.html.twig' %}
+
+{% block page_title %}{{ 'gssp.unrecoverable_error.title'|trans }}{% endblock %}
+
+{% block body %}
+    <p class="bg-danger">
+        {{ 'gssp.error.unrecoverable_error'|trans }}
+        {% if message is defined %}
+            <br>
+            {{ 'gssp.error.unrecoverable_error_message_intro'|trans }}
+            <br>
+            {{ message }}
+        {% endif %}
+    </p>
+{% endblock content %}

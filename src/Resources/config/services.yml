@@ -4,5 +4,48 @@ services:
         arguments:
           - '@surfnet_saml.metadata_factory'
 
-    surfnet_gssp.saml.service_provider_repository:
-        class: Surfnet\GsspBundle\GsspServiceProviderRepository
+    surfnet_gssp.saml.identity_controller:
+        class: Surfnet\GsspBundle\Controller\IdentityController
+        arguments:
+          - '@surfnet_saml.http.redirect_binding'
+          - '@surfnet_gssp.configuration_container'
+          - '@surfnet_gssp.saml.state_handler'
+          - '@surfnet_gssp.service.response'
+          - '@surfnet_gssp.saml.reponse_context'
+
+    surfnet_gssp.saml.state_handler:
+        class: Surfnet\GsspBundle\Saml\StateHandler\SessionStateHandler
+        arguments:
+          - '@session'
+
+    surfnet_gssp.saml.signing_service:
+        class: Surfnet\GsspBundle\Saml\AssertionSigningService
+        arguments:
+          - '@surfnet_saml.hosted.identity_provider'
+
+    surfnet_gssp.saml.reponse_context:
+        class: Surfnet\GsspBundle\Saml\ResponseContext
+        arguments:
+          - '@surfnet_saml.hosted.identity_provider'
+          - '@surfnet_saml.remote.service_providers'
+          - '@surfnet_gssp.saml.state_handler'
+
+    surfnet_gssp.service.datetime:
+        class: Surfnet\GsspBundle\Service\DateTime\SystemDateTimeService
+
+    surfnet_gssp.service.response:
+        class: Surfnet\GsspBundle\Service\ResponseService
+        arguments:
+          - '@surfnet_saml.hosted.identity_provider'
+          - '@surfnet_gssp.saml.reponse_context'
+          - '@surfnet_gssp.saml.signing_service'
+          - '@surfnet_gssp.service.datetime'
+
+    surfnet_gssp.service.authentication_registration:
+        class: Surfnet\GsspBundle\Service\AuthenticationRegistrationService
+        arguments:
+          - '@surfnet_gssp.saml.state_handler'
+          - '@router'
+
+    Surfnet\GsspBundle\Service\AuthenticationServiceInterface:
+        alias: 'surfnet_gssp.service.authentication'

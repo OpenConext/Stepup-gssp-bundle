@@ -15,15 +15,19 @@
  * limitations under the License.
  */
 
-namespace Surfnet\GsspBundle;
+namespace Surfnet\GsspBundle\Service;
 
-use PHPUnit_Framework_TestCase;
-
-final class TestUnitTest extends PHPUnit_Framework_TestCase
+interface DateTimeService
 {
+    /**
+     * @return \DateTimeImmutable
+     */
+    public function getCurrent();
 
-    public function testItWorks()
-    {
-        $this->assertTrue(true);
-    }
+    /**
+     * @param string $interval
+     *      a \DateInterval compatible interval to skew the time with
+     * @return \DateTimeImmutable
+     */
+    public function interval($interval);
 }

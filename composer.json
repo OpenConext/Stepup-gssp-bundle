@@ -10,7 +10,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\GsspBundle\\": "tests/"
+            "Tests\\Surfnet\\GsspBundle\\": "tests/"
         },
         "files": [
             "vendor/symfony/symfony/src/Symfony/Component/VarDumper/Resources/functions/dump.php"
@@ -18,10 +18,11 @@
     },
     "require": {
         "php": ">=5.5.9",
+        "beberlei/assert": "^2.7",
         "incenteev/composer-parameter-handler": "^2.0",
         "sensio/distribution-bundle": "^5.0.19",
         "sensio/framework-extra-bundle": "^3.0.2",
-        "surfnet/stepup-saml-bundle": "^2.9",
+        "surfnet/stepup-saml-bundle": "2.11",
         "symfony-bundles/bundle-dependency": "^1.0",
         "symfony/monolog-bundle": "^3.1.0",
         "symfony/polyfill-apcu": "^1.0",
@@ -32,6 +33,7 @@
         "behat/behat": "^3.4",
         "jakub-onderka/php-parallel-lint": "^0.9.2",
         "malukenho/docheader": "^0.1.6",
+        "mockery/mockery": "^1.0",
         "phpmd/phpmd": "^2.6",
         "phpunit/phpcov": "^3.1",
         "phpunit/phpunit": "^5.7",
@@ -61,6 +63,10 @@
         "phpcs": [
             "vendor/bin/phpcs --standard=phpcs.xml --report=full --warning-severity=0 ./src",
             "vendor/bin/phpcs --standard=phpcs_tests.xml --report=full --warning-severity=0 ./tests"
+        ],
+        "phpcbf": [
+            "vendor/bin/phpcbf --standard=phpcs.xml ./src",
+            "vendor/bin/phpcbf --standard=phpcs_tests.xml ./tests"
         ],
         "phpcpd": ["vendor/bin/phpcpd  ./src", "vendor/bin/phpcpd  ./tests"],
 
