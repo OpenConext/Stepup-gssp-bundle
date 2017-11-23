@@ -31,21 +31,12 @@ final class SessionStateHandler extends AbstractStateHandler
         $this->session = $session;
     }
 
-    /**
-     * @param string $key
-     * @param mixed $value Any scalar
-     */
     protected function set($key, $value)
     {
         $this->session->set(self::SESSION_PATH.$key, $value);
+        return $this;
     }
 
-    /**
-     * @param string $key
-     * @return mixed|null Any scalar
-     *
-     * @throws \Surfnet\GsspBundle\Exception\NotFound
-     */
     protected function get($key)
     {
         $sessionKey = self::SESSION_PATH.$key;

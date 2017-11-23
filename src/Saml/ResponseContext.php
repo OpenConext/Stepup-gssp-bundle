@@ -17,8 +17,6 @@
 
 namespace Surfnet\GsspBundle\Saml;
 
-use DateTime;
-use DateTimeZone;
 use Surfnet\SamlBundle\Entity\IdentityProvider;
 use Surfnet\SamlBundle\Entity\ServiceProvider;
 use Surfnet\SamlBundle\Entity\ServiceProviderRepository;
@@ -27,7 +25,6 @@ final class ResponseContext implements ResponseContextInterface
 {
     private $hostedIdentityProvider;
     private $stateHandler;
-    private $generationTime;
     private $serviceProviderRepository;
 
     public function __construct(
@@ -37,7 +34,6 @@ final class ResponseContext implements ResponseContextInterface
     ) {
         $this->hostedIdentityProvider = $identityProvider;
         $this->stateHandler           = $stateHandler;
-        $this->generationTime         = new DateTime('now', new DateTimeZone('UTC'));
         $this->serviceProviderRepository = $serviceProviderRepository;
     }
 
@@ -55,14 +51,6 @@ final class ResponseContext implements ResponseContextInterface
     public function getIssuer()
     {
         return $this->hostedIdentityProvider->getEntityId();
-    }
-
-    /**
-     * @return int
-     */
-    public function getIssueInstant()
-    {
-        return $this->generationTime->getTimestamp();
     }
 
     /**

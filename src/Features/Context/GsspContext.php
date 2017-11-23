@@ -115,8 +115,20 @@ final class GsspContext implements Context
      */
     private $ssoReturnResponse;
 
-    public function __construct()
+    /**
+     * Every scenario we start with a clean slate.
+     *
+     * @BeforeScenario
+     */
+    public function bootstrapDependencies()
     {
+        // Empty state variables.
+        $this->ssoReturnResponse = null;
+        $this->response = null;
+        $this->twigParameters = [];
+        $this->twigTemplate = null;
+
+        // Create required dependencies.
         $logger = new NullLogger();
         $this->container = new BridgeContainer($logger);
         SAML2_Compat_ContainerSingleton::setContainer($this->container);

@@ -33,11 +33,6 @@ interface ResponseContextInterface
     public function getIssuer();
 
     /**
-     * @return int
-     */
-    public function getIssueInstant();
-
-    /**
      * @return null|string
      */
     public function getInResponseTo();

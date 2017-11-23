@@ -75,6 +75,20 @@ interface StateHandler
     public function getPreferredLocale();
 
     /**
+     * Set the current request type as registration flow.
+     *
+     * @return $this
+     */
+    public function setRequestTypeRegistration();
+
+    /**
+     * Is the current request type registration flow?
+     *
+     * @return bool
+     */
+    public function isRequestTypeRegistration();
+
+    /**
      * @param string $nameId
      * @return $this
      */
@@ -95,5 +109,8 @@ interface StateHandler
      */
     public function hasRequestId();
 
+    /**
+     * Invalidate and delete the full state with all attributes.
+     */
     public function invalidate();
 }
