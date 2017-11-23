@@ -44,21 +44,17 @@ final class ResponseService implements ResponseServiceInterface
 
     public function createResponse()
     {
-        $assertion = new SAML2_Assertion();
-        $assertion->setNotBefore($this->dateTimeService->getCurrent()->getTimestamp());
-        $assertion->setNotOnOrAfter($this->dateTimeService->interval('PT5M')->getTimestamp());
-        $assertion->setIssuer($this->hostedIdentityProvider->getEntityId());
-        $assertion->setIssueInstant($this->dateTimeService->getCurrent()->getTimestamp());
+        $response = $this->createNewAuthnResponse();
 
-        $this->assertionSigningService->signAssertion($assertion);
-        $targetServiceProvider = $this->responseContext->getServiceProvider();
-        $this->addSubjectConfirmationFor($assertion);
+        if ($this->responseContext->inErrorState()) {
+            $response->setStatus($this->responseContext->getErrorStatus());
+            return $response;
+        }
 
-        $assertion->setValidAudiences([$targetServiceProvider->getEntityId()]);
+        $assertion = $this->createAssertion();
+        $response->setAssertions([$assertion]);
 
-        $this->addAuthenticationStatementTo($assertion);
-
-        return $this->createNewAuthnResponse($assertion);
+        return $response;
     }
 
     private function addSubjectConfirmationFor(SAML2_Assertion $assertion)
@@ -94,15 +90,33 @@ final class ResponseService implements ResponseServiceInterface
         );
     }
 
-    private function createNewAuthnResponse(
-        SAML2_Assertion $assertion
-    ) {
+    private function createNewAuthnResponse()
+    {
         $response = new \SAML2_Response();
-        $response->setAssertions([$assertion]);
         $response->setIssuer($this->hostedIdentityProvider->getEntityId());
         $response->setIssueInstant($this->dateTimeService->getCurrent()->getTimestamp());
         $response->setDestination($this->responseContext->getServiceProvider()->getAssertionConsumerUrl());
         $response->setInResponseTo($this->responseContext->getRequestId());
+
         return $response;
+    }
+
+    private function createAssertion()
+    {
+        $assertion = new SAML2_Assertion();
+        $assertion->setNotBefore($this->dateTimeService->getCurrent()->getTimestamp());
+        $assertion->setNotOnOrAfter($this->dateTimeService->interval('PT5M')->getTimestamp());
+        $assertion->setIssuer($this->hostedIdentityProvider->getEntityId());
+        $assertion->setIssueInstant($this->dateTimeService->getCurrent()->getTimestamp());
+
+        $this->assertionSigningService->signAssertion($assertion);
+        $targetServiceProvider = $this->responseContext->getServiceProvider();
+        $this->addSubjectConfirmationFor($assertion);
+
+        $assertion->setValidAudiences([$targetServiceProvider->getEntityId()]);
+
+        $this->addAuthenticationStatementTo($assertion);
+
+        return $assertion;
     }
 }

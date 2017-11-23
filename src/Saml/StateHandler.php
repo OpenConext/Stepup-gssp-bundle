@@ -118,4 +118,24 @@ interface StateHandler
      * Invalidate and delete the full state with all attributes.
      */
     public function invalidate();
+
+    /**
+     * @return bool
+     */
+    public function hasErrorStatus();
+
+    /**
+     * @param string $message
+     *   The error message.
+     * @param string $subCode
+     *   Saml response sub code.
+     *
+     * @return $this
+     */
+    public function setErrorStatus($message, $subCode);
+
+    /**
+     * @return array
+     */
+    public function getErrorStatus();
 }

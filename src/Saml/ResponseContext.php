@@ -95,6 +95,22 @@ final class ResponseContext implements ResponseContextInterface
     }
 
     /**
+     * @return bool
+     */
+    public function inErrorState()
+    {
+        return $this->stateHandler->hasErrorStatus();
+    }
+
+    /**
+     * @return array
+     */
+    public function getErrorStatus()
+    {
+        return $this->stateHandler->getErrorStatus();
+    }
+
+    /**
      * @return string
      */
     public function getRequestId()

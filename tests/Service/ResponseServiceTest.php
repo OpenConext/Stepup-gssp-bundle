@@ -33,7 +33,7 @@ class ResponseServiceTest extends \PHPUnit_Framework_TestCase
     /**
      * @var ResponseContextInterface|MockInterface
      */
-    protected $responseService;
+    protected $responseContext;
     /**
      * @var IdentityProvider|MockInterface
      */
@@ -52,7 +52,7 @@ class ResponseServiceTest extends \PHPUnit_Framework_TestCase
         $logger = new NullLogger();
         $container = new BridgeContainer($logger);
         SAML2_Compat_ContainerSingleton::setContainer($container);
-        $this->responseService = \Mockery::mock(ResponseContextInterface::class);
+        $this->responseContext = \Mockery::mock(ResponseContextInterface::class);
         $this->identityProvider = \Mockery::mock(IdentityProvider::class);
         $this->serviceProvider = \Mockery::mock(ServiceProvider::class);
         $this->assertionSigningService = \Mockery::spy(AssertionSigningServiceInterface::class);
@@ -78,15 +78,16 @@ class ResponseServiceTest extends \PHPUnit_Framework_TestCase
             'getEntityId' => 'https://service_provider/saml/metadata',
             'getAssertionConsumerUrl' => 'https://service_provider/saml/acu'
         ]);
-        $this->responseService
+        $this->responseContext
             ->shouldReceive([
                 'getServiceProvider' => $this->serviceProvider,
                 'getSubjectNameId' => 'subject_name_id',
-                'getRequestId' => 'sp_request_id'
+                'getRequestId' => 'sp_request_id',
+                'inErrorState' => false
             ]);
         $service = new ResponseService(
             $this->identityProvider,
-            $this->responseService,
+            $this->responseContext,
             $this->assertionSigningService,
             $datetimeService
         );
@@ -99,5 +100,51 @@ class ResponseServiceTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertionSigningService->shouldHaveReceived('signAssertion');
+    }
+
+    /**
+     * @test
+     */
+    public function canCreateErrorResponse()
+    {
+        $datetimeService = new StaticDateTimeService(
+            \DateTimeImmutable::createFromFormat(
+                \DateTime::ATOM,
+                '2016-12-08T10:42:59+0100'
+            )
+        );
+
+        $this->identityProvider->shouldReceive([
+            'getEntityId' => 'https://identity_provider/saml/metadata'
+        ]);
+
+        $this->serviceProvider->shouldReceive([
+            'getEntityId' => 'https://service_provider/saml/metadata',
+            'getAssertionConsumerUrl' => 'https://service_provider/saml/acu'
+        ]);
+        $this->responseContext
+            ->shouldReceive([
+                'getServiceProvider' => $this->serviceProvider,
+                'getRequestId' => 'sp_request_id',
+                'inErrorState' => true,
+                'getErrorStatus' => [
+                    'Code' => \SAML2_Const::STATUS_RESPONDER,
+                    'Message' => 'message',
+                    'SubCode' => \SAML2_Const::STATUS_AUTHN_FAILED
+                ]
+            ]);
+        $service = new ResponseService(
+            $this->identityProvider,
+            $this->responseContext,
+            $this->assertionSigningService,
+            $datetimeService
+        );
+        $response = $service->createResponse();
+        $xml = $response->toUnsignedXML()->ownerDocument->saveXML();
+        $xml = preg_replace('/ID=".*?"/', 'ID="1234"', $xml);
+        $this->assertXmlStringEqualsXmlFile(
+            __DIR__ . '/fixture/saml_error_response.xml',
+            $xml
+        );
     }
 }

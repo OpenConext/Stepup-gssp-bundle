@@ -17,6 +17,7 @@
 
 namespace Surfnet\GsspBundle\Service;
 
+use SAML2_Const;
 use Symfony\Component\HttpFoundation\Response;
 
 interface AuthenticationRegistrationService
@@ -25,9 +26,28 @@ interface AuthenticationRegistrationService
      * Register the user, this will set the saml subject nameId.
      *
      * @param string $subjectNameId
-     *
-     * @return Response
-     *   The response that handles the redirect back to the service provider.
      */
     public function register($subjectNameId);
+
+    /**
+     * If there is need for a registration.
+     *
+     * @return bool
+     */
+    public function requiresRegistration();
+
+    /**
+     * @param string $message
+     *   The error message.
+     * @param string $subCode
+     *   Saml response sub code.
+     */
+    public function error($message, $subCode = SAML2_Const::STATUS_AUTHN_FAILED);
+
+    /**
+     * Creates the response that handles the redirect back to the service provider.
+     *
+     * @return Response
+     */
+    public function createRedirectResponse();
 }

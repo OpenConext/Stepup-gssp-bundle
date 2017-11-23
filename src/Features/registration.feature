@@ -32,13 +32,13 @@ Feature: When an user needs to enroll for a new token
       | info   | AuthnRequest stored in state                                                                                                  | present |
       | notice | Redirect user to the application registration route https://identity_provider/registration                                    | present |
 
-      | notice | Application sets the subject nameID to unique-identifier-token                                                               | present |
+      | notice | Application sets the subject nameID to unique-identifier-token                                                                | present |
       | notice | Created redirect response for sso return endpoint "https://identity_provider/saml/sso_return"                                 | present |
 
       | notice | Received sso return request                                                                                                   | present |
       | info   | Create sso response                                                                                                           | present |
       | notice | /Saml response created with id ".+", request ID: ".+"/                                                                        | present |
-      | notice | Invalidate current state and redirect user to service provider assertion consumer url "https://service_provider/saml/acu"      | present |
+      | notice | Invalidate current state and redirect user to service provider assertion consumer url "https://service_provider/saml/acu"     | present |
 
   Scenario: When a service provider is unknown the AuthnRequest should be denied
     Given a normal SAML 2.0 AuthnRequest form a unknown service provider entityId 'https://service_provider_unkown/saml/metadata' acu 'https://service_provider_unkown/saml/acu'
@@ -125,7 +125,7 @@ Feature: When an user needs to enroll for a new token
       | info    | AuthnRequest stored in state                                                                                                  | present |
       | notice  | Redirect user to the application registration route https://identity_provider/registration                                    | present |
 
-      | notice  | Application sets the subject nameID to unique-identifier-token                                                               | present |
+      | notice  | Application sets the subject nameID to unique-identifier-token                                                                | present |
       | notice  | Created redirect response for sso return endpoint "https://identity_provider/saml/sso_return"                                 | present |
 
       | notice  | Received sso request                                                                                                          | present |
@@ -139,3 +139,16 @@ Feature: When an user needs to enroll for a new token
       | notice  | /AuthnRequest processing complete, received AuthnRequest from "https:\/\/service_provider\/saml\/metadata", request ID: ".+"/ |         |
       | info    | AuthnRequest stored in state                                                                                                  | present |
       | notice  | Redirect user to the application registration route https://identity_provider/registration                                    | present |
+
+
+  Scenario: When the registration fails the application should send an yaml error response
+    Given a normal SAML 2.0 AuthnRequest
+    And AuthnRequest is signed with sha256
+
+    When the service provider send the AuthnRequest with HTTP-Redirect binding
+
+    Then the identity provider sets an error 'Authentication failed'
+
+    When the user is redirected to the identity provider sso return endpoint
+    Then Identity provider sso return endpoint should redirect client-side a saml response to the service provider
+    And the saml response status code should be "urn:oasis:names:tc:SAML:2.0:status:Responder"

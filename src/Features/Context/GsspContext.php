@@ -20,6 +20,7 @@ namespace Surfnet\GsspBundle\Features\Context;
 use Assert\Assertion;
 use Assert\AssertionFailedException;
 use Behat\Behat\Context\Context;
+use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Gherkin\Node\TableNode;
 use SAML2_AuthnRequest;
 use SAML2_Certificate_KeyLoader;
@@ -359,6 +360,7 @@ final class GsspContext implements Context
     public function assignAUniqueIdentifierToTheToken()
     {
         $this->authenticationRegistrationService->register('unique-identifier-token');
+        $this->authenticationRegistrationService->createRedirectResponse();
     }
 
     /**
@@ -564,5 +566,14 @@ final class GsspContext implements Context
         }
         $logs = array_slice($logs, count($rows));
         Assertion::noContent($logs, var_export($logs, true));
+    }
+
+    /**
+     * @Then the identity provider sets an error :message
+     */
+    public function theIdentityProviderSetsAnError($message)
+    {
+        $this->authenticationRegistrationService->error($message);
+        $this->authenticationRegistrationService->createRedirectResponse();
     }
 }
