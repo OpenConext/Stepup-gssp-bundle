@@ -18,6 +18,7 @@
 namespace Surfnet\GsspBundle\Saml\StateHandler;
 
 use Surfnet\GsspBundle\Exception\NotFound;
+use Surfnet\GsspBundle\Exception\RuntimeException;
 use Surfnet\GsspBundle\Saml\StateHandler;
 
 abstract class AbstractStateHandler implements StateHandler
@@ -167,6 +168,39 @@ abstract class AbstractStateHandler implements StateHandler
         return $this->has('subject_name_id');
     }
 
+    public function setRequestTypeRegistration()
+    {
+        if ($this->has('request_type')) {
+            throw RuntimeException::requestTypeAlreadyGiven($this->get('request_type'), 'registration');
+        }
+        return $this->set('request_type', 'registration');
+    }
+
+    public function isRequestTypeRegistration()
+    {
+        return $this->is('request_type', 'registration');
+    }
+
+    /**
+     * Is the property the given value.
+     *
+     * @param string $key
+     * @param mixed $value
+     *
+     * @return bool
+     */
+    protected function is($key, $value)
+    {
+        return $this->has($key) && $this->get($key) === $value;
+    }
+
+    /**
+     * Is there property with the given key defined and not empty.
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
     protected function has($key)
     {
         try {
@@ -178,13 +212,17 @@ abstract class AbstractStateHandler implements StateHandler
 
     /**
      * @param string $key
-     * @param mixed $value Any scalar
+     * @param mixed $value
+     *    Any scalar
+     *
+     * @return $this
      */
     abstract protected function set($key, $value);
 
     /**
      * @param string $key
-     * @return mixed|null Any scalar
+     * @return mixed|null
+     *    Any scalar
      *
      * @throws \Surfnet\GsspBundle\Exception\NotFound
      */

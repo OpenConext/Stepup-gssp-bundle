@@ -42,10 +42,10 @@ services:
           - '@surfnet_gssp.service.datetime'
 
     surfnet_gssp.service.authentication_registration:
-        class: Surfnet\GsspBundle\Service\AuthenticationRegistrationService
+        class: Surfnet\GsspBundle\Service\StateBasedAuthenticationRegistrationService
         arguments:
           - '@surfnet_gssp.saml.state_handler'
           - '@router'
 
-    Surfnet\GsspBundle\Service\AuthenticationServiceInterface:
-        alias: 'surfnet_gssp.service.authentication'
+    Surfnet\GsspBundle\Service\AuthenticationRegistrationService:
+        alias: 'surfnet_gssp.service.authentication_registration'

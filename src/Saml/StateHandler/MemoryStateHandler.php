@@ -23,21 +23,12 @@ final class MemoryStateHandler extends AbstractStateHandler
 {
     private $state = [];
 
-    /**
-     * @param string $key
-     * @param mixed $value Any scalar
-     */
     protected function set($key, $value)
     {
         $this->state[$key] = $value;
+        return $this;
     }
 
-    /**
-     * @param string $key
-     * @return mixed|null Any scalar
-     *
-     * @throws \Surfnet\GsspBundle\Exception\NotFound
-     */
     protected function get($key)
     {
         if (!isset($this->state[$key])) {

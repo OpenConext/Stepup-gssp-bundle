@@ -43,7 +43,7 @@ final class StateBasedAuthenticationRegistrationService implements Authenticatio
 
     public function register($subjectNameId)
     {
-        if (!$this->stateHandler->hasRequestId() || $this->stateHandler->hasSubjectNameId()) {
+        if (!$this->stateHandler->isRequestTypeRegistration()) {
             throw RuntimeException::shouldNotRegister();
         }
         $this->stateHandler->setSubjectNameId($subjectNameId);

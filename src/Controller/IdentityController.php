@@ -83,7 +83,8 @@ final class IdentityController extends Controller
         $this->stateHandler
             ->setRequestId($originalRequest->getRequestId())
             ->setRequestServiceProvider($originalRequest->getServiceProvider())
-            ->setRelayState($request->get(AuthnRequest::PARAMETER_RELAY_STATE, ''));
+            ->setRelayState($request->get(AuthnRequest::PARAMETER_RELAY_STATE, ''))
+            ->setRequestTypeRegistration();
         return new RedirectResponse($this->generateUrl($this->registrationRoute->getRegistrationRoute()));
     }
 
