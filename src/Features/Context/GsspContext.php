@@ -20,7 +20,7 @@ namespace Surfnet\GsspBundle\Features\Context;
 use Assert\Assertion;
 use Assert\AssertionFailedException;
 use Behat\Behat\Context\Context;
-use Psr\Log\NullLogger;
+use Behat\Gherkin\Node\TableNode;
 use SAML2_AuthnRequest;
 use SAML2_Certificate_KeyLoader;
 use SAML2_Certificate_PrivateKeyLoader;
@@ -31,6 +31,7 @@ use SAML2_DOMDocumentFactory;
 use SAML2_Message;
 use SAML2_Response;
 use Surfnet\GsspBundle\Controller\IdentityController;
+use Surfnet\GsspBundle\Logger\StateDependedSariLogger;
 use Surfnet\GsspBundle\Saml\AssertionSigningService;
 use Surfnet\GsspBundle\Saml\ResponseContext;
 use Surfnet\GsspBundle\Saml\StateHandler\MemoryStateHandler;
@@ -43,9 +44,11 @@ use Surfnet\SamlBundle\Entity\IdentityProvider;
 use Surfnet\SamlBundle\Entity\ServiceProvider;
 use Surfnet\SamlBundle\Entity\StaticServiceProviderRepository;
 use Surfnet\SamlBundle\Http\RedirectBinding;
+use Surfnet\SamlBundle\Monolog\SamlAuthenticationLogger;
 use Surfnet\SamlBundle\SAML2\AuthnRequest;
 use Surfnet\SamlBundle\SAML2\BridgeContainer;
 use Surfnet\SamlBundle\Signing\SignatureVerifier;
+use Symfony\Component\Debug\BufferingLogger;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -61,6 +64,10 @@ use XMLSecurityKey;
  */
 final class GsspContext implements Context
 {
+    /**
+     * @var BufferingLogger
+     */
+    private $logger;
     /**
      * @var ResponseContext
      */
@@ -95,12 +102,10 @@ final class GsspContext implements Context
      * @var IdentityProvider
      */
     private $identityProvider;
-
     /**
      * @var SAML2_AuthnRequest
      */
     private $authnRequest;
-
     /**
      * @var BridgeContainer
      */
@@ -119,6 +124,7 @@ final class GsspContext implements Context
      * Every scenario we start with a clean slate.
      *
      * @BeforeScenario
+     * @throws \Assert\AssertionFailedException
      */
     public function bootstrapDependencies()
     {
@@ -129,11 +135,17 @@ final class GsspContext implements Context
         $this->twigTemplate = null;
 
         // Create required dependencies.
-        $logger = new NullLogger();
+        $stateHandler = new MemoryStateHandler();
+        $this->logger = new BufferingLogger();
+        $logger = new StateDependedSariLogger(
+            $this->logger,
+            new SamlAuthenticationLogger($this->logger),
+            $stateHandler
+        );
         $this->container = new BridgeContainer($logger);
         SAML2_Compat_ContainerSingleton::setContainer($this->container);
 
-        $samlBundle = __DIR__.'/../../../vendor/surfnet/stepup-saml-bundle';
+        $samlBundle = __DIR__ . '/../../../vendor/surfnet/stepup-saml-bundle';
 
         $this->serviceProvider = new ServiceProvider([
             'entityId' => 'https://service_provider/saml/metadata',
@@ -167,7 +179,7 @@ final class GsspContext implements Context
         $configuration = new ConfigurationContainer([
             'registration_route' => 'registration_route_action',
         ]);
-        $stateHandler = new MemoryStateHandler();
+
         $router = \Mockery::mock(RouterInterface::class);
         $router->shouldReceive('generate')
             ->with('registration_route_action', [], UrlGeneratorInterface::ABSOLUTE_PATH)
@@ -179,7 +191,8 @@ final class GsspContext implements Context
 
         $this->authenticationRegistrationService = new StateBasedAuthenticationRegistrationService(
             $stateHandler,
-            $router
+            $router,
+            $logger
         );
         $signingService = new AssertionSigningService($this->identityProvider);
         $this->responseContext = new ResponseContext(
@@ -198,7 +211,8 @@ final class GsspContext implements Context
             $configuration,
             $stateHandler,
             $responseService,
-            $this->responseContext
+            $this->responseContext,
+            $logger
         );
         $container = \Mockery::mock(ContainerInterface::class);
         $container->shouldReceive('has')->with('templating')->andReturn(false);
@@ -210,7 +224,7 @@ final class GsspContext implements Context
         ) {
             $this->twigParameters = $parameters;
             $this->twigTemplate = $template;
-            return $template.'-response';
+            return $template . '-response';
         });
         $container->shouldReceive('get')->with('twig')->andReturn($this->twigEnvironment);
 
@@ -512,5 +526,43 @@ final class GsspContext implements Context
     public function thereShouldNotBeAnUniqueIdentifierTokenAssigned()
     {
         Assertion::false($this->responseContext->isRegistered());
+    }
+
+    /**
+     * @When /^I clear the logs$/
+     */
+    public function clearTheLogs()
+    {
+        $this->logger->cleanLogs();
+    }
+
+    /**
+     * @Given /^the logs are:$/
+     *
+     * @throws \Assert\AssertionFailedException
+     */
+    public function theLogsAre(TableNode $table)
+    {
+        $logs = $this->logger->cleanLogs();
+        $rows = array_values($table->getColumnsHash());
+        foreach ($rows as $index => $row) {
+            Assertion::true(isset($logs[$index]), sprintf('Missing message %s', $row['message']));
+            list($level, $message, $context) = $logs[$index];
+            if (preg_match('/^\/.*\/$/', $row['message']) === 1) {
+                Assertion::regex($message, $row['message']);
+            } else {
+                Assertion::eq($row['message'], $message);
+            }
+            Assertion::eq($row['level'], $level, sprintf('Level does not match for %s', $row['message']));
+            Assertion::choice($row['sari'], ['', 'present']);
+            if ($row['sari'] === 'present') {
+                Assertion::keyExists($context, 'sari', sprintf('Missing sari for message %s', $row['message']));
+                Assertion::notEmpty($context['sari']);
+            } else {
+                Assertion::keyNotExists($context, 'sari', sprintf('Having unexpected sari for message %s', $row['message']));
+            }
+        }
+        $logs = array_slice($logs, count($rows));
+        Assertion::noContent($logs, var_export($logs, true));
     }
 }

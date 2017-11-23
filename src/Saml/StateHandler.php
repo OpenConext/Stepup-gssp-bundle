@@ -89,6 +89,11 @@ interface StateHandler
     public function isRequestTypeRegistration();
 
     /**
+     * @return bool
+     */
+    public function hasRequestType();
+
+    /**
      * @param string $nameId
      * @return $this
      */

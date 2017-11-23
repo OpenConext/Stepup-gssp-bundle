@@ -17,6 +17,7 @@
 
 namespace Surfnet\GsspBundle\Controller;
 
+use Psr\Log\LoggerInterface;
 use RuntimeException;
 use SAML2_Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -43,19 +44,22 @@ final class IdentityController extends Controller
     private $stateHandler;
     private $responseService;
     private $responseContext;
+    private $logger;
 
     public function __construct(
         RedirectBinding $httpBinding,
         ConfigurationContainer $configuration,
         StateHandler $stateHandler,
         ResponseServiceInterface $responseService,
-        ResponseContextInterface $responseContext
+        ResponseContextInterface $responseContext,
+        LoggerInterface $logger
     ) {
         $this->registrationRoute = $configuration;
         $this->stateHandler = $stateHandler;
         $this->responseService = $responseService;
         $this->responseContext = $responseContext;
         $this->httpBinding = $httpBinding;
+        $this->logger = $logger;
     }
 
     /**
@@ -68,24 +72,48 @@ final class IdentityController extends Controller
      */
     public function ssoAction(Request $request)
     {
+        $this->logger->notice('Received sso request');
+
         // If we already have a request, we clear the current state.
         if ($this->responseContext->hasRequest()) {
+            $this->logger->warning('There is already state present, clear previous state');
             $this->stateHandler->invalidate();
         }
 
         try {
+            $this->logger->info('Processing AuthnRequest');
             $originalRequest = $this->httpBinding->receiveSignedAuthnRequestFrom($request);
+            $this->logger->notice(sprintf(
+                'AuthnRequest processing complete, received AuthnRequest from "%s", request ID: "%s"',
+                $originalRequest->getServiceProvider(),
+                $originalRequest->getRequestId()
+            ));
         } catch (RuntimeException $e) {
+            $this->logger->critical(sprintf('Could not process Request, error: "%s"', $e->getMessage()));
+
             return $this->render('@SurfnetGssp/StepupGssp/unrecoverableError.html.twig', [
                 'message' => $e->getMessage(),
             ], new Response(null, Response::HTTP_NOT_ACCEPTABLE));
         }
+
+        // Store AuthnRequest state.
         $this->stateHandler
             ->setRequestId($originalRequest->getRequestId())
             ->setRequestServiceProvider($originalRequest->getServiceProvider())
             ->setRelayState($request->get(AuthnRequest::PARAMETER_RELAY_STATE, ''))
             ->setRequestTypeRegistration();
-        return new RedirectResponse($this->generateUrl($this->registrationRoute->getRegistrationRoute()));
+        $this->logger->info(sprintf(
+            'AuthnRequest stored in state'
+        ));
+
+        // Redirect user to the application registration route.
+        $route = $this->generateRegistrationRoute();
+        $this->logger->notice(sprintf(
+            'Redirect user to the application registration route %s',
+            $route
+        ));
+
+        return new RedirectResponse($route);
     }
 
     /**
@@ -100,8 +128,12 @@ final class IdentityController extends Controller
      */
     public function ssoReturnAction()
     {
+        $this->logger->notice('Received sso return request');
+
         // Show error if we don't have an active AuthnRequest.
         if (!$this->responseContext->hasRequest()) {
+            $this->logger->critical('There is no request state present');
+
             return $this->render('@SurfnetGssp/StepupGssp/unrecoverableError.html.twig', [
                 'message' => 'There is no active AuthnRequest to process the return',
             ], new Response(null, Response::HTTP_NOT_ACCEPTABLE));
@@ -109,22 +141,45 @@ final class IdentityController extends Controller
 
         // This should not happen, we are not yet registered, redirect back to the application.
         if (!$this->responseContext->isRegistered()) {
-            return new RedirectResponse($this->generateUrl($this->registrationRoute->getRegistrationRoute()));
+            $url = $this->generateRegistrationRoute();
+            $this->logger->warning(sprintf(
+                'User was not registered by the application, redirect user back the registration route "%s"',
+                $url
+            ));
+
+            return new RedirectResponse($url);
         }
 
+        // Create saml response.
         try {
+            $this->logger->info('Create sso response');
             $response = $this->responseService->createResponse();
+            $this->logger->notice(sprintf(
+                'saml response created with id "%s", request ID: "%s"',
+                $response->getId(),
+                $this->responseContext->getRequestId()
+            ));
         } catch (RuntimeException $e) {
             return $this->render('@SurfnetGssp/StepupGssp/unrecoverableError.html.twig', [
                 'message' => $e->getMessage(),
             ], new Response('', Response::HTTP_NOT_ACCEPTABLE));
         }
 
-        return $this->render('@SurfnetGssp/StepupGssp/consumeAssertion.html.twig', [
-            'acu' => $this->responseContext->getAssertionConsumerUrl(),
+        $acu = $this->responseContext->getAssertionConsumerUrl();
+        $response = $this->render('@SurfnetGssp/StepupGssp/consumeAssertion.html.twig', [
+            'acu' => $acu,
             'response' => $this->getResponseAsXML($response),
             'relayState' => $this->responseContext->getRelayState(),
         ]);
+
+        // We clear the state, because we don't need it anymore.
+        $this->logger->notice(sprintf(
+            'Invalidate current state and redirect user to service provider assertion consumerUrl "%s"',
+            $acu
+        ));
+        $this->stateHandler->invalidate();
+
+        return $response;
     }
 
     /**
@@ -134,5 +189,13 @@ final class IdentityController extends Controller
     private function getResponseAsXML(SAML2_Response $response)
     {
         return base64_encode($response->toUnsignedXML()->ownerDocument->saveXML());
+    }
+
+    /**
+     * @return string
+     */
+    private function generateRegistrationRoute()
+    {
+        return $this->generateUrl($this->registrationRoute->getRegistrationRoute());
     }
 }

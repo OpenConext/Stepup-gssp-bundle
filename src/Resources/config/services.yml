@@ -12,6 +12,7 @@ services:
           - '@surfnet_gssp.saml.state_handler'
           - '@surfnet_gssp.service.response'
           - '@surfnet_gssp.saml.reponse_context'
+          - '@surfnet_gssp.logger'
 
     surfnet_gssp.saml.state_handler:
         class: Surfnet\GsspBundle\Saml\StateHandler\SessionStateHandler
@@ -46,6 +47,14 @@ services:
         arguments:
           - '@surfnet_gssp.saml.state_handler'
           - '@router'
+          - '@surfnet_gssp.logger'
 
     Surfnet\GsspBundle\Service\AuthenticationRegistrationService:
         alias: 'surfnet_gssp.service.authentication_registration'
+
+    surfnet_gssp.logger:
+        class: Surfnet\GsspBundle\Logger\StateDependedSariLogger
+        arguments:
+         - '@logger'
+         - '@surfnet_saml.logger'
+         - '@surfnet_gssp.saml.state_handler'
