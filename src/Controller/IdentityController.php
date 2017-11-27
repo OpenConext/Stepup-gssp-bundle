@@ -155,7 +155,7 @@ final class IdentityController extends Controller
             $this->logger->info('Create sso response');
             $response = $this->responseService->createResponse();
             $this->logger->notice(sprintf(
-                'saml response created with id "%s", request ID: "%s"',
+                'Saml response created with id "%s", request ID: "%s"',
                 $response->getId(),
                 $this->responseContext->getRequestId()
             ));
@@ -174,7 +174,7 @@ final class IdentityController extends Controller
 
         // We clear the state, because we don't need it anymore.
         $this->logger->notice(sprintf(
-            'Invalidate current state and redirect user to service provider assertion consumerUrl "%s"',
+            'Invalidate current state and redirect user to service provider assertion consumer url "%s"',
             $acu
         ));
         $this->stateHandler->invalidate();

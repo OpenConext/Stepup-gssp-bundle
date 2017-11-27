@@ -32,13 +32,13 @@ Feature: When an user needs to enroll for a new token
       | info   | AuthnRequest stored in state                                                                                                  | present |
       | notice | Redirect user to the application registration route https://identity_provider/registration                                    | present |
 
-      | notice | Application set's the subject nameID to unique-identifier-token                                                               | present |
+      | notice | Application sets the subject nameID to unique-identifier-token                                                               | present |
       | notice | Created redirect response for sso return endpoint "https://identity_provider/saml/sso_return"                                 | present |
 
       | notice | Received sso return request                                                                                                   | present |
       | info   | Create sso response                                                                                                           | present |
-      | notice | /saml response created with id ".+", request ID: ".+"/                                                                        | present |
-      | notice | Invalidate current state and redirect user to service provider assertion consumerUrl "https://service_provider/saml/acu"      | present |
+      | notice | /Saml response created with id ".+", request ID: ".+"/                                                                        | present |
+      | notice | Invalidate current state and redirect user to service provider assertion consumer url "https://service_provider/saml/acu"      | present |
 
   Scenario: When a service provider is unknown the AuthnRequest should be denied
     Given a normal SAML 2.0 AuthnRequest form a unknown service provider entityId 'https://service_provider_unkown/saml/metadata' acu 'https://service_provider_unkown/saml/acu'
@@ -125,7 +125,7 @@ Feature: When an user needs to enroll for a new token
       | info    | AuthnRequest stored in state                                                                                                  | present |
       | notice  | Redirect user to the application registration route https://identity_provider/registration                                    | present |
 
-      | notice  | Application set's the subject nameID to unique-identifier-token                                                               | present |
+      | notice  | Application sets the subject nameID to unique-identifier-token                                                               | present |
       | notice  | Created redirect response for sso return endpoint "https://identity_provider/saml/sso_return"                                 | present |
 
       | notice  | Received sso request                                                                                                          | present |

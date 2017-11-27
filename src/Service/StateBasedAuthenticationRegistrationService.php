@@ -54,7 +54,7 @@ final class StateBasedAuthenticationRegistrationService implements Authenticatio
             $this->logger->critical('Current request does not need a registration');
             throw RuntimeException::shouldNotRegister();
         }
-        $this->logger->notice(sprintf('Application set\'s the subject nameID to %s', $subjectNameId));
+        $this->logger->notice(sprintf('Application sets the subject nameID to %s', $subjectNameId));
         $this->stateHandler->setSubjectNameId($subjectNameId);
         $url = $this->router->generate('gssp_saml_sso_return');
         $this->logger->notice(sprintf('Created redirect response for sso return endpoint "%s"', $url));
