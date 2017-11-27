@@ -17,6 +17,7 @@
 
 namespace Surfnet\GsspBundle\Saml\StateHandler;
 
+use Assert\Assertion;
 use Surfnet\GsspBundle\Exception\NotFound;
 use Surfnet\GsspBundle\Exception\RuntimeException;
 use Surfnet\GsspBundle\Saml\StateHandler;
@@ -29,9 +30,7 @@ abstract class AbstractStateHandler implements StateHandler
      */
     public function setRequestId($originalRequestId)
     {
-        $this->set('request_id', $originalRequestId);
-
-        return $this;
+        return $this->set('request_id', $originalRequestId);
     }
 
     /**
@@ -60,9 +59,7 @@ abstract class AbstractStateHandler implements StateHandler
      */
     public function setRequestServiceProvider($serviceProvider)
     {
-        $this->set('service_provider', $serviceProvider);
-
-        return $this;
+        return $this->set('service_provider', $serviceProvider);
     }
 
     /**
@@ -81,9 +78,7 @@ abstract class AbstractStateHandler implements StateHandler
      */
     public function setRelayState($relayState)
     {
-        $this->set('relay_state', $relayState);
-
-        return $this;
+        return $this->set('relay_state', $relayState);
     }
 
     /**
@@ -102,9 +97,7 @@ abstract class AbstractStateHandler implements StateHandler
      */
     public function saveIdentityNameId($nameId)
     {
-        $this->set('name_id', $nameId);
-
-        return $this;
+        return $this->set('name_id', $nameId);
     }
 
     /**
@@ -123,9 +116,7 @@ abstract class AbstractStateHandler implements StateHandler
      */
     public function setPreferredLocale($locale)
     {
-        $this->set('locale', $locale);
-
-        return $this;
+        return $this->set('locale', $locale);
     }
 
     /**
@@ -145,9 +136,7 @@ abstract class AbstractStateHandler implements StateHandler
      */
     public function setSubjectNameId($nameId)
     {
-        $this->set('subject_name_id', $nameId);
-
-        return $this;
+        return $this->set('subject_name_id', $nameId);
     }
 
     /**
@@ -179,6 +168,11 @@ abstract class AbstractStateHandler implements StateHandler
     public function isRequestTypeRegistration()
     {
         return $this->is('request_type', 'registration');
+    }
+
+    public function hasRequestType()
+    {
+        return $this->has('request_type');
     }
 
     /**
