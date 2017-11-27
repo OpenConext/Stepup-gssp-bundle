@@ -58,6 +58,22 @@ interface ResponseContextInterface
     public function getIdentityNameId();
 
     /**
+     * Does the current state have an error?
+     *
+     * When there is an error the SSO return endpoint send an saml error back to the SP.
+     *
+     * @return bool
+     */
+    public function inErrorState();
+
+    /**
+     * Return saml response status.
+     *
+     * @return array
+     */
+    public function getErrorStatus();
+
+    /**
      * @return string
      */
     public function getRequestId();

@@ -18,6 +18,7 @@
 namespace Surfnet\GsspBundle\Service;
 
 use Psr\Log\LoggerInterface;
+use SAML2_Const;
 use Surfnet\GsspBundle\Exception\RuntimeException;
 use Surfnet\GsspBundle\Saml\StateHandler;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -25,17 +26,8 @@ use Symfony\Component\Routing\RouterInterface;
 
 final class StateBasedAuthenticationRegistrationService implements AuthenticationRegistrationService
 {
-    /**
-     * @var StateHandler
-     */
     private $stateHandler;
-    /**
-     * @var RouterInterface
-     */
     private $router;
-    /**
-     * @var LoggerInterface
-     */
     private $logger;
 
     public function __construct(
@@ -56,8 +48,29 @@ final class StateBasedAuthenticationRegistrationService implements Authenticatio
         }
         $this->logger->notice(sprintf('Application sets the subject nameID to %s', $subjectNameId));
         $this->stateHandler->setSubjectNameId($subjectNameId);
-        $url = $this->router->generate('gssp_saml_sso_return');
+    }
+
+    public function requiresRegistration()
+    {
+        return $this->stateHandler->isRequestTypeRegistration();
+    }
+
+    public function error($message, $subCode = SAML2_Const::STATUS_AUTHN_FAILED)
+    {
+        $this->logger->critical($message);
+        $this->stateHandler->setErrorStatus($message, SAML2_Const::STATUS_AUTHN_FAILED);
+    }
+
+    public function createRedirectResponse()
+    {
+        $url = $this->generateSSOreturnUrl();
         $this->logger->notice(sprintf('Created redirect response for sso return endpoint "%s"', $url));
+
         return new RedirectResponse($url);
+    }
+
+    private function generateSSOreturnUrl()
+    {
+        return $this->router->generate('gssp_saml_sso_return');
     }
 }

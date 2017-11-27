@@ -140,7 +140,7 @@ final class IdentityController extends Controller
         }
 
         // This should not happen, we are not yet registered, redirect back to the application.
-        if (!$this->responseContext->isRegistered()) {
+        if (!$this->responseContext->inErrorState() && !$this->responseContext->isRegistered()) {
             $url = $this->generateRegistrationRoute();
             $this->logger->warning(sprintf(
                 'User was not registered by the application, redirect user back the registration route "%s"',

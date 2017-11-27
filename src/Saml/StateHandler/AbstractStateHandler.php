@@ -17,7 +17,6 @@
 
 namespace Surfnet\GsspBundle\Saml\StateHandler;
 
-use Assert\Assertion;
 use Surfnet\GsspBundle\Exception\NotFound;
 use Surfnet\GsspBundle\Exception\RuntimeException;
 use Surfnet\GsspBundle\Saml\StateHandler;
@@ -162,6 +161,7 @@ abstract class AbstractStateHandler implements StateHandler
         if ($this->has('request_type')) {
             throw RuntimeException::requestTypeAlreadyGiven($this->get('request_type'), 'registration');
         }
+
         return $this->set('request_type', 'registration');
     }
 
@@ -173,6 +173,29 @@ abstract class AbstractStateHandler implements StateHandler
     public function hasRequestType()
     {
         return $this->has('request_type');
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasErrorStatus()
+    {
+        return $this->has('error_response_sub_code') || $this->has('error_response_message');
+    }
+
+    public function setErrorStatus($message, $subCode)
+    {
+        $this->set('error_response_message', $message);
+        return $this->set('error_response_sub_code', $subCode);
+    }
+
+    public function getErrorStatus()
+    {
+        return [
+            'Code' => \SAML2_Const::STATUS_RESPONDER,
+            'Message' => $this->get('error_response_message'),
+            'SubCode' => $this->get('error_response_sub_code')
+        ];
     }
 
     /**
