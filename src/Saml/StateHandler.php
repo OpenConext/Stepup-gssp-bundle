@@ -138,4 +138,21 @@ interface StateHandler
      * @return array
      */
     public function getErrorStatus();
+
+    /**
+     * @return string
+     */
+    public function getStepupRequestId();
+
+    /**
+     * @return bool
+     */
+    public function hasStepupRequestId();
+
+    /**
+     * @param string $requestId
+     *
+     * @return self
+     */
+    public function setStepupRequestId($requestId);
 }

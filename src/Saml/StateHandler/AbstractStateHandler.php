@@ -186,6 +186,7 @@ abstract class AbstractStateHandler implements StateHandler
     public function setErrorStatus($message, $subCode)
     {
         $this->set('error_response_message', $message);
+
         return $this->set('error_response_sub_code', $subCode);
     }
 
@@ -194,8 +195,23 @@ abstract class AbstractStateHandler implements StateHandler
         return [
             'Code' => \SAML2_Const::STATUS_RESPONDER,
             'Message' => $this->get('error_response_message'),
-            'SubCode' => $this->get('error_response_sub_code')
+            'SubCode' => $this->get('error_response_sub_code'),
         ];
+    }
+
+    public function getStepupRequestId()
+    {
+        return $this->get('stepup_request_id');
+    }
+
+    public function hasStepupRequestId()
+    {
+        return $this->has('stepup_request_id');
+    }
+
+    public function setStepupRequestId($requestId)
+    {
+        return $this->set('stepup_request_id', $requestId);
     }
 
     /**

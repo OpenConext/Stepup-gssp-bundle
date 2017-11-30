@@ -58,3 +58,18 @@ services:
          - '@logger'
          - '@surfnet_saml.logger'
          - '@surfnet_gssp.saml.state_handler'
+
+    surfnet_gssp.stepup_request_id_response.listener:
+        class: Surfnet\GsspBundle\EventSubscriber\StepupRequestIdResponseListener
+        tags: [kernel.event_subscriber]
+        arguments:
+          - '@surfnet_gssp.saml.state_handler'
+
+    surfnet_gssp.stepup_request_id_logger.decorator:
+        class: Surfnet\GsspBundle\Logger\StepupRequestIdLoggerDecorator
+        public: false
+        decorates: surfnet_gssp.logger
+        arguments:
+          - '@surfnet_gssp.stepup_request_id_logger.decorator.inner'
+          - '@surfnet_gssp.saml.state_handler'
+

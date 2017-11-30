@@ -40,8 +40,6 @@ Acceptance tests test the actual features that the software delivers. It does so
 (command handlers) in combination with the domain code. The infrastructure (databases, external systems) are replaced
 with stand-ins in order to make the test suite faster.
 
-Acceptance tests will be written for all command handlers and will be run as part of every CI build.
-
 Tools: Behat
 
 ## Security testing
@@ -51,11 +49,3 @@ vulnerabilities as part of every CI build. If any of the dependencies contains a
 fail.
 
 Tools: SensioLabs Security Checker
-
-## Code coverage
-By default code coverage reports are generated for all available test types (unit, integration, web-tests, acceptance). 
-
-Code coverage can be viewed at `web/coverage/index.html`.
-
-Tests can be run without coverage by using do so by providing the `-no-coverage` suffix. For example when you want to
-run the unit tests without coverage use: `phpunit-no-coverage`
