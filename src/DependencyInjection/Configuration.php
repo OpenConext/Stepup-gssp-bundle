@@ -35,6 +35,10 @@ class Configuration implements ConfigurationInterface
                 ->isRequired()
                 ->info('Application route name to do the registration')
             ->end()
+            ->scalarNode('authentication_route')
+                ->isRequired()
+                ->info('Application route name to do the authentication')
+            ->end()
         ->end();
 
         return $treeBuilder;

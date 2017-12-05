@@ -46,10 +46,17 @@ surfnet_saml:
             enabled: true
             entity_id: "%saml_remote_idp_entity_id%"
             sso_url: "%saml_remote_idp_sso_url%"
-            certificate_file: "%saml_remote_idp_certificate%" 
+            certificate_file: "%saml_remote_idp_certificate%"
+            
+            
+surfnet_gssp:
+    registration_route: '<your-registration-route>'
+    authentication_route: '<your-authentication-route>'             
 ```
 
-See [Saml bundle documentation](https://github.com/OpenConext/Stepup-saml-bundle) for more information about the configuration above
+See [Saml bundle documentation](https://github.com/OpenConext/Stepup-saml-bundle) for more information about the 'surfnet_saml' configuration above.
+
+See the controller for examples of the 'surfnet_gssp' routes in [Example controller](https://github.com/OpenConext/Stepup-gssp-example/blob/master/src/AppBundle/Controller/DefaultController.php)
 
 ```yaml
 assetic:
