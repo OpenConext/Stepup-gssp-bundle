@@ -31,13 +31,16 @@ use SAML2_Const;
 use SAML2_DOMDocumentFactory;
 use SAML2_Message;
 use SAML2_Response;
-use Surfnet\GsspBundle\Controller\IdentityController;
+use Surfnet\GsspBundle\Controller\SSOController;
+use Surfnet\GsspBundle\Controller\SSOReturnController;
 use Surfnet\GsspBundle\Logger\StateDependedSariLogger;
 use Surfnet\GsspBundle\Saml\AssertionSigningService;
 use Surfnet\GsspBundle\Saml\ResponseContext;
 use Surfnet\GsspBundle\Saml\StateHandler\MemoryStateHandler;
-use Surfnet\GsspBundle\Service\StateBasedAuthenticationRegistrationService;
-use Surfnet\GsspBundle\Service\AuthenticationRegistrationService;
+use Surfnet\GsspBundle\Service\AuthenticationService;
+use Surfnet\GsspBundle\Service\StateBasedAuthenticationService;
+use Surfnet\GsspBundle\Service\StateBasedRegistrationService;
+use Surfnet\GsspBundle\Service\RegistrationService;
 use Surfnet\GsspBundle\Service\ConfigurationContainer;
 use Surfnet\GsspBundle\Service\DateTime\SystemDateTimeService;
 use Surfnet\GsspBundle\Service\ResponseService;
@@ -74,9 +77,13 @@ final class GsspContext implements Context
      */
     private $responseContext;
     /**
-     * @var AuthenticationRegistrationService
+     * @var RegistrationService
      */
-    private $authenticationRegistrationService;
+    private $registrationService;
+    /**
+     * @var AuthenticationService
+     */
+    private $authenticationService;
     /**
      * @var \Mockery\MockInterface|Twig_Environment
      */
@@ -96,9 +103,13 @@ final class GsspContext implements Context
      */
     private $twigParameters = [];
     /**
-     * @var IdentityController
+     * @var SSOController
      */
-    private $controller;
+    private $ssoController;
+    /**
+     * @var SSOReturnController
+     */
+    private $ssoReturnController;
     /**
      * @var IdentityProvider
      */
@@ -146,52 +157,70 @@ final class GsspContext implements Context
         $this->container = new BridgeContainer($logger);
         SAML2_Compat_ContainerSingleton::setContainer($this->container);
 
-        $samlBundle = __DIR__ . '/../../../vendor/surfnet/stepup-saml-bundle';
+        $samlBundle = __DIR__.'/../../../vendor/surfnet/stepup-saml-bundle';
 
-        $this->serviceProvider = new ServiceProvider([
-            'entityId' => 'https://service_provider/saml/metadata',
-            'assertionConsumerUrl' => 'https://service_provider/saml/acu',
-            'certificateFile' => sprintf('%s/src/Resources/keys/development_publickey.cer', $samlBundle),
-            'privateKeys' => [
-                new SAML2_Configuration_PrivateKey(
-                    sprintf('%s/src/Resources/keys/development_privatekey.pem', $samlBundle),
-                    'default'
-                ),
-            ],
-            'sharedKey' => sprintf('%s/src/Resources/keys/development_publickey.cer', $samlBundle),
-        ]);
+        $this->serviceProvider = new ServiceProvider(
+            [
+                'entityId' => 'https://service_provider/saml/metadata',
+                'assertionConsumerUrl' => 'https://service_provider/saml/acu',
+                'certificateFile' => sprintf('%s/src/Resources/keys/development_publickey.cer', $samlBundle),
+                'privateKeys' => [
+                    new SAML2_Configuration_PrivateKey(
+                        sprintf('%s/src/Resources/keys/development_privatekey.pem', $samlBundle),
+                        'default'
+                    ),
+                ],
+                'sharedKey' => sprintf('%s/src/Resources/keys/development_publickey.cer', $samlBundle),
+            ]
+        );
 
-        $this->identityProvider = new IdentityProvider([
-            'entityId' => 'https://identity_provider/saml/metadata',
-            'certificateFile' => sprintf('%s/src/Resources/keys/development_publickey.cer', $samlBundle),
-            'privateKeys' => [
-                new SAML2_Configuration_PrivateKey(
-                    sprintf('%s/src/Resources/keys/development_privatekey.pem', $samlBundle),
-                    'default'
-                ),
-            ],
-            'sharedKey' => sprintf('%s/src/Resources/keys/development_publickey.cer', $samlBundle),
-        ]);
+        $this->identityProvider = new IdentityProvider(
+            [
+                'entityId' => 'https://identity_provider/saml/metadata',
+                'certificateFile' => sprintf('%s/src/Resources/keys/development_publickey.cer', $samlBundle),
+                'privateKeys' => [
+                    new SAML2_Configuration_PrivateKey(
+                        sprintf('%s/src/Resources/keys/development_privatekey.pem', $samlBundle),
+                        'default'
+                    ),
+                ],
+                'sharedKey' => sprintf('%s/src/Resources/keys/development_publickey.cer', $samlBundle),
+            ]
+        );
 
         $serviceProviders = new StaticServiceProviderRepository([$this->serviceProvider]);
         $keyLoader = new SAML2_Certificate_KeyLoader();
         $signatureVerifier = new SignatureVerifier($keyLoader, $logger);
         $redirectBinding = new RedirectBinding($logger, $signatureVerifier, $serviceProviders);
-        $configuration = new ConfigurationContainer([
-            'registration_route' => 'registration_route_action',
-            'authentication_route' => 'not-used',
-        ]);
+        $configuration = new ConfigurationContainer(
+            [
+                'registration_route' => 'registration_route_action',
+                'authentication_route' => 'authentication_route_action',
+            ]
+        );
 
         $router = \Mockery::mock(RouterInterface::class);
         $router->shouldReceive('generate')
             ->with('registration_route_action', [], UrlGeneratorInterface::ABSOLUTE_PATH)
-            ->andReturn('https://identity_provider/registration');
+            ->andReturn('https://identity_provider/registration')
+        ;
+
+        $router->shouldReceive('generate')
+            ->with('authentication_route_action', [], UrlGeneratorInterface::ABSOLUTE_PATH)
+            ->andReturn('https://identity_provider/authentication')
+        ;
 
         $router->shouldReceive('generate')
             ->with('gssp_saml_sso_return')
-            ->andReturn('https://identity_provider/saml/sso_return');
+            ->andReturn('https://identity_provider/saml/sso_return')
+        ;
 
-        $this->authenticationRegistrationService = new StateBasedAuthenticationRegistrationService(
+        $this->registrationService = new StateBasedRegistrationService(
+            $stateHandler,
+            $router,
+            $logger
+        );
+        $this->authenticationService = new StateBasedAuthenticationService(
             $stateHandler,
             $router,
             $logger
@@ -208,8 +237,14 @@ final class GsspContext implements Context
             $signingService,
             new SystemDateTimeService()
         );
-        $this->controller = new IdentityController(
+        $this->ssoController = new SSOController(
             $redirectBinding,
+            $configuration,
+            $stateHandler,
+            $this->responseContext,
+            $logger
+        );
+        $this->ssoReturnController = new SSOReturnController(
             $configuration,
             $stateHandler,
             $responseService,
@@ -220,19 +255,24 @@ final class GsspContext implements Context
         $container->shouldReceive('has')->with('templating')->andReturn(false);
         $container->shouldReceive('has')->with('twig')->andReturn(true);
         $this->twigEnvironment = \Mockery::mock(Twig_Environment::class);
-        $this->twigEnvironment->shouldReceive('render')->andReturnUsing(function (
-            $template,
-            $parameters = []
-        ) {
-            $this->twigParameters = $parameters;
-            $this->twigTemplate = $template;
-            return $template . '-response';
-        });
+        $this->twigEnvironment->shouldReceive('render')->andReturnUsing(
+            function (
+                $template,
+                $parameters = []
+            ) {
+                $this->twigParameters = $parameters;
+                $this->twigTemplate = $template;
+
+                return $template.'-response';
+            }
+        )
+        ;
         $container->shouldReceive('get')->with('twig')->andReturn($this->twigEnvironment);
 
 
         $container->shouldReceive('get')->with('router')->andReturn($router);
-        $this->controller->setContainer($container);
+        $this->ssoController->setContainer($container);
+        $this->ssoReturnController->setContainer($container);
     }
 
     /**
@@ -283,9 +323,11 @@ final class GsspContext implements Context
      */
     public function signAuthnRequest()
     {
-        $this->authnRequest->setSignatureKey(self::loadPrivateKey(
-            $this->serviceProvider->getPrivateKey(SAML2_Configuration_PrivateKey::NAME_DEFAULT)
-        ));
+        $this->authnRequest->setSignatureKey(
+            self::loadPrivateKey(
+                $this->serviceProvider->getPrivateKey(SAML2_Configuration_PrivateKey::NAME_DEFAULT)
+            )
+        );
     }
 
     /**
@@ -360,21 +402,21 @@ final class GsspContext implements Context
      */
     public function assignAUniqueIdentifierToTheToken()
     {
-        $this->authenticationRegistrationService->register('unique-identifier-token');
-        $this->authenticationRegistrationService->createRedirectResponse();
+        $this->registrationService->register('unique-identifier-token');
+        $this->registrationService->replyToServiceProvider();
     }
 
     /**
      * @Then the user is redirected to the identity provider sso return endpoint
      * @Then the user is redirected to the identity provider sso return endpoint without registration
+     * @Then the user is redirected to the identity provider sso return endpoint without authentication
      *
      * @throws AssertionFailedException
      * @throws \Exception
      */
     public function requestSSOreturnEndpoint()
     {
-        $request = Request::create('http://identity_provider/saml/sso_return');
-        $this->response = $this->controller->ssoReturnAction($request);
+        $this->response = $this->ssoReturnController->ssoReturnAction();
     }
 
     /**
@@ -439,7 +481,7 @@ final class GsspContext implements Context
         $assertion = $this->getSsoAssertionResponse();
         $nameId = $assertion->getNameId();
         Assertion::eq('unique-identifier-token', $nameId['Value']);
-        Assertion::eq('urn:oasis:names:tc:SAML:2.0:nameid-format:persistent', $nameId['Format']);
+        Assertion::eq(\SAML2_Const::NAMEID_PERSISTENT, $nameId['Format']);
     }
 
     /**
@@ -505,7 +547,7 @@ final class GsspContext implements Context
     public function callIdentityProviderSSOAction(array $parameters = [])
     {
         $request = Request::create('http://identity_provider/saml/sso', 'GET', $parameters);
-        $this->response = $this->controller->ssoAction($request);
+        $this->response = $this->ssoController->ssoAction($request);
     }
 
     /**
@@ -519,6 +561,19 @@ final class GsspContext implements Context
         /** @var RedirectResponse $response */
         $response = $this->response;
         Assertion::eq($response->getTargetUrl(), 'https://identity_provider/registration');
+    }
+
+    /**
+     * @Then /^the response should be an redirect the application authentication endpoint$/
+     *
+     * @throws \Assert\AssertionFailedException
+     */
+    public function theResponseShouldBeAnRedirectTheApplicationAuthenticationEndpoint()
+    {
+        Assertion::isInstanceOf($this->response, RedirectResponse::class);
+        /** @var RedirectResponse $response */
+        $response = $this->response;
+        Assertion::eq($response->getTargetUrl(), 'https://identity_provider/authentication');
     }
 
     /**
@@ -570,11 +625,27 @@ final class GsspContext implements Context
     }
 
     /**
-     * @Then the identity provider sets an error :message
+     * @Then the identity provider rejects the request with the error :message
      */
     public function theIdentityProviderSetsAnError($message)
     {
-        $this->authenticationRegistrationService->error($message);
-        $this->authenticationRegistrationService->createRedirectResponse();
+        $this->registrationService->reject($message);
+        $this->registrationService->replyToServiceProvider();
+    }
+
+    /**
+     * @Given set the subject nameId to :nameId
+     */
+    public function setTheSubjectNameIdTo($nameId)
+    {
+        $this->authnRequest->setNameId(['Value' => $nameId, 'Format' => \SAML2_Const::NAMEID_PERSISTENT]);
+    }
+
+    /**
+     * @Then /^the identity provider authenticates the user$/
+     */
+    public function theIdentityProviderAuthenticatesTheUser()
+    {
+        $this->authenticationService->authenticate();
     }
 }

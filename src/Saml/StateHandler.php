@@ -89,6 +89,20 @@ interface StateHandler
     public function isRequestTypeRegistration();
 
     /**
+     * @param string $nameId
+     *
+     * @return self
+     */
+    public function setRequestTypeAuthentication($nameId);
+
+    /**
+     * Is the current request type authentication flow?
+     *
+     * @return bool
+     */
+    public function isRequestTypeAuthentication();
+
+    /**
      * @return bool
      */
     public function hasRequestType();
@@ -155,4 +169,14 @@ interface StateHandler
      * @return self
      */
     public function setStepupRequestId($requestId);
+
+    /**
+     * @return self
+     */
+    public function authenticate();
+
+    /**
+     * @return bool
+     */
+    public function isAuthenticated();
 }

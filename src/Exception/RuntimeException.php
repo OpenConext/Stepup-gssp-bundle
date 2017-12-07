@@ -34,4 +34,9 @@ class RuntimeException extends CoreRuntimeException implements Exception
             $type
         ));
     }
+
+    public static function shouldNotAuthenticate()
+    {
+        return new self('The current application context does not require authentication');
+    }
 }

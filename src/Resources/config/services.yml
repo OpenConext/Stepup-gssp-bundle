@@ -4,10 +4,18 @@ services:
         arguments:
           - '@surfnet_saml.metadata_factory'
 
-    surfnet_gssp.saml.identity_controller:
-        class: Surfnet\GsspBundle\Controller\IdentityController
+    surfnet_gssp.saml.sso_controller:
+        class: Surfnet\GsspBundle\Controller\SSOController
         arguments:
           - '@surfnet_saml.http.redirect_binding'
+          - '@surfnet_gssp.configuration_container'
+          - '@surfnet_gssp.saml.state_handler'
+          - '@surfnet_gssp.saml.reponse_context'
+          - '@surfnet_gssp.logger'
+
+    surfnet_gssp.saml.sso_return_controller:
+        class: Surfnet\GsspBundle\Controller\SSOReturnController
+        arguments:
           - '@surfnet_gssp.configuration_container'
           - '@surfnet_gssp.saml.state_handler'
           - '@surfnet_gssp.service.response'
@@ -42,15 +50,19 @@ services:
           - '@surfnet_gssp.saml.signing_service'
           - '@surfnet_gssp.service.datetime'
 
-    surfnet_gssp.service.authentication_registration:
-        class: Surfnet\GsspBundle\Service\StateBasedAuthenticationRegistrationService
+    Surfnet\GsspBundle\Service\AuthenticationService:
+        class: Surfnet\GsspBundle\Service\StateBasedAuthenticationService
         arguments:
           - '@surfnet_gssp.saml.state_handler'
           - '@router'
           - '@surfnet_gssp.logger'
 
-    Surfnet\GsspBundle\Service\AuthenticationRegistrationService:
-        alias: 'surfnet_gssp.service.authentication_registration'
+    Surfnet\GsspBundle\Service\RegistrationService:
+        class: Surfnet\GsspBundle\Service\StateBasedRegistrationService
+        arguments:
+          - '@surfnet_gssp.saml.state_handler'
+          - '@router'
+          - '@surfnet_gssp.logger'
 
     surfnet_gssp.logger:
         class: Surfnet\GsspBundle\Logger\StateDependedSariLogger

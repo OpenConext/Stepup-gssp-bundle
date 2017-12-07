@@ -23,23 +23,19 @@ use SAML2_Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Surfnet\GsspBundle\Saml\ResponseContextInterface;
 use Surfnet\GsspBundle\Saml\StateHandler;
-use Surfnet\GsspBundle\Service\AuthenticationRegistrationService;
 use Surfnet\GsspBundle\Service\ConfigurationContainer;
 use Surfnet\GsspBundle\Service\ResponseServiceInterface;
-use Surfnet\SamlBundle\Http\RedirectBinding;
-use Surfnet\SamlBundle\SAML2\AuthnRequest;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @Route(service="surfnet_gssp.saml.identity_controller")
- * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * Sends back the SAML return response to the service provider.
+ *
+ * @Route(service="surfnet_gssp.saml.sso_return_controller")
  */
-final class IdentityController extends Controller
+final class SSOReturnController extends Controller
 {
-    private $httpBinding;
     private $registrationRoute;
     private $stateHandler;
     private $responseService;
@@ -47,7 +43,6 @@ final class IdentityController extends Controller
     private $logger;
 
     public function __construct(
-        RedirectBinding $httpBinding,
         ConfigurationContainer $configuration,
         StateHandler $stateHandler,
         ResponseServiceInterface $responseService,
@@ -58,71 +53,14 @@ final class IdentityController extends Controller
         $this->stateHandler = $stateHandler;
         $this->responseService = $responseService;
         $this->responseContext = $responseContext;
-        $this->httpBinding = $httpBinding;
         $this->logger = $logger;
     }
 
     /**
-     * The route that receives the AuthnRequest from the service provider.
+     * When the application is done with registration or authentication process, the user will be redirected to this route.
      *
-     * If the request is valid the user will be redirected to the application registration route.
-     *
-     * @Route("/saml/sso", name="gssp_saml_sso", methods={"GET"})
-     * @throws \InvalidArgumentException
-     */
-    public function ssoAction(Request $request)
-    {
-        $this->logger->notice('Received sso request');
-
-        // If we already have a request, we clear the current state.
-        if ($this->responseContext->hasRequest()) {
-            $this->logger->warning('There is already state present, clear previous state');
-            $this->stateHandler->invalidate();
-        }
-
-        try {
-            $this->logger->info('Processing AuthnRequest');
-            $originalRequest = $this->httpBinding->receiveSignedAuthnRequestFrom($request);
-            $this->logger->notice(sprintf(
-                'AuthnRequest processing complete, received AuthnRequest from "%s", request ID: "%s"',
-                $originalRequest->getServiceProvider(),
-                $originalRequest->getRequestId()
-            ));
-        } catch (RuntimeException $e) {
-            $this->logger->critical(sprintf('Could not process Request, error: "%s"', $e->getMessage()));
-
-            return $this->render('@SurfnetGssp/StepupGssp/unrecoverableError.html.twig', [
-                'message' => $e->getMessage(),
-            ], new Response(null, Response::HTTP_NOT_ACCEPTABLE));
-        }
-
-        // Store AuthnRequest state.
-        $this->stateHandler
-            ->setRequestId($originalRequest->getRequestId())
-            ->setStepupRequestId($this->getOrGenerateStepupRequestId($request))
-            ->setRequestServiceProvider($originalRequest->getServiceProvider())
-            ->setRelayState($request->get(AuthnRequest::PARAMETER_RELAY_STATE, ''))
-            ->setRequestTypeRegistration();
-        $this->logger->info(sprintf(
-            'AuthnRequest stored in state'
-        ));
-
-        // Redirect user to the application registration route.
-        $route = $this->generateRegistrationRoute();
-        $this->logger->notice(sprintf(
-            'Redirect user to the application registration route %s',
-            $route
-        ));
-
-        return new RedirectResponse($route);
-    }
-
-    /**
-     * When the application is done with registration process, the user will be redirected to this route.
-     *
-     * This will redirect the user back the service provider with a saml response.
-     *
-     * @see AuthenticationRegistrationService
+     * This will redirect the user back the service provider with a saml response. The replyToServiceProvider from
+     * the RegistrationService and the AuthenticationService will redirect to this.
      *
      * @Route("/saml/sso_return", name="gssp_saml_sso_return", methods={"POST", "GET"})
      * @throws \Exception
@@ -140,9 +78,28 @@ final class IdentityController extends Controller
             ], new Response(null, Response::HTTP_NOT_ACCEPTABLE));
         }
 
-        // This should not happen, we are not yet registered, redirect back to the application.
-        if (!$this->responseContext->inErrorState() && !$this->responseContext->isRegistered()) {
-            $url = $this->generateRegistrationRoute();
+        if ($this->responseContext->inErrorState()) {
+            return $this->createSamlResponse();
+        }
+
+        if ($this->stateHandler->isRequestTypeRegistration()) {
+            return $this->ssoRegistrationReturnAction();
+        }
+
+        if ($this->stateHandler->isRequestTypeAuthentication()) {
+            return $this->ssoAuthenticationReturnAction();
+        }
+
+        return $this->render('@SurfnetGssp/StepupGssp/unrecoverableError.html.twig', [
+            'message' => 'Application state invalid',
+        ], new Response(null, Response::HTTP_NOT_ACCEPTABLE));
+    }
+
+    private function ssoRegistrationReturnAction()
+    {
+        // This should not happen, the user is not yet registered, redirect back to the application.
+        if (!$this->responseContext->isRegistered()) {
+            $url = $this->generateUrl($this->registrationRoute->getRegistrationRoute());
             $this->logger->warning(sprintf(
                 'User was not registered by the application, redirect user back the registration route "%s"',
                 $url
@@ -150,8 +107,31 @@ final class IdentityController extends Controller
 
             return new RedirectResponse($url);
         }
+        return $this->createSamlResponse();
+    }
 
-        // Create saml response.
+    private function ssoAuthenticationReturnAction()
+    {
+        // This should not happen, if the user is not authenticated, redirect back to the application.
+        if (!$this->stateHandler->isAuthenticated()) {
+            $url = $this->generateUrl($this->registrationRoute->getAuthenticationRoute());
+            $this->logger->warning(sprintf(
+                'User was not authenticated by the application, redirect user back the authentication route "%s"',
+                $url
+            ));
+            return new RedirectResponse($url);
+        }
+        return $this->createSamlResponse();
+    }
+
+    /**
+     * @return Response
+     *
+     * @throws \Exception
+     * @throws \InvalidArgumentException
+     */
+    private function createSamlResponse()
+    {
         try {
             $this->logger->info('Create sso response');
             $response = $this->responseService->createResponse();
@@ -184,37 +164,11 @@ final class IdentityController extends Controller
     }
 
     /**
-     * Generates a stepup requets id.
-     *
-     * The request ID should be generated by
-     * hashing the application and machine name and timestamp to a hexadecimal string.
-     *
-     * @param Request $request
-     *
-     * @return array|string
-     */
-    private function getOrGenerateStepupRequestId(Request $request)
-    {
-        if ($request->headers->has('X-Stepup-Request-Id')) {
-            return $request->headers->get('X-Stepup-Request-Id');
-        }
-        return bin2hex(implode([$request->getHost(), gethostname(), time()]));
-    }
-
-    /**
      * @param SAML2_Response $response
      * @return string
      */
     private function getResponseAsXML(SAML2_Response $response)
     {
         return base64_encode($response->toUnsignedXML()->ownerDocument->saveXML());
-    }
-
-    /**
-     * @return string
-     */
-    private function generateRegistrationRoute()
-    {
-        return $this->generateUrl($this->registrationRoute->getRegistrationRoute());
     }
 }
