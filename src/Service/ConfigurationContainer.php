@@ -30,6 +30,13 @@ final class ConfigurationContainer
     private $registrationRoute;
 
     /**
+     * The gssp middleware route that does the actual authentication.
+     *
+     * @var string
+     */
+    private $authenticationRoute;
+
+    /**
      * @param array[] $configuration
      *
      * @throws \Assert\AssertionFailedException
@@ -39,6 +46,20 @@ final class ConfigurationContainer
         Assertion::keyExists($configuration, 'registration_route');
         Assertion::string($configuration['registration_route']);
         $this->registrationRoute = $configuration['registration_route'];
+
+        Assertion::keyExists($configuration, 'authentication_route');
+        Assertion::string($configuration['authentication_route']);
+        $this->authenticationRoute = $configuration['authentication_route'];
+    }
+
+    /**
+     * Getter.
+     *
+     * @return string
+     */
+    public function getAuthenticationRoute()
+    {
+        return $this->authenticationRoute;
     }
 
     /**

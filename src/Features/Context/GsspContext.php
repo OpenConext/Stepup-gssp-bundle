@@ -179,6 +179,7 @@ final class GsspContext implements Context
         $redirectBinding = new RedirectBinding($logger, $signatureVerifier, $serviceProviders);
         $configuration = new ConfigurationContainer([
             'registration_route' => 'registration_route_action',
+            'authentication_route' => 'not-used',
         ]);
 
         $router = \Mockery::mock(RouterInterface::class);
@@ -385,13 +386,13 @@ final class GsspContext implements Context
     public function shouldReturnSamlResponse()
     {
         $parameters = $this->twigParameters;
-        Assertion::eq('@SurfnetGssp/StepupGssp/consumeAssertion.html.twig', $this->twigTemplate);
+        Assertion::eq('@SurfnetGssp/StepupGssp/ssoReturn.html.twig', $this->twigTemplate);
         Assertion::eq('', $parameters['relayState']);
         Assertion::eq('https://service_provider/saml/acu', $parameters['acu']);
         $decodedSamlRequest = base64_decode($parameters['response']);
         $document = SAML2_DOMDocumentFactory::fromString($decodedSamlRequest);
         $this->ssoReturnResponse = SAML2_Message::fromXML($document->firstChild);
-        Assertion::eq('@SurfnetGssp/StepupGssp/consumeAssertion.html.twig-response', $this->response->getContent());
+        Assertion::eq('@SurfnetGssp/StepupGssp/ssoReturn.html.twig-response', $this->response->getContent());
     }
 
     /**

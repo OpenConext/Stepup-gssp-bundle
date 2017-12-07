@@ -167,7 +167,7 @@ final class IdentityController extends Controller
         }
 
         $acu = $this->responseContext->getAssertionConsumerUrl();
-        $response = $this->render('@SurfnetGssp/StepupGssp/consumeAssertion.html.twig', [
+        $response = $this->render('@SurfnetGssp/StepupGssp/ssoReturn.html.twig', [
             'acu' => $acu,
             'response' => $this->getResponseAsXML($response),
             'relayState' => $this->responseContext->getRelayState(),
