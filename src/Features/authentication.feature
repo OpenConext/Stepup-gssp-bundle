@@ -1,15 +1,15 @@
-Feature: When an user needs to enroll for a new token
-  To enroll an user for a new token
+Feature: When an user needs to be authenticated
   As a service provider
-  I need to send an AuthnRequest to the identity provider
+  I need to send an AuthnRequest with a nameID to the identity provider
 
-  Scenario: When an user needs to enroll for a new token
+  Scenario: When an user needs to be authenticated
     Given a normal SAML 2.0 AuthnRequest
     And AuthnRequest is signed with sha256
+    And set the subject nameId to 'unique-identifier-token'
 
     When the service provider send the AuthnRequest with HTTP-Redirect binding
 
-    Then the identity provider register the user with an unique identifier token
+    Then the identity provider authenticates the user
 
     When the user is redirected to the identity provider sso return endpoint
     Then Identity provider sso return endpoint should redirect client-side a saml response to the service provider
@@ -20,7 +20,6 @@ Feature: When an user needs to enroll for a new token
 
     And the logs are:
       | level  | message                                                                                                                       | sari    |
-
       | notice | Received sso request                                                                                                          |         |
       | info   | Processing AuthnRequest                                                                                                       |         |
       | debug  | Extracting public keys for ServiceProvider "https://service_provider/saml/metadata"                                           |         |
@@ -30,28 +29,27 @@ Feature: When an user needs to enroll for a new token
       | debug  | Signature VERIFIED                                                                                                            |         |
       | notice | /AuthnRequest processing complete, received AuthnRequest from "https:\/\/service_provider\/saml\/metadata", request ID: ".+"/ |         |
       | info   | AuthnRequest stored in state                                                                                                  | present |
-      | notice | Redirect user to the application registration route https://identity_provider/registration                                    | present |
+      | notice | Redirect user to the application authentication route https://identity_provider/authentication                                | present |
 
-      | notice | Application sets the subject nameID to unique-identifier-token                                                                | present |
-      | notice | Created redirect response for sso return endpoint "https://identity_provider/saml/sso_return"                                 | present |
-
+      | notice | Application authenticates the user                                                                                            | present |
       | notice | Received sso return request                                                                                                   | present |
+
       | info   | Create sso response                                                                                                           | present |
       | notice | /Saml response created with id ".+", request ID: ".+"/                                                                        | present |
       | notice | Invalidate current state and redirect user to service provider assertion consumer url "https://service_provider/saml/acu"     | present |
 
-  Scenario: When an user request the sso return endpoint without being registered the user should be redirected to the application registration endpoint
+  Scenario: When an user request the sso return endpoint without being authenticated the user should be redirected to the application authentication endpoint
     Given a normal SAML 2.0 AuthnRequest
     And AuthnRequest is signed with sha256
+    And set the subject nameId to 'unique-identifier-token'
     And the service provider send the AuthnRequest with HTTP-Redirect binding
     And I clear the logs
 
-    When the user is redirected to the identity provider sso return endpoint without registration
+    When the user is redirected to the identity provider sso return endpoint without authentication
 
-    Then the response should be an redirect the application registration endpoint
+    Then the response should be an redirect the application authentication endpoint
 
     And the logs are:
-      | level   | message                                                                                                                        | sari    |
-      | notice  | Received sso return request                                                                                                    | present |
-      | warning | User was not registered by the application, redirect user back the registration route "https://identity_provider/registration" | present |
-
+      | level   | message                                                                                                                               | sari    |
+      | notice  | Received sso return request                                                                                                           | present |
+      | warning | User was not authenticated by the application, redirect user back the authentication route "https://identity_provider/authentication" | present |

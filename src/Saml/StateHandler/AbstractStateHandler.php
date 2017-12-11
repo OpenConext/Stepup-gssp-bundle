@@ -170,6 +170,21 @@ abstract class AbstractStateHandler implements StateHandler
         return $this->is('request_type', 'registration');
     }
 
+    public function setRequestTypeAuthentication($nameId)
+    {
+        $this->setSubjectNameId($nameId);
+        if ($this->has('request_type')) {
+            throw RuntimeException::requestTypeAlreadyGiven($this->get('request_type'), 'authentication');
+        }
+
+        return $this->set('request_type', 'authentication');
+    }
+
+    public function isRequestTypeAuthentication()
+    {
+        return $this->is('request_type', 'authentication');
+    }
+
     public function hasRequestType()
     {
         return $this->has('request_type');
@@ -212,6 +227,23 @@ abstract class AbstractStateHandler implements StateHandler
     public function setStepupRequestId($requestId)
     {
         return $this->set('stepup_request_id', $requestId);
+    }
+
+
+    /**
+     * @return self
+     */
+    public function authenticate()
+    {
+        return $this->set('authenticated', true);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAuthenticated()
+    {
+        return $this->is('authenticated', true);
     }
 
     /**

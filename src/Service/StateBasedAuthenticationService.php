@@ -24,7 +24,12 @@ use Surfnet\GsspBundle\Saml\StateHandler;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\RouterInterface;
 
-final class StateBasedAuthenticationRegistrationService implements AuthenticationRegistrationService
+/**
+ * Contains the application interface for the authentication flow.
+ *
+ * @see AuthenticationService for an example
+ */
+final class StateBasedAuthenticationService implements AuthenticationService
 {
     private $stateHandler;
     private $router;
@@ -40,33 +45,41 @@ final class StateBasedAuthenticationRegistrationService implements Authenticatio
         $this->logger = $logger;
     }
 
-    public function register($subjectNameId)
+    public function authenticationRequired()
     {
-        if (!$this->stateHandler->isRequestTypeRegistration()) {
-            $this->logger->critical('Current request does not need a registration');
-            throw RuntimeException::shouldNotRegister();
+        return $this->stateHandler->isRequestTypeAuthentication();
+    }
+
+    public function authenticate()
+    {
+        if (!$this->stateHandler->isRequestTypeAuthentication()) {
+            $this->logger->critical('Current request does not need a authentication');
+            throw RuntimeException::shouldNotAuthenticate();
         }
-        $this->logger->notice(sprintf('Application sets the subject nameID to %s', $subjectNameId));
-        $this->stateHandler->setSubjectNameId($subjectNameId);
+        $this->logger->notice('Application authenticates the user');
+        $this->stateHandler->authenticate();
     }
 
-    public function requiresRegistration()
-    {
-        return $this->stateHandler->isRequestTypeRegistration();
-    }
-
-    public function error($message, $subCode = SAML2_Const::STATUS_AUTHN_FAILED)
+    public function reject($message, $subCode = SAML2_Const::STATUS_AUTHN_FAILED)
     {
         $this->logger->critical($message);
-        $this->stateHandler->setErrorStatus($message, SAML2_Const::STATUS_AUTHN_FAILED);
+        $this->stateHandler->setErrorStatus($message, $subCode);
     }
 
-    public function createRedirectResponse()
+    public function replyToServiceProvider()
     {
         $url = $this->generateSSOreturnUrl();
         $this->logger->notice(sprintf('Created redirect response for sso return endpoint "%s"', $url));
 
         return new RedirectResponse($url);
+    }
+
+    public function getNameId()
+    {
+        if (!$this->stateHandler->hasSubjectNameId()) {
+            return null;
+        }
+        return $this->stateHandler->getSubjectNameId();
     }
 
     private function generateSSOreturnUrl()
