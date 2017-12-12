@@ -15,30 +15,45 @@
  * limitations under the License.
  */
 
-namespace Surfnet\GsspBundle\Saml\StateHandler;
+namespace Surfnet\GsspBundle\Service\ValueStore;
 
 use Surfnet\GsspBundle\Exception\NotFound;
+use Surfnet\GsspBundle\Service\ValueStore;
 
-final class MemoryStateHandler extends AbstractStateHandler
+final class InMemoryValueStore implements ValueStore
 {
-    private $state = [];
+    private $values = [];
 
-    protected function set($key, $value)
+    public function set($key, $value)
     {
-        $this->state[$key] = $value;
+        $this->values[$key] = $value;
         return $this;
     }
 
-    protected function get($key)
+    public function get($key)
     {
-        if (!isset($this->state[$key])) {
+        if (!isset($this->values[$key])) {
             throw NotFound::stateProperty($key);
         }
-        return $this->state[$key];
+        return $this->values[$key];
     }
 
-    public function invalidate()
+    public function is($key, $value)
     {
-        $this->state = [];
+        if (!$this->has($key)) {
+            return false;
+        }
+        return $this->values[$key] === $value;
+    }
+
+    public function has($key)
+    {
+        return isset($this->values[$key]);
+    }
+
+    public function clear()
+    {
+        $this->values = [];
+        return $this;
     }
 }

@@ -17,6 +17,7 @@
 
 namespace Surfnet\GsspBundle\Saml;
 
+use Surfnet\GsspBundle\Service\StateHandlerInterface;
 use Surfnet\SamlBundle\Entity\IdentityProvider;
 use Surfnet\SamlBundle\Entity\ServiceProvider;
 use Surfnet\SamlBundle\Entity\ServiceProviderRepository;
@@ -30,7 +31,7 @@ final class ResponseContext implements ResponseContextInterface
     public function __construct(
         IdentityProvider $identityProvider,
         ServiceProviderRepository $serviceProviderRepository,
-        StateHandler $stateHandler
+        StateHandlerInterface $stateHandler
     ) {
         $this->hostedIdentityProvider = $identityProvider;
         $this->stateHandler           = $stateHandler;
@@ -89,9 +90,9 @@ final class ResponseContext implements ResponseContextInterface
     /**
      * @return string
      */
-    public function getIdentityNameId()
+    public function getSubjectNameId()
     {
-        return $this->stateHandler->getIdentityNameId();
+        return $this->stateHandler->getSubjectNameId();
     }
 
     /**
@@ -119,14 +120,6 @@ final class ResponseContext implements ResponseContextInterface
     }
 
     /**
-     * @return string
-     */
-    public function getSubjectNameId()
-    {
-        return $this->stateHandler->getSubjectNameId();
-    }
-
-    /**
      * @return bool
      */
     public function hasRequest()
@@ -139,6 +132,6 @@ final class ResponseContext implements ResponseContextInterface
      */
     public function isRegistered()
     {
-        return $this->stateHandler->hasSubjectNameId();
+        return $this->stateHandler->isRequestTypeRegistration() && $this->stateHandler->hasSubjectNameId();
     }
 }

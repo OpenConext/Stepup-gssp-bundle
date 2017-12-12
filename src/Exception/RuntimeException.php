@@ -26,12 +26,11 @@ class RuntimeException extends CoreRuntimeException implements Exception
         return new self('The current application context does not require a registration');
     }
 
-    public static function requestTypeAlreadyGiven($previous, $type)
+    public static function requestTypeAlreadyKnown($previous)
     {
         return new self(sprintf(
-            'Request type is already given as "%s" and cannot be changed to "%s"',
-            $previous,
-            $type
+            'Request type is already known as "%s"',
+            $previous
         ));
     }
 

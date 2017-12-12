@@ -15,15 +15,53 @@
  * limitations under the License.
  */
 
-namespace Surfnet\GsspBundle\Saml;
+namespace Surfnet\GsspBundle\Service;
 
-interface StateHandler
+use Surfnet\SamlBundle\SAML2\ReceivedAuthnRequest;
+
+/**
+ * Knows and preserves the integrity of the GSSP application state.
+ */
+interface StateHandlerInterface
 {
     /**
-     * @param string $originalRequestId
+     * Stores the state of a registration request.
+     *
+     * @param ReceivedAuthnRequest $authnRequest
+     * @param string $relayState
+     * @param string $stepupRequestId
+     */
+    public function saveRegistrationRequest(ReceivedAuthnRequest $authnRequest, $relayState, $stepupRequestId);
+
+    /**
+     * Stores the state of a authentication request.
+     *
+     * @param ReceivedAuthnRequest $authnRequest
+     * @param string $relayState
+     * @param string $stepupRequestId
+     */
+    public function saveAuthenticationRequest(ReceivedAuthnRequest $authnRequest, $relayState, $stepupRequestId);
+
+    /**
+     * @param string $message
+     *   The error message.
+     * @param string $subCode
+     *   Saml response sub code.
+     *
      * @return $this
      */
-    public function setRequestId($originalRequestId);
+    public function setErrorStatus($message, $subCode);
+
+    /**
+     * @param $nameId
+     * @return $this
+     */
+    public function saveSubjectNameId($nameId);
+
+    /**
+     * @return self
+     */
+    public function authenticate();
 
     /**
      * @return string
@@ -31,21 +69,9 @@ interface StateHandler
     public function getRequestId();
 
     /**
-     * @param string $serviceProvider
-     * @return $this
-     */
-    public function setRequestServiceProvider($serviceProvider);
-
-    /**
      * @return string
      */
     public function getRequestServiceProvider();
-
-    /**
-     * @param string $relayState
-     * @return $this
-     */
-    public function setRelayState($relayState);
 
     /**
      * @return string
@@ -53,33 +79,9 @@ interface StateHandler
     public function getRelayState();
 
     /**
-     * @param $nameId
-     * @return $this
-     */
-    public function saveIdentityNameId($nameId);
-
-    /**
      * @return string
      */
-    public function getIdentityNameId();
-
-    /**
-     * @param string $locale
-     * @return $this
-     */
-    public function setPreferredLocale($locale);
-
-    /**
-     * @return string
-     */
-    public function getPreferredLocale();
-
-    /**
-     * Set the current request type as registration flow.
-     *
-     * @return $this
-     */
-    public function setRequestTypeRegistration();
+    public function getSubjectNameId();
 
     /**
      * Is the current request type registration flow?
@@ -87,13 +89,6 @@ interface StateHandler
      * @return bool
      */
     public function isRequestTypeRegistration();
-
-    /**
-     * @param string $nameId
-     *
-     * @return self
-     */
-    public function setRequestTypeAuthentication($nameId);
 
     /**
      * Is the current request type authentication flow?
@@ -106,17 +101,6 @@ interface StateHandler
      * @return bool
      */
     public function hasRequestType();
-
-    /**
-     * @param string $nameId
-     * @return $this
-     */
-    public function setSubjectNameId($nameId);
-
-    /**
-     * @return string
-     */
-    public function getSubjectNameId();
 
     /**
      * @return bool
@@ -139,16 +123,6 @@ interface StateHandler
     public function hasErrorStatus();
 
     /**
-     * @param string $message
-     *   The error message.
-     * @param string $subCode
-     *   Saml response sub code.
-     *
-     * @return $this
-     */
-    public function setErrorStatus($message, $subCode);
-
-    /**
      * @return array
      */
     public function getErrorStatus();
@@ -162,18 +136,6 @@ interface StateHandler
      * @return bool
      */
     public function hasStepupRequestId();
-
-    /**
-     * @param string $requestId
-     *
-     * @return self
-     */
-    public function setStepupRequestId($requestId);
-
-    /**
-     * @return self
-     */
-    public function authenticate();
 
     /**
      * @return bool

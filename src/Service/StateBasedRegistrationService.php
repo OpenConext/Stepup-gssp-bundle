@@ -20,7 +20,6 @@ namespace Surfnet\GsspBundle\Service;
 use Psr\Log\LoggerInterface;
 use SAML2_Const;
 use Surfnet\GsspBundle\Exception\RuntimeException;
-use Surfnet\GsspBundle\Saml\StateHandler;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -36,7 +35,7 @@ final class StateBasedRegistrationService implements RegistrationService
     private $logger;
 
     public function __construct(
-        StateHandler $stateHandler,
+        StateHandlerInterface $stateHandler,
         RouterInterface $router,
         LoggerInterface $logger
     ) {
@@ -52,7 +51,7 @@ final class StateBasedRegistrationService implements RegistrationService
             throw RuntimeException::shouldNotRegister();
         }
         $this->logger->notice(sprintf('Application sets the subject nameID to %s', $subjectNameId));
-        $this->stateHandler->setSubjectNameId($subjectNameId);
+        $this->stateHandler->saveSubjectNameId($subjectNameId);
     }
 
     public function registrationRequired()
@@ -70,7 +69,6 @@ final class StateBasedRegistrationService implements RegistrationService
     {
         $url = $this->generateSSOreturnUrl();
         $this->logger->notice(sprintf('Created redirect response for sso return endpoint "%s"', $url));
-
         return new RedirectResponse($url);
     }
 
