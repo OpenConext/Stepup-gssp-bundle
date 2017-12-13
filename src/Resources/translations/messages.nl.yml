@@ -1,0 +1,8 @@
+gssp.sso_return.title: 'Terug naar de service provider'
+gssp.sso_return.one_moment_please: 'Een moment alstublieft...'
+gssp.sso_return.js_disabled: 'Javascript is uitgeschakeld, klik op de knop hieronder om door te gaan'
+gssp.sso_return.submit_button: 'Verzenden'
+
+gssp.unrecoverable_error.title: 'Onherstelbare fout'
+gssp.unrecoverable_error.message.title: 'Fout'
+gssp.unrecoverable_error.message.intro: 'Het volgende is gebeurd:'
