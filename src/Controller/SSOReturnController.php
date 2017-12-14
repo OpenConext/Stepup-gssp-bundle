@@ -158,7 +158,6 @@ final class SSOReturnController extends Controller
             'Invalidate current state and redirect user to service provider assertion consumer url "%s"',
             $acu
         ));
-        $this->stateHandler->invalidate();
 
         return $response;
     }
