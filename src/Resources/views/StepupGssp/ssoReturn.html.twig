@@ -1,17 +1,11 @@
 {% extends '::base.html.twig' %}
 {% block stylesheets %}
     {{ parent() }}
-    {% stylesheets '@SurfnetGsspBundle/Resources/public/css/hiddensubmit.css' %}
-    <link href="{{ asset_url }}" type="text/css" rel="stylesheet" media="screen"/>
-    {% endstylesheets %}
+    <link href="{{ asset('bundles/surfnetgssp/css/hiddensubmit.css') }}" type="text/css" rel="stylesheet" media="screen"/>
 {% endblock %}
 {% block javascripts %}
     {{ parent() }}
-    {% javascripts
-    '@SurfnetGsspBundle/Resources/public/js/submitonload.js'%}
-
-    <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+    <script type="text/javascript" src="{{ asset('bundles/surfnetgssp/js/submitonload.js') }}"></script>
 {% endblock %}
 
 {% block page_title %}{{ 'gssp.sso_return.title'|trans }}{% endblock %}

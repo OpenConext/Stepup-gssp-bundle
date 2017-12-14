@@ -61,14 +61,6 @@ See the controller for working examples of the 'surfnet_gssp' routes in [Example
 The AuthenticationService and the RegistrationService is the API for the application to interact with this bundle. 
 Both services document an example how to use them in a controller action.
 
-
-```yaml
-assetic:
-    ...
-    bundles:
-      - SurfnetGsspBundle
-```
-
 **routing.yml**
 
 ```yaml
