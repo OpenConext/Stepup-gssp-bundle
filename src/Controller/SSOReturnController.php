@@ -22,7 +22,7 @@ use RuntimeException;
 use SAML2_Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Surfnet\GsspBundle\Saml\ResponseContextInterface;
-use Surfnet\GsspBundle\Saml\StateHandler;
+use Surfnet\GsspBundle\Service\StateHandlerInterface;
 use Surfnet\GsspBundle\Service\ConfigurationContainer;
 use Surfnet\GsspBundle\Service\ResponseServiceInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -44,7 +44,7 @@ final class SSOReturnController extends Controller
 
     public function __construct(
         ConfigurationContainer $configuration,
-        StateHandler $stateHandler,
+        StateHandlerInterface $stateHandler,
         ResponseServiceInterface $responseService,
         ResponseContextInterface $responseContext,
         LoggerInterface $logger

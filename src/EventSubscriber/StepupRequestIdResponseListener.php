@@ -17,7 +17,7 @@
 
 namespace Surfnet\GsspBundle\EventSubscriber;
 
-use Surfnet\GsspBundle\Saml\StateHandler;
+use Surfnet\GsspBundle\Service\StateHandlerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -29,7 +29,7 @@ final class StepupRequestIdResponseListener implements EventSubscriberInterface
 {
     private $stateHandler;
 
-    public function __construct(StateHandler $stateHandler)
+    public function __construct(StateHandlerInterface $stateHandler)
     {
         $this->stateHandler = $stateHandler;
     }

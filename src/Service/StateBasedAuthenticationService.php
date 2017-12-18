@@ -20,7 +20,6 @@ namespace Surfnet\GsspBundle\Service;
 use Psr\Log\LoggerInterface;
 use SAML2_Const;
 use Surfnet\GsspBundle\Exception\RuntimeException;
-use Surfnet\GsspBundle\Saml\StateHandler;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -36,7 +35,7 @@ final class StateBasedAuthenticationService implements AuthenticationService
     private $logger;
 
     public function __construct(
-        StateHandler $stateHandler,
+        StateHandlerInterface $stateHandler,
         RouterInterface $router,
         LoggerInterface $logger
     ) {

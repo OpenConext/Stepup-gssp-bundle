@@ -19,7 +19,7 @@ namespace Surfnet\GsspBundle\Logger;
 
 use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
-use Surfnet\GsspBundle\Saml\StateHandler;
+use Surfnet\GsspBundle\Service\StateHandlerInterface;
 
 /**
  * Add's stepup request id to the logs.
@@ -31,7 +31,7 @@ final class StepupRequestIdLoggerDecorator extends AbstractLogger
 
     public function __construct(
         LoggerInterface $logger,
-        StateHandler $stateHandler
+        StateHandlerInterface $stateHandler
     ) {
         $this->logger = $logger;
         $this->stateHandler = $stateHandler;

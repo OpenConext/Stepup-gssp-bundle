@@ -20,7 +20,6 @@ namespace Surfnet\GsspBundle\Features\Context;
 use Assert\Assertion;
 use Assert\AssertionFailedException;
 use Behat\Behat\Context\Context;
-use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Gherkin\Node\TableNode;
 use SAML2_AuthnRequest;
 use SAML2_Certificate_KeyLoader;
@@ -36,7 +35,6 @@ use Surfnet\GsspBundle\Controller\SSOReturnController;
 use Surfnet\GsspBundle\Logger\StateDependedSariLogger;
 use Surfnet\GsspBundle\Saml\AssertionSigningService;
 use Surfnet\GsspBundle\Saml\ResponseContext;
-use Surfnet\GsspBundle\Saml\StateHandler\MemoryStateHandler;
 use Surfnet\GsspBundle\Service\AuthenticationService;
 use Surfnet\GsspBundle\Service\StateBasedAuthenticationService;
 use Surfnet\GsspBundle\Service\StateBasedRegistrationService;
@@ -44,6 +42,8 @@ use Surfnet\GsspBundle\Service\RegistrationService;
 use Surfnet\GsspBundle\Service\ConfigurationContainer;
 use Surfnet\GsspBundle\Service\DateTime\SystemDateTimeService;
 use Surfnet\GsspBundle\Service\ResponseService;
+use Surfnet\GsspBundle\Service\ValueStore\InMemoryValueStore;
+use Surfnet\GsspBundle\Service\StateHandler;
 use Surfnet\SamlBundle\Entity\IdentityProvider;
 use Surfnet\SamlBundle\Entity\ServiceProvider;
 use Surfnet\SamlBundle\Entity\StaticServiceProviderRepository;
@@ -147,7 +147,7 @@ final class GsspContext implements Context
         $this->twigTemplate = null;
 
         // Create required dependencies.
-        $stateHandler = new MemoryStateHandler();
+        $stateHandler = new StateHandler(new InMemoryValueStore());
         $this->logger = new BufferingLogger();
         $logger = new StateDependedSariLogger(
             $this->logger,

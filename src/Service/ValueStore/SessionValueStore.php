@@ -15,14 +15,15 @@
  * limitations under the License.
  */
 
-namespace Surfnet\GsspBundle\Saml\StateHandler;
+namespace Surfnet\GsspBundle\Service\ValueStore;
 
 use Surfnet\GsspBundle\Exception\NotFound;
+use Surfnet\GsspBundle\Service\ValueStore;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
-final class SessionStateHandler extends AbstractStateHandler
+final class SessionValueStore implements ValueStore
 {
-    const SESSION_PATH = 'surfnet/gssp/request';
+    const SESSION_PATH = 'surfnet/gssp/request/';
 
     private $session;
 
@@ -31,22 +32,33 @@ final class SessionStateHandler extends AbstractStateHandler
         $this->session = $session;
     }
 
-    protected function set($key, $value)
+    public function set($key, $value)
     {
         $this->session->set(self::SESSION_PATH.$key, $value);
+
         return $this;
     }
 
-    protected function get($key)
+    public function get($key)
     {
-        $sessionKey = self::SESSION_PATH.$key;
-        if (!$this->session->has($sessionKey)) {
-            throw NotFound::stateProperty($sessionKey);
+        if (!$this->has($key)) {
+            throw NotFound::stateProperty($key);
         }
-        return $this->session->get($sessionKey);
+
+        return $this->session->get(self::SESSION_PATH.$key);
     }
 
-    public function invalidate()
+    public function is($key, $value)
+    {
+        return $this->has($key) && $this->get($key) === $value;
+    }
+
+    public function has($key)
+    {
+        return $this->session->has(self::SESSION_PATH.$key);
+    }
+
+    public function clear()
     {
         $this->session->invalidate();
     }

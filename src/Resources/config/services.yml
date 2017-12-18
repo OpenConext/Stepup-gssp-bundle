@@ -9,7 +9,7 @@ services:
         arguments:
           - '@surfnet_saml.http.redirect_binding'
           - '@surfnet_gssp.configuration_container'
-          - '@surfnet_gssp.saml.state_handler'
+          - '@surfnet_gssp.state_handler.service'
           - '@surfnet_gssp.saml.reponse_context'
           - '@surfnet_gssp.logger'
 
@@ -17,15 +17,21 @@ services:
         class: Surfnet\GsspBundle\Controller\SSOReturnController
         arguments:
           - '@surfnet_gssp.configuration_container'
-          - '@surfnet_gssp.saml.state_handler'
+          - '@surfnet_gssp.state_handler.service'
           - '@surfnet_gssp.service.response'
           - '@surfnet_gssp.saml.reponse_context'
           - '@surfnet_gssp.logger'
 
-    surfnet_gssp.saml.state_handler:
-        class: Surfnet\GsspBundle\Saml\StateHandler\SessionStateHandler
+    surfnet_gssp.value_store.service:
+        class: Surfnet\GsspBundle\Service\ValueStore\SessionValueStore
+        private: true
         arguments:
           - '@session'
+
+    surfnet_gssp.state_handler.service:
+        class: Surfnet\GsspBundle\Service\StateHandler
+        arguments:
+          - '@surfnet_gssp.value_store.service'
 
     surfnet_gssp.saml.signing_service:
         class: Surfnet\GsspBundle\Saml\AssertionSigningService
@@ -37,7 +43,7 @@ services:
         arguments:
           - '@surfnet_saml.hosted.identity_provider'
           - '@surfnet_saml.remote.service_providers'
-          - '@surfnet_gssp.saml.state_handler'
+          - '@surfnet_gssp.state_handler.service'
 
     surfnet_gssp.service.datetime:
         class: Surfnet\GsspBundle\Service\DateTime\SystemDateTimeService
@@ -53,14 +59,14 @@ services:
     Surfnet\GsspBundle\Service\AuthenticationService:
         class: Surfnet\GsspBundle\Service\StateBasedAuthenticationService
         arguments:
-          - '@surfnet_gssp.saml.state_handler'
+          - '@surfnet_gssp.state_handler.service'
           - '@router'
           - '@surfnet_gssp.logger'
 
     Surfnet\GsspBundle\Service\RegistrationService:
         class: Surfnet\GsspBundle\Service\StateBasedRegistrationService
         arguments:
-          - '@surfnet_gssp.saml.state_handler'
+          - '@surfnet_gssp.state_handler.service'
           - '@router'
           - '@surfnet_gssp.logger'
 
@@ -69,13 +75,13 @@ services:
         arguments:
          - '@logger'
          - '@surfnet_saml.logger'
-         - '@surfnet_gssp.saml.state_handler'
+         - '@surfnet_gssp.state_handler.service'
 
     surfnet_gssp.stepup_request_id_response.listener:
         class: Surfnet\GsspBundle\EventSubscriber\StepupRequestIdResponseListener
         tags: [kernel.event_subscriber]
         arguments:
-          - '@surfnet_gssp.saml.state_handler'
+          - '@surfnet_gssp.state_handler.service'
 
     surfnet_gssp.stepup_request_id_logger.decorator:
         class: Surfnet\GsspBundle\Logger\StepupRequestIdLoggerDecorator
@@ -83,5 +89,5 @@ services:
         decorates: surfnet_gssp.logger
         arguments:
           - '@surfnet_gssp.stepup_request_id_logger.decorator.inner'
-          - '@surfnet_gssp.saml.state_handler'
+          - '@surfnet_gssp.state_handler.service'
 

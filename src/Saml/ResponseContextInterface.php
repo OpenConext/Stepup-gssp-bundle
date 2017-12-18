@@ -55,7 +55,7 @@ interface ResponseContextInterface
     /**
      * @return string
      */
-    public function getIdentityNameId();
+    public function getSubjectNameId();
 
     /**
      * Does the current state have an error?
@@ -82,11 +82,6 @@ interface ResponseContextInterface
      * @return bool
      */
     public function hasRequest();
-
-    /**
-     * @return string
-     */
-    public function getSubjectNameId();
 
     /**
      * @return bool

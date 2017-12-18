@@ -19,7 +19,7 @@ namespace Surfnet\GsspBundle\Logger;
 
 use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
-use Surfnet\GsspBundle\Saml\StateHandler;
+use Surfnet\GsspBundle\Service\StateHandlerInterface;
 use Surfnet\SamlBundle\Monolog\SamlAuthenticationLogger;
 
 /**
@@ -34,7 +34,7 @@ final class StateDependedSariLogger extends AbstractLogger
     public function __construct(
         LoggerInterface $logger,
         SamlAuthenticationLogger $sariLogger,
-        StateHandler $stateHandler
+        StateHandlerInterface $stateHandler
     ) {
         $this->logger = $logger;
         $this->stateHandler = $stateHandler;

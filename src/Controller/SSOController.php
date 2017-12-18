@@ -21,7 +21,7 @@ use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Surfnet\GsspBundle\Saml\ResponseContextInterface;
-use Surfnet\GsspBundle\Saml\StateHandler;
+use Surfnet\GsspBundle\Service\StateHandlerInterface;
 use Surfnet\GsspBundle\Service\ConfigurationContainer;
 use Surfnet\SamlBundle\Http\RedirectBinding;
 use Surfnet\SamlBundle\SAML2\AuthnRequest;
@@ -48,7 +48,7 @@ final class SSOController extends Controller
     public function __construct(
         RedirectBinding $httpBinding,
         ConfigurationContainer $configuration,
-        StateHandler $stateHandler,
+        StateHandlerInterface $stateHandler,
         ResponseContextInterface $responseContext,
         LoggerInterface $logger
     ) {
@@ -104,13 +104,11 @@ final class SSOController extends Controller
 
     private function authenticationAction(Request $request, ReceivedAuthnRequest $originalRequest)
     {
-        $this->stateHandler
-            ->setRequestId($originalRequest->getRequestId())
-            ->setStepupRequestId($this->getOrGenerateStepupRequestId($request))
-            ->setRequestServiceProvider($originalRequest->getServiceProvider())
-            ->setRelayState($request->get(AuthnRequest::PARAMETER_RELAY_STATE, ''))
-            ->setRequestTypeAuthentication($originalRequest->getNameId())
-        ;
+        $this->stateHandler->saveAuthenticationRequest(
+            $originalRequest,
+            $this->getRelayStateFromRequest($request),
+            $this->getOrGenerateStepupRequestId($request)
+        );
 
         $this->logger->info(sprintf(
             'AuthnRequest stored in state'
@@ -128,13 +126,11 @@ final class SSOController extends Controller
 
     private function registrationAction(Request $request, ReceivedAuthnRequest $originalRequest)
     {
-        $this->stateHandler
-            ->setRequestId($originalRequest->getRequestId())
-            ->setStepupRequestId($this->getOrGenerateStepupRequestId($request))
-            ->setRequestServiceProvider($originalRequest->getServiceProvider())
-            ->setRelayState($request->get(AuthnRequest::PARAMETER_RELAY_STATE, ''))
-            ->setRequestTypeRegistration()
-        ;
+        $this->stateHandler->saveRegistrationRequest(
+            $originalRequest,
+            $this->getRelayStateFromRequest($request),
+            $this->getOrGenerateStepupRequestId($request)
+        );
 
         $this->logger->info(sprintf(
             'AuthnRequest stored in state'
@@ -148,6 +144,20 @@ final class SSOController extends Controller
         ));
 
         return new RedirectResponse($route);
+    }
+
+    /**
+     * Directly fetches the relay-state from the AuthnRequest query parameter.
+     *
+     * The idea is that the SP verifies the integrity of the relay-state like sending an opaque identifier as RelayState to the IDP,
+     * and not the direct Target Resource URL. This protects the integrity of the RelayState and also prevents third-party tampering
+     * and verify the RelayState with the RelayState value in the SAML Response sent by the IDP.
+     *
+     * The conclusion is that IDP does not need to and cannot verify integrity of the relay-state.
+     */
+    private function getRelayStateFromRequest(Request $request)
+    {
+        return $request->get(AuthnRequest::PARAMETER_RELAY_STATE, '');
     }
 
     /**
