@@ -120,6 +120,25 @@ To run all required test you can run the following command from the dev env:
 
 Every part can be run separately. Check "scripts" section of the composer.json file for the different options.
 
+Release instructions
+=====================
+
+The projects follow semantic versioning. To create a new release perform the following steps:
+
+1. Merge feature branch in development branch.
+
+2. Merge development branch in master branch.
+
+3. Checkout and update (pull) master branch
+
+4. Create version with RMT
+
+```bash 
+    ./RMT release
+```
+
+5. Release the new version on github [Releases](https://github.com/OpenConext/Stepup-gssp-bundle/releases)
+
 Other resources
 ======================
 

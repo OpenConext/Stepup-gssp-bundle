@@ -32,6 +32,7 @@
     "require-dev": {
         "behat/behat": "^3.4",
         "jakub-onderka/php-parallel-lint": "^0.9.2",
+        "liip/rmt": "^1.2",
         "malukenho/docheader": "^0.1.6",
         "mockery/mockery": "^1.0",
         "phpmd/phpmd": "^2.6",
