@@ -18,10 +18,9 @@
 namespace Surfnet\GsspBundle\Service;
 
 use Assert\Assertion;
+use SAML2\Constants;
 use Surfnet\GsspBundle\Exception\RuntimeException;
-use Surfnet\SamlBundle\SAML2\AuthnRequest;
 use Surfnet\SamlBundle\SAML2\ReceivedAuthnRequest;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Knows and preserves the integrity of the GSSP application state.
@@ -166,7 +165,7 @@ final class StateHandler implements StateHandlerInterface
     public function getErrorStatus()
     {
         return [
-            'Code' => \SAML2_Const::STATUS_RESPONDER,
+            'Code' => Constants::STATUS_RESPONDER,
             'Message' => $this->store->get(self::RESPONSE_ERROR_MESSAGE),
             'SubCode' => $this->store->get(self::RESPONSE_ERROR_SUB_CODE),
         ];
