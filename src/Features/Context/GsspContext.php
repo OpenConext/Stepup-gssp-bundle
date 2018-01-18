@@ -21,16 +21,15 @@ use Assert\Assertion;
 use Assert\AssertionFailedException;
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\TableNode;
-use RobRichards\XMLSecLibs\XMLSecurityKey;
-use SAML2\AuthnRequest as SAMLAuthnRequest;
-use SAML2\Certificate\KeyLoader;
-use SAML2\Certificate\PrivateKeyLoader;
-use SAML2\Compat\ContainerSingleton;
-use SAML2\Configuration\PrivateKey;
-use SAML2\Constants;
-use SAML2\DOMDocumentFactory;
-use SAML2\Message;
-use SAML2\Response as SAMLResponse;
+use SAML2_AuthnRequest;
+use SAML2_Certificate_KeyLoader;
+use SAML2_Certificate_PrivateKeyLoader;
+use SAML2_Compat_ContainerSingleton;
+use SAML2_Configuration_PrivateKey;
+use SAML2_Const;
+use SAML2_DOMDocumentFactory;
+use SAML2_Message;
+use SAML2_Response;
 use Surfnet\GsspBundle\Controller\SSOController;
 use Surfnet\GsspBundle\Controller\SSOReturnController;
 use Surfnet\GsspBundle\Logger\StateDependedSariLogger;
@@ -61,6 +60,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Twig_Environment;
+use XMLSecurityKey;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -115,7 +115,7 @@ final class GsspContext implements Context
      */
     private $identityProvider;
     /**
-     * @var SAMLAuthnRequest
+     * @var SAML2_AuthnRequest
      */
     private $authnRequest;
     /**
@@ -128,7 +128,7 @@ final class GsspContext implements Context
     private $serviceProvider;
 
     /**
-     * @var SAMLResponse
+     * @var SAML2_Response
      */
     private $ssoReturnResponse;
 
@@ -155,7 +155,7 @@ final class GsspContext implements Context
             $stateHandler
         );
         $this->container = new BridgeContainer($logger);
-        ContainerSingleton::setContainer($this->container);
+        SAML2_Compat_ContainerSingleton::setContainer($this->container);
 
         $samlBundle = __DIR__.'/../../../vendor/surfnet/stepup-saml-bundle';
 
@@ -165,7 +165,7 @@ final class GsspContext implements Context
                 'assertionConsumerUrl' => 'https://service_provider/saml/acu',
                 'certificateFile' => sprintf('%s/src/Resources/keys/development_publickey.cer', $samlBundle),
                 'privateKeys' => [
-                    new PrivateKey(
+                    new SAML2_Configuration_PrivateKey(
                         sprintf('%s/src/Resources/keys/development_privatekey.pem', $samlBundle),
                         'default'
                     ),
@@ -179,7 +179,7 @@ final class GsspContext implements Context
                 'entityId' => 'https://identity_provider/saml/metadata',
                 'certificateFile' => sprintf('%s/src/Resources/keys/development_publickey.cer', $samlBundle),
                 'privateKeys' => [
-                    new PrivateKey(
+                    new SAML2_Configuration_PrivateKey(
                         sprintf('%s/src/Resources/keys/development_privatekey.pem', $samlBundle),
                         'default'
                     ),
@@ -189,7 +189,7 @@ final class GsspContext implements Context
         );
 
         $serviceProviders = new StaticServiceProviderRepository([$this->serviceProvider]);
-        $keyLoader = new KeyLoader();
+        $keyLoader = new SAML2_Certificate_KeyLoader();
         $signatureVerifier = new SignatureVerifier($keyLoader, $logger);
         $redirectBinding = new RedirectBinding($logger, $signatureVerifier, $serviceProviders);
         $configuration = new ConfigurationContainer(
@@ -284,11 +284,11 @@ final class GsspContext implements Context
      */
     public function createANormalAuthnRequest()
     {
-        $request = new SAMLAuthnRequest();
+        $request = new SAML2_AuthnRequest();
         $request->setAssertionConsumerServiceURL($this->serviceProvider->getAssertionConsumerUrl());
         $request->setDestination($this->identityProvider->getSsoUrl());
         $request->setIssuer($this->serviceProvider->getEntityId());
-        $request->setProtocolBinding(Constants::BINDING_HTTP_REDIRECT);
+        $request->setProtocolBinding(SAML2_Const::BINDING_HTTP_REDIRECT);
         $this->authnRequest = $request;
     }
 
@@ -306,11 +306,11 @@ final class GsspContext implements Context
      */
     public function createANormalAuthnRequestFromServiceProvider($entityId, $acu)
     {
-        $request = new SAMLAuthnRequest();
+        $request = new SAML2_AuthnRequest();
         $request->setAssertionConsumerServiceURL($acu);
         $request->setDestination($this->identityProvider->getSsoUrl());
         $request->setIssuer($entityId);
-        $request->setProtocolBinding(Constants::BINDING_HTTP_REDIRECT);
+        $request->setProtocolBinding(SAML2_Const::BINDING_HTTP_REDIRECT);
         $this->authnRequest = $request;
     }
 
@@ -325,7 +325,7 @@ final class GsspContext implements Context
     {
         $this->authnRequest->setSignatureKey(
             self::loadPrivateKey(
-                $this->serviceProvider->getPrivateKey(PrivateKey::NAME_DEFAULT)
+                $this->serviceProvider->getPrivateKey(SAML2_Configuration_PrivateKey::NAME_DEFAULT)
             )
         );
     }
@@ -432,8 +432,8 @@ final class GsspContext implements Context
         Assertion::eq('', $parameters['relayState']);
         Assertion::eq('https://service_provider/saml/acu', $parameters['acu']);
         $decodedSamlRequest = base64_decode($parameters['response']);
-        $document = DOMDocumentFactory::fromString($decodedSamlRequest);
-        $this->ssoReturnResponse = Message::fromXML($document->firstChild);
+        $document = SAML2_DOMDocumentFactory::fromString($decodedSamlRequest);
+        $this->ssoReturnResponse = SAML2_Message::fromXML($document->firstChild);
         Assertion::eq('@SurfnetGssp/StepupGssp/ssoReturn.html.twig-response', $this->response->getContent());
     }
 
@@ -480,18 +480,18 @@ final class GsspContext implements Context
     {
         $assertion = $this->getSsoAssertionResponse();
         $nameId = $assertion->getNameId();
-        Assertion::eq('unique-identifier-token', $nameId->value);
-        Assertion::eq(Constants::NAMEID_PERSISTENT, $nameId->Format);
+        Assertion::eq('unique-identifier-token', $nameId['Value']);
+        Assertion::eq(\SAML2_Const::NAMEID_PERSISTENT, $nameId['Format']);
     }
 
     /**
-     * @param PrivateKey $key
-     * @return PrivateKey|XMLSecurityKey
+     * @param SAML2_Configuration_PrivateKey $key
+     * @return SAML2_Configuration_PrivateKey|XMLSecurityKey
      * @throws \Exception
      */
-    private static function loadPrivateKey(PrivateKey $key)
+    private static function loadPrivateKey(SAML2_Configuration_PrivateKey $key)
     {
-        $keyLoader = new PrivateKeyLoader();
+        $keyLoader = new SAML2_Certificate_PrivateKeyLoader();
         $privateKey = $keyLoader->loadPrivateKey($key);
 
         $key = new XMLSecurityKey(XMLSecurityKey::RSA_SHA256, ['type' => 'private']);
@@ -501,8 +501,8 @@ final class GsspContext implements Context
     }
 
     /**
-     * @param PrivateKey $publicKey
-     * @return PrivateKey|XMLSecurityKey
+     * @param SAML2_Configuration_PrivateKey $publicKey
+     * @return SAML2_Configuration_PrivateKey|XMLSecurityKey
      *
      * @throws \Exception
      */
@@ -520,16 +520,16 @@ final class GsspContext implements Context
      */
     private function loadIdpPublicCertificate()
     {
-        $keyLoader = new KeyLoader();
+        $keyLoader = new SAML2_Certificate_KeyLoader();
         $keyLoader->loadCertificateFile($this->identityProvider->getCertificateFile());
-        /** @var \SAML2\Certificate\X509 $publicKey */
+        /** @var \SAML2_Certificate_X509 $publicKey */
         $publicKey = $keyLoader->getKeys()->getOnlyElement();
 
         return $publicKey->getCertificate();
     }
 
     /**
-     * @return mixed|\SAML2\Assertion|\SAML2\EncryptedAssertion
+     * @return mixed|\SAML2_Assertion|\SAML2_EncryptedAssertion
      */
     private function getSsoAssertionResponse()
     {
@@ -638,7 +638,7 @@ final class GsspContext implements Context
      */
     public function setTheSubjectNameIdTo($nameId)
     {
-        $this->authnRequest->setNameId(['Value' => $nameId, 'Format' => Constants::NAMEID_PERSISTENT]);
+        $this->authnRequest->setNameId(['Value' => $nameId, 'Format' => \SAML2_Const::NAMEID_PERSISTENT]);
     }
 
     /**
