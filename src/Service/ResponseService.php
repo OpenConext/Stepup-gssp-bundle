@@ -17,7 +17,11 @@
 
 namespace Surfnet\GsspBundle\Service;
 
-use SAML2_Assertion;
+use SAML2\Assertion;
+use SAML2\Constants;
+use SAML2\Response;
+use SAML2\XML\saml\SubjectConfirmation;
+use SAML2\XML\saml\SubjectConfirmationData;
 use Surfnet\GsspBundle\Saml\AssertionSigningServiceInterface;
 use Surfnet\GsspBundle\Saml\ResponseContextInterface;
 use Surfnet\SamlBundle\Entity\IdentityProvider;
@@ -57,16 +61,16 @@ final class ResponseService implements ResponseServiceInterface
         return $response;
     }
 
-    private function addSubjectConfirmationFor(SAML2_Assertion $assertion)
+    private function addSubjectConfirmationFor(Assertion $assertion)
     {
-        $confirmation = new \SAML2_XML_saml_SubjectConfirmation();
-        $confirmation->Method = \SAML2_Const::CM_BEARER;
+        $confirmation = new SubjectConfirmation();
+        $confirmation->Method = Constants::CM_BEARER;
         $assertion->setNameId([
             'Value' => $this->responseContext->getSubjectNameId(),
-            'Format' => \SAML2_Const::NAMEID_PERSISTENT,
+            'Format' => Constants::NAMEID_PERSISTENT,
         ]);
 
-        $confirmationData = new \SAML2_XML_saml_SubjectConfirmationData();
+        $confirmationData = new SubjectConfirmationData();
         $confirmationData->InResponseTo = $this->responseContext->getRequestId();
         $confirmationData->Recipient = $this->responseContext->getServiceProvider()->getAssertionConsumerUrl();
         $confirmationData->NotOnOrAfter = $this->dateTimeService->interval('PT8H')->getTimestamp();
@@ -76,7 +80,7 @@ final class ResponseService implements ResponseServiceInterface
         $assertion->setSubjectConfirmation([$confirmation]);
     }
 
-    private function addAuthenticationStatementTo(SAML2_Assertion $assertion)
+    private function addAuthenticationStatementTo(Assertion $assertion)
     {
         $assertion->setAuthnInstant($this->dateTimeService->getCurrent()->getTimestamp());
         $assertion->setAuthnContextClassRef('urn:oasis:names:tc:SAML:2.0:ac:classes:MobileTwoFactorUnregistered');
@@ -92,7 +96,7 @@ final class ResponseService implements ResponseServiceInterface
 
     private function createNewAuthnResponse()
     {
-        $response = new \SAML2_Response();
+        $response = new Response();
         $response->setIssuer($this->hostedIdentityProvider->getEntityId());
         $response->setIssueInstant($this->dateTimeService->getCurrent()->getTimestamp());
         $response->setDestination($this->responseContext->getServiceProvider()->getAssertionConsumerUrl());
@@ -103,7 +107,7 @@ final class ResponseService implements ResponseServiceInterface
 
     private function createAssertion()
     {
-        $assertion = new SAML2_Assertion();
+        $assertion = new Assertion();
         $assertion->setNotBefore($this->dateTimeService->getCurrent()->getTimestamp());
         $assertion->setNotOnOrAfter($this->dateTimeService->interval('PT5M')->getTimestamp());
         $assertion->setIssuer($this->hostedIdentityProvider->getEntityId());

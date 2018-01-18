@@ -20,7 +20,7 @@ namespace Surfnet\GsspBundle\Service;
 interface ResponseServiceInterface
 {
     /**
-     * @return \SAML2_Response
+     * @return \SAML2\Response
      * @throws \Exception
      */
     public function createResponse();

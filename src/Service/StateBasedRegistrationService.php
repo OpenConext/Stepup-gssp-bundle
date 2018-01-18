@@ -18,7 +18,7 @@
 namespace Surfnet\GsspBundle\Service;
 
 use Psr\Log\LoggerInterface;
-use SAML2_Const;
+use SAML2\Constants;
 use Surfnet\GsspBundle\Exception\RuntimeException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\RouterInterface;
@@ -59,7 +59,7 @@ final class StateBasedRegistrationService implements RegistrationService
         return $this->stateHandler->isRequestTypeRegistration();
     }
 
-    public function reject($message, $subCode = SAML2_Const::STATUS_AUTHN_FAILED)
+    public function reject($message, $subCode = Constants::STATUS_AUTHN_FAILED)
     {
         $this->logger->critical($message);
         $this->stateHandler->setErrorStatus($message, $subCode);

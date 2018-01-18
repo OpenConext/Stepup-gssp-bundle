@@ -17,7 +17,7 @@
 
 namespace Surfnet\GsspBundle\Service;
 
-use SAML2_Const;
+use SAML2\Constants;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -64,7 +64,7 @@ interface RegistrationService
      * @param string $subCode
      *   Saml response sub code.
      */
-    public function reject($message, $subCode = SAML2_Const::STATUS_AUTHN_FAILED);
+    public function reject($message, $subCode = Constants::STATUS_AUTHN_FAILED);
 
     /**
      * Creates the response that handles the redirect back to the service provider.
