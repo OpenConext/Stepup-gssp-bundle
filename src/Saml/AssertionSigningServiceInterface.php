@@ -17,13 +17,13 @@
 
 namespace Surfnet\GsspBundle\Saml;
 
-use SAML2\Assertion;
+use SAML2_Assertion;
 
 interface AssertionSigningServiceInterface
 {
     /**
-     * @param Assertion $assertion
-     * @return Assertion
+     * @param SAML2_Assertion $assertion
+     * @return SAML2_Assertion
      */
-    public function signAssertion(Assertion $assertion);
+    public function signAssertion(SAML2_Assertion $assertion);
 }

@@ -17,12 +17,12 @@
 
 namespace Surfnet\GsspBundle\Saml;
 
-use RobRichards\XMLSecLibs\XMLSecurityKey;
-use SAML2\Assertion;
-use SAML2\Certificate\KeyLoader;
-use SAML2\Certificate\PrivateKeyLoader;
-use SAML2\Configuration\PrivateKey;
+use SAML2_Assertion;
+use SAML2_Certificate_KeyLoader;
+use SAML2_Certificate_PrivateKeyLoader;
+use SAML2_Configuration_PrivateKey;
 use Surfnet\SamlBundle\Entity\IdentityProvider;
+use XMLSecurityKey;
 
 final class AssertionSigningService implements AssertionSigningServiceInterface
 {
@@ -37,10 +37,10 @@ final class AssertionSigningService implements AssertionSigningServiceInterface
     }
 
     /**
-     * @param Assertion $assertion
-     * @return Assertion
+     * @param SAML2_Assertion $assertion
+     * @return SAML2_Assertion
      */
-    public function signAssertion(Assertion $assertion)
+    public function signAssertion(SAML2_Assertion $assertion)
     {
         $assertion->setSignatureKey($this->loadPrivateKey());
         $assertion->setCertificates([$this->getPublicCertificate()]);
@@ -53,8 +53,8 @@ final class AssertionSigningService implements AssertionSigningServiceInterface
      */
     private function loadPrivateKey()
     {
-        $key        = $this->identityProvider->getPrivateKey(PrivateKey::NAME_DEFAULT);
-        $keyLoader  = new PrivateKeyLoader();
+        $key        = $this->identityProvider->getPrivateKey(SAML2_Configuration_PrivateKey::NAME_DEFAULT);
+        $keyLoader  = new SAML2_Certificate_PrivateKeyLoader();
         $privateKey = $keyLoader->loadPrivateKey($key);
 
         $xmlSecurityKey = new XMLSecurityKey(XMLSecurityKey::RSA_SHA256, ['type' => 'private']);
@@ -68,9 +68,9 @@ final class AssertionSigningService implements AssertionSigningServiceInterface
      */
     private function getPublicCertificate()
     {
-        $keyLoader = new KeyLoader();
+        $keyLoader = new SAML2_Certificate_KeyLoader();
         $keyLoader->loadCertificateFile($this->identityProvider->getCertificateFile());
-        /** @var \SAML2\Certificate\X509 $publicKey */
+        /** @var \SAML2_Certificate_X509 $publicKey */
         $publicKey = $keyLoader->getKeys()->getOnlyElement();
 
         return $publicKey->getCertificate();

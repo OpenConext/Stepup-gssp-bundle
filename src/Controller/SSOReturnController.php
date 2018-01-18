@@ -19,7 +19,7 @@ namespace Surfnet\GsspBundle\Controller;
 
 use Psr\Log\LoggerInterface;
 use RuntimeException;
-use SAML2\Response as SAMLResponse;
+use SAML2_Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Surfnet\GsspBundle\Saml\ResponseContextInterface;
 use Surfnet\GsspBundle\Service\StateHandlerInterface;
@@ -134,10 +134,10 @@ final class SSOReturnController extends Controller
     {
         try {
             $this->logger->info('Create sso response');
-            $samlResponse = $this->responseService->createResponse();
+            $response = $this->responseService->createResponse();
             $this->logger->notice(sprintf(
                 'Saml response created with id "%s", request ID: "%s"',
-                $samlResponse->getId(),
+                $response->getId(),
                 $this->responseContext->getRequestId()
             ));
         } catch (RuntimeException $e) {
@@ -149,7 +149,7 @@ final class SSOReturnController extends Controller
         $acu = $this->responseContext->getAssertionConsumerUrl();
         $response = $this->render('@SurfnetGssp/StepupGssp/ssoReturn.html.twig', [
             'acu' => $acu,
-            'response' => $this->getResponseAsXML($samlResponse),
+            'response' => $this->getResponseAsXML($response),
             'relayState' => $this->responseContext->getRelayState(),
         ]);
 
@@ -163,10 +163,10 @@ final class SSOReturnController extends Controller
     }
 
     /**
-     * @param SAMLResponse $response
+     * @param SAML2_Response $response
      * @return string
      */
-    private function getResponseAsXML(SAMLResponse $response)
+    private function getResponseAsXML(SAML2_Response $response)
     {
         return base64_encode($response->toUnsignedXML()->ownerDocument->saveXML());
     }
