@@ -71,7 +71,7 @@ services:
           - '@surfnet_gssp.logger'
 
     surfnet_gssp.logger:
-        class: Surfnet\GsspBundle\Logger\StateDependedSariLogger
+        class: Surfnet\GsspBundle\Logger\StepupRequestIdSariLogger
         arguments:
          - '@logger'
          - '@surfnet_saml.logger'
@@ -84,7 +84,7 @@ services:
           - '@surfnet_gssp.state_handler.service'
 
     surfnet_gssp.stepup_request_id_logger.decorator:
-        class: Surfnet\GsspBundle\Logger\StepupRequestIdLoggerDecorator
+        class: Surfnet\GsspBundle\Logger\AuthnRequestIdLoggerDecorator
         public: false
         decorates: surfnet_gssp.logger
         arguments:

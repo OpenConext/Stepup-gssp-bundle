@@ -33,7 +33,7 @@ use SAML2\Message;
 use SAML2\Response as SAMLResponse;
 use Surfnet\GsspBundle\Controller\SSOController;
 use Surfnet\GsspBundle\Controller\SSOReturnController;
-use Surfnet\GsspBundle\Logger\StateDependedSariLogger;
+use Surfnet\GsspBundle\Logger\StepupRequestIdSariLogger;
 use Surfnet\GsspBundle\Saml\AssertionSigningService;
 use Surfnet\GsspBundle\Saml\ResponseContext;
 use Surfnet\GsspBundle\Service\AuthenticationService;
@@ -149,7 +149,7 @@ final class GsspContext implements Context
         // Create required dependencies.
         $stateHandler = new StateHandler(new InMemoryValueStore());
         $this->logger = new BufferingLogger();
-        $logger = new StateDependedSariLogger(
+        $logger = new StepupRequestIdSariLogger(
             $this->logger,
             new SamlAuthenticationLogger($this->logger),
             $stateHandler
