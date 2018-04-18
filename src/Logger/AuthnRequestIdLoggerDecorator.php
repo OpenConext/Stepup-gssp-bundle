@@ -20,43 +20,28 @@ namespace Surfnet\GsspBundle\Logger;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
 use Surfnet\GsspBundle\Service\StateHandlerInterface;
-use Surfnet\SamlBundle\Monolog\SamlAuthenticationLogger;
 
 /**
- * It depends what the current application state is will it use the sari logger.
+ * Add auth request id to the logs.
  */
-final class StateDependedSariLogger extends AbstractLogger
+final class AuthnRequestIdLoggerDecorator extends AbstractLogger
 {
     private $logger;
     private $stateHandler;
-    private $sariLogger;
 
     public function __construct(
         LoggerInterface $logger,
-        SamlAuthenticationLogger $sariLogger,
         StateHandlerInterface $stateHandler
     ) {
         $this->logger = $logger;
         $this->stateHandler = $stateHandler;
-        $this->sariLogger = $sariLogger;
     }
 
     public function log($level, $message, array $context = array())
     {
-        if ($this->isRequiredToLogWithSari()) {
-            $this->createSariLogger()->log($level, $message, $context);
-        } else {
-            $this->logger->log($level, $message, $context);
+        if ($this->stateHandler->hasRequestId()) {
+            $context['_request_id'] = $this->stateHandler->getRequestId();
         }
-    }
-
-    private function isRequiredToLogWithSari()
-    {
-        return $this->stateHandler->hasRequestType();
-    }
-
-    private function createSariLogger()
-    {
-        return $this->sariLogger->forAuthentication($this->stateHandler->getRequestId());
+        $this->logger->log($level, $message, $context);
     }
 }

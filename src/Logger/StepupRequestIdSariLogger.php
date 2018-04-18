@@ -20,28 +20,43 @@ namespace Surfnet\GsspBundle\Logger;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
 use Surfnet\GsspBundle\Service\StateHandlerInterface;
+use Surfnet\SamlBundle\Monolog\SamlAuthenticationLogger;
 
 /**
- * Add's stepup request id to the logs.
+ * It depends what the current application state is will it use the sari logger.
  */
-final class StepupRequestIdLoggerDecorator extends AbstractLogger
+final class StepupRequestIdSariLogger extends AbstractLogger
 {
     private $logger;
     private $stateHandler;
+    private $sariLogger;
 
     public function __construct(
         LoggerInterface $logger,
+        SamlAuthenticationLogger $sariLogger,
         StateHandlerInterface $stateHandler
     ) {
         $this->logger = $logger;
         $this->stateHandler = $stateHandler;
+        $this->sariLogger = $sariLogger;
     }
 
     public function log($level, $message, array $context = array())
     {
-        if ($this->stateHandler->hasStepupRequestId()) {
-            $context['_request_id'] = $this->stateHandler->getStepupRequestId();
+        if ($this->isRequiredToLogWithSari()) {
+            $this->createSariLogger()->log($level, $message, $context);
+        } else {
+            $this->logger->log($level, $message, $context);
         }
-        $this->logger->log($level, $message, $context);
+    }
+
+    private function isRequiredToLogWithSari()
+    {
+        return $this->stateHandler->hasStepupRequestId();
+    }
+
+    private function createSariLogger()
+    {
+        return $this->sariLogger->forAuthentication($this->stateHandler->getStepupRequestId());
     }
 }
