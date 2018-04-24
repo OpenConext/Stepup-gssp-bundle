@@ -348,7 +348,7 @@ final class GsspContext implements Context
      *
      *  Removes the signature from the request.
      *
-     * @When the service provider send an unsigned AuthnRequest with HTTP-Redirect binding
+     * @When the service provider sends an unsigned AuthnRequest with HTTP-Redirect binding
      *
      * @throws \Exception
      */
@@ -369,7 +369,7 @@ final class GsspContext implements Context
      *
      *  Set an invalid signature
      *
-     * @When the service provider send an invalided signed AuthnRequest with HTTP-Redirect binding
+     * @When the service provider sends an invalided signed AuthnRequest with HTTP-Redirect binding
      *
      * @throws \Exception
      */

@@ -13,7 +13,7 @@ Feature: When invalid states are requested the IdP should respond properly
 
   Scenario: When a service provider sends an AuthnRequest without signature the request should be denied
     Given a normal SAML 2.0 AuthnRequest
-    When the service provider send an unsigned AuthnRequest with HTTP-Redirect binding
+    When the service provider sends an unsigned AuthnRequest with HTTP-Redirect binding
     Then the identity provider response should be an unrecoverable error 'The SAMLRequest is expected to be signed but it was not'
     And the logs are:
       | level    | message                                                                                     | sari |
@@ -23,7 +23,7 @@ Feature: When invalid states are requested the IdP should respond properly
 
   Scenario: When a service provider sends an AuthnRequest with incorrect signature the request should be denied
     Given a normal SAML 2.0 AuthnRequest
-    When the service provider send an invalided signed AuthnRequest with HTTP-Redirect binding
+    When the service provider sends an invalided signed AuthnRequest with HTTP-Redirect binding
     Then the identity provider response should be an unrecoverable error 'The SAMLRequest has been signed, but the signature format is not supported'
     And the logs are:
       | level    | message                                                                                                        | sari |
@@ -84,7 +84,7 @@ Feature: When invalid states are requested the IdP should respond properly
       | info    | AuthnRequest stored in state                                                                                                  | present |
       | notice  | Redirect user to the application registration route https://identity_provider/registration                                    | present |
 
-  Scenario: When the registration fails the application should send an yaml error response
+  Scenario: When the registration fails the application should send a yaml error response
     Given a normal SAML 2.0 AuthnRequest
     And AuthnRequest is signed with sha256
 
