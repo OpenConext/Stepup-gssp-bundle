@@ -609,7 +609,7 @@ final class GsspContext implements Context
             if (preg_match('/^\/.*\/$/', $row['message']) === 1) {
                 Assertion::regex($message, $row['message']);
             } else {
-                Assertion::eq($row['message'], $message);
+                Assertion::eq($message, $row['message']);
             }
             Assertion::eq($row['level'], $level, sprintf('Level does not match for %s', $row['message']));
             Assertion::choice($row['sari'], ['', 'present']);
