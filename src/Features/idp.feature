@@ -24,18 +24,18 @@ Feature: When invalid states are requested the IdP should respond properly
   Scenario: When a service provider sends an AuthnRequest with incorrect signature the request should be denied
     Given a normal SAML 2.0 AuthnRequest
     When the service provider sends an invalided signed AuthnRequest with HTTP-Redirect binding
-    Then the identity provider response should be an unrecoverable error 'The SAMLRequest has been signed, but the signature format is not supported'
+    Then the identity provider response should be an unrecoverable error 'Validation of the signature in the AuthnRequest failed'
     And the logs are:
-      | level    | message                                                                                                        | sari |
-      | notice   | Received sso request                                                                                           |      |
-      | info     | Processing AuthnRequest                                                                                        |      |
-      | debug    | Extracting public keys for ServiceProvider "https://service_provider/saml/metadata"                            |      |
-      | debug    | Found "1" keys, filtering the keys to get X509 keys                                                            |      |
-      | debug    | Found "1" X509 keys, attempting to use each for signature verification                                         |      |
-      | debug    | /Attempting to verify signature with certificate.*/                                                            |      |
-      | debug    | Signature NOT VERIFIED                                                                                         |      |
-      | debug    | Signature could not be verified with any of the found X509 keys.                                               |      |
-      | critical | Could not process Request, error: "The SAMLRequest has been signed, but the signature format is not supported" |      |
+      | level    | message                                                                                    | sari |
+      | notice   | Received sso request                                                                       |      |
+      | info     | Processing AuthnRequest                                                                    |      |
+      | debug    | Extracting public keys for ServiceProvider "https://service_provider/saml/metadata"        |      |
+      | debug    | Found "1" keys, filtering the keys to get X509 keys                                        |      |
+      | debug    | Found "1" X509 keys, attempting to use each for signature verification                     |      |
+      | debug    | /Attempting to verify signature with certificate.*/                                        |      |
+      | debug    | Signature NOT VERIFIED                                                                     |      |
+      | debug    | Signature could not be verified with any of the found X509 keys.                           |      |
+      | critical | Could not process Request, error: "Validation of the signature in the AuthnRequest failed" |      |
 
   Scenario: When an user request the sso endpoint without AuthnRequest the request should be denied
     When an user request identity provider sso endpoint
