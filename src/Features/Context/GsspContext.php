@@ -348,7 +348,7 @@ final class GsspContext implements Context
      *
      *  Removes the signature from the request.
      *
-     * @When the service provider send an unsigned AuthnRequest with HTTP-Redirect binding
+     * @When the service provider sends an unsigned AuthnRequest with HTTP-Redirect binding
      *
      * @throws \Exception
      */
@@ -369,7 +369,7 @@ final class GsspContext implements Context
      *
      *  Set an invalid signature
      *
-     * @When the service provider send an invalided signed AuthnRequest with HTTP-Redirect binding
+     * @When the service provider sends an invalided signed AuthnRequest with HTTP-Redirect binding
      *
      * @throws \Exception
      */
@@ -609,7 +609,7 @@ final class GsspContext implements Context
             if (preg_match('/^\/.*\/$/', $row['message']) === 1) {
                 Assertion::regex($message, $row['message']);
             } else {
-                Assertion::eq($row['message'], $message);
+                Assertion::eq($message, $row['message']);
             }
             Assertion::eq($row['level'], $level, sprintf('Level does not match for %s', $row['message']));
             Assertion::choice($row['sari'], ['', 'present']);
