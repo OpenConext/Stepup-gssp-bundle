@@ -29,18 +29,16 @@ interface StateHandlerInterface
      *
      * @param ReceivedAuthnRequest $authnRequest
      * @param string $relayState
-     * @param string $stepupRequestId
      */
-    public function saveRegistrationRequest(ReceivedAuthnRequest $authnRequest, $relayState, $stepupRequestId);
+    public function saveRegistrationRequest(ReceivedAuthnRequest $authnRequest, $relayState);
 
     /**
      * Stores the state of a authentication request.
      *
      * @param ReceivedAuthnRequest $authnRequest
      * @param string $relayState
-     * @param string $stepupRequestId
      */
-    public function saveAuthenticationRequest(ReceivedAuthnRequest $authnRequest, $relayState, $stepupRequestId);
+    public function saveAuthenticationRequest(ReceivedAuthnRequest $authnRequest, $relayState);
 
     /**
      * @param string $message
@@ -126,16 +124,6 @@ interface StateHandlerInterface
      * @return array
      */
     public function getErrorStatus();
-
-    /**
-     * @return string
-     */
-    public function getStepupRequestId();
-
-    /**
-     * @return bool
-     */
-    public function hasStepupRequestId();
 
     /**
      * @return bool

@@ -28,7 +28,6 @@ use Surfnet\SamlBundle\SAML2\ReceivedAuthnRequest;
 final class StateHandler implements StateHandlerInterface
 {
     const REQUEST_ID = 'request_id';
-    const REQUEST_STEPUP_ID = 'stepup_request_id';
     const REQUEST_SERVICE_PROVIDER = 'service_provider';
     const REQUEST_RELAY_STATE = 'relay_state';
 
@@ -56,30 +55,24 @@ final class StateHandler implements StateHandlerInterface
         $this->store = $store;
     }
 
-    public function saveRegistrationRequest(ReceivedAuthnRequest $authnRequest, $relayState, $stepupRequestId)
+    public function saveRegistrationRequest(ReceivedAuthnRequest $authnRequest, $relayState)
     {
         $this->assertRequestTypeNotSet();
         Assertion::string($relayState);
-        Assertion::string($stepupRequestId);
-        Assertion::notNull($stepupRequestId);
 
         $this->setRequestId($authnRequest->getRequestId())
-            ->setStepupRequestId($stepupRequestId)
             ->setRequestServiceProvider($authnRequest->getServiceProvider())
             ->setRelayState($relayState)
             ->set(self::REQUEST_TYPE, self::REQUEST_TYPE_REGISTRATION)
         ;
     }
 
-    public function saveAuthenticationRequest(ReceivedAuthnRequest $authnRequest, $relayState, $stepupRequestId)
+    public function saveAuthenticationRequest(ReceivedAuthnRequest $authnRequest, $relayState)
     {
         $this->assertRequestTypeNotSet();
         Assertion::string($relayState);
-        Assertion::string($stepupRequestId);
-        Assertion::notNull($stepupRequestId);
 
         $this->setRequestId($authnRequest->getRequestId())
-            ->setStepupRequestId($stepupRequestId)
             ->setRequestServiceProvider($authnRequest->getServiceProvider())
             ->setRelayState($relayState)
             ->set(self::NAME_ID, $authnRequest->getNameId())
@@ -171,16 +164,6 @@ final class StateHandler implements StateHandlerInterface
         ];
     }
 
-    public function getStepupRequestId()
-    {
-        return $this->store->get(self::REQUEST_STEPUP_ID);
-    }
-
-    public function hasStepupRequestId()
-    {
-        return $this->store->has(self::REQUEST_STEPUP_ID);
-    }
-
     public function isAuthenticated()
     {
         return $this->store->is(self::RESPONSE_TYPE_USER_AUTHENTICATED, true);
@@ -199,11 +182,6 @@ final class StateHandler implements StateHandlerInterface
     private function setRequestServiceProvider($serviceProvider)
     {
         return $this->set(self::REQUEST_SERVICE_PROVIDER, $serviceProvider);
-    }
-
-    private function setStepupRequestId($requestId)
-    {
-        return $this->set(self::REQUEST_STEPUP_ID, $requestId);
     }
 
     private function setRequestId($originalRequestId)

@@ -52,11 +52,13 @@ final class StepupRequestIdSariLogger extends AbstractLogger
 
     private function isRequiredToLogWithSari()
     {
-        return $this->stateHandler->hasStepupRequestId();
+        return $this->stateHandler->hasRequestId();
     }
 
     private function createSariLogger()
     {
-        return $this->sariLogger->forAuthentication($this->stateHandler->getStepupRequestId());
+        return $this->sariLogger->forAuthentication(
+            $this->stateHandler->getRequestId()
+        );
     }
 }

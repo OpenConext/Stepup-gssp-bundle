@@ -1,5 +1,7 @@
+<?php
+
 /**
- * Copyright %regexp:\d{4}% SURFnet B.V.
+ * Copyright 2018 SURFnet B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,3 +15,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+namespace Surfnet\GsspBundle\Monolog\Processor;
+
+class RequestIdProcessor
+{
+    /**
+     * @var string
+     */
+    private $requestId;
+
+    public function __construct()
+    {
+        $this->requestId = md5(openssl_random_pseudo_bytes(50));
+    }
+
+    /**
+     * Adds the random request ID onto the records extra data.
+     *
+     * @param array $record
+     * @return array
+     */
+    public function __invoke(array $record)
+    {
+        $record['extra']['request_id'] = $this->requestId;
+
+        return $record;
+    }
+}
