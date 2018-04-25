@@ -1,6 +1,9 @@
 
-VERSION 1  REMOVE DEPRECATED SERVICE CONFIG
+VERSION 1  Initial release
 ===========================================
+
+   Version 1.2 - Logging improvements (see https://github.com/OpenConext/Stepup-gssp-bundle/pull/21)
+      25/04/2018 10:00  1.1.0  initial release
 
    Version 1.1 - Change request id logging
       18/04/2018 11:50  1.1.0  initial release
