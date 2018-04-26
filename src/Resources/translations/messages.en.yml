@@ -3,6 +3,3 @@ gssp.sso_return.one_moment_please: 'One moment please...'
 gssp.sso_return.js_disabled: 'Javascript is disabled, please click the button below to proceed'
 gssp.sso_return.submit_button: 'Submit'
 
-gssp.unrecoverable_error.title: 'Unrecoverable error'
-gssp.unrecoverable_error.message.title: 'Error'
-gssp.unrecoverable_error.message.intro: 'The following has occurred:'

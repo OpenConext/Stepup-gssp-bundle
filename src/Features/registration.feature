@@ -7,7 +7,7 @@ Feature: When an user needs to enroll for a new token
     Given a normal SAML 2.0 AuthnRequest
     And AuthnRequest is signed with sha256
 
-    When the service provider send the AuthnRequest with HTTP-Redirect binding
+    When the service provider sends the AuthnRequest with HTTP-Redirect binding
 
     Then the identity provider register the user with an unique identifier token
 
@@ -43,7 +43,7 @@ Feature: When an user needs to enroll for a new token
   Scenario: When an user request the sso return endpoint without being registered the user should be redirected to the application registration endpoint
     Given a normal SAML 2.0 AuthnRequest
     And AuthnRequest is signed with sha256
-    And the service provider send the AuthnRequest with HTTP-Redirect binding
+    And the service provider sends the AuthnRequest with HTTP-Redirect binding
     And I clear the logs
 
     When the user is redirected to the identity provider sso return endpoint without registration

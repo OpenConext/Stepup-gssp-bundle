@@ -21,6 +21,7 @@ use Psr\Log\LoggerInterface;
 use RuntimeException;
 use SAML2\Response as SAMLResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Surfnet\GsspBundle\Exception\UnrecoverableErrorException;
 use Surfnet\GsspBundle\Saml\ResponseContextInterface;
 use Surfnet\GsspBundle\Service\StateHandlerInterface;
 use Surfnet\GsspBundle\Service\ConfigurationContainer;
@@ -71,11 +72,7 @@ final class SSOReturnController extends Controller
 
         // Show error if we don't have an active AuthnRequest.
         if (!$this->responseContext->hasRequest()) {
-            $this->logger->critical('There is no request state present');
-
-            return $this->render('@SurfnetGssp/StepupGssp/unrecoverableError.html.twig', [
-                'message' => 'There is no active AuthnRequest to process the return',
-            ], new Response(null, Response::HTTP_NOT_ACCEPTABLE));
+            throw new UnrecoverableErrorException('There is no request state present');
         }
 
         if ($this->responseContext->inErrorState()) {
@@ -90,9 +87,7 @@ final class SSOReturnController extends Controller
             return $this->ssoAuthenticationReturnAction();
         }
 
-        return $this->render('@SurfnetGssp/StepupGssp/unrecoverableError.html.twig', [
-            'message' => 'Application state invalid',
-        ], new Response(null, Response::HTTP_NOT_ACCEPTABLE));
+        throw new UnrecoverableErrorException('Application state invalid');
     }
 
     private function ssoRegistrationReturnAction()

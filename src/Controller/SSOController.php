@@ -20,6 +20,7 @@ namespace Surfnet\GsspBundle\Controller;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Surfnet\GsspBundle\Exception\UnrecoverableErrorException;
 use Surfnet\GsspBundle\Saml\ResponseContextInterface;
 use Surfnet\GsspBundle\Service\StateHandlerInterface;
 use Surfnet\GsspBundle\Service\ConfigurationContainer;
@@ -29,7 +30,6 @@ use Surfnet\SamlBundle\SAML2\ReceivedAuthnRequest;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Handles the SAML AuthnRequest from the service provider.
@@ -86,11 +86,14 @@ final class SSOController extends Controller
                 $originalRequest->getRequestId()
             ));
         } catch (RuntimeException $e) {
-            $this->logger->critical(sprintf('Could not process Request, error: "%s"', $e->getMessage()));
-
-            return $this->render('@SurfnetGssp/StepupGssp/unrecoverableError.html.twig', [
-                'message' => $e->getMessage(),
-            ], new Response(null, Response::HTTP_NOT_ACCEPTABLE));
+            throw new UnrecoverableErrorException(
+                sprintf(
+                    'Error processing the SAML authentication request: %s',
+                    $e->getMessage()
+                ),
+                0,
+                $e
+            );
         }
 
         // Determine the AuthnRequest type. If there is a nameId present it's an authentication request

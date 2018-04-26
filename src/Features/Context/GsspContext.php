@@ -21,6 +21,7 @@ use Assert\Assertion;
 use Assert\AssertionFailedException;
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\TableNode;
+use Exception;
 use RobRichards\XMLSecLibs\XMLSecurityKey;
 use SAML2\AuthnRequest as SAMLAuthnRequest;
 use SAML2\Certificate\KeyLoader;
@@ -131,6 +132,11 @@ final class GsspContext implements Context
      * @var SAMLResponse
      */
     private $ssoReturnResponse;
+
+    /**
+     * @var Exception
+     */
+    private $lastException;
 
     /**
      * Every scenario we start with a clean slate.
@@ -333,13 +339,14 @@ final class GsspContext implements Context
     /**
      * Call the SSO IdP endpoint action with HTTP AuthnRequest request, set the response on this context.
      *
-     * @When the service provider send the AuthnRequest with HTTP-Redirect binding
+     * @When the service provider sends the AuthnRequest with HTTP-Redirect binding
      */
     public function callIdentityProviderSSOActionWithAuthnRequest()
     {
         $request = AuthnRequest::createNew($this->authnRequest);
         $query = $request->buildRequestQuery();
         parse_str($query, $parameters);
+
         $this->callIdentityProviderSSOAction($parameters);
     }
 
@@ -386,15 +393,24 @@ final class GsspContext implements Context
     }
 
     /**
-     * @Then the identity provider response should be an unrecoverable error :message
+     * @Then the identity provider response should be an unrecoverable error :expected
+     *
+     * This error should be handled by the application implementing this bundle.
      *
      * @throws AssertionFailedException
      */
-    public function responseShouldBeAnUnrecoverableError($message)
+    public function responseShouldBeAnUnrecoverableError($expected)
     {
-        Assertion::eq('@SurfnetGssp/StepupGssp/unrecoverableError.html.twig', $this->twigTemplate);
-        Assertion::eq($message, $this->twigParameters['message']);
-        Assertion::eq(Response::HTTP_NOT_ACCEPTABLE, $this->response->getStatusCode());
+        $actual = '';
+
+        if ($this->lastException) {
+            $actual = $this->lastException->getMessage();
+        }
+
+        Assertion::eq(
+            $actual,
+            sprintf('Error processing the SAML authentication request: %s', $expected)
+        );
     }
 
     /**
@@ -541,13 +557,20 @@ final class GsspContext implements Context
     /**
      * @param array $parameters
      *
-     * @When /^an user request identity provider sso endpoint$/
-     * @When /^the user request identity provider sso endpoint$/
+     * @When /^an user requests the identity provider sso endpoint$/
+     * @When /^the user requests the identity provider sso endpoint$/
      */
     public function callIdentityProviderSSOAction(array $parameters = [])
     {
         $request = Request::create('http://identity_provider/saml/sso', 'GET', $parameters);
-        $this->response = $this->ssoController->ssoAction($request);
+
+        unset($this->lastException);
+
+        try {
+            $this->response = $this->ssoController->ssoAction($request);
+        } catch (Exception $e) {
+            $this->lastException = $e;
+        }
     }
 
     /**
