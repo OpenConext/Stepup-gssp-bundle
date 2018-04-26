@@ -7,7 +7,7 @@ Feature: When an user needs to be authenticated
     And AuthnRequest is signed with sha256
     And set the subject nameId to 'unique-identifier-token'
 
-    When the service provider send the AuthnRequest with HTTP-Redirect binding
+    When the service provider sends the AuthnRequest with HTTP-Redirect binding
 
     Then the identity provider authenticates the user
 
@@ -38,11 +38,11 @@ Feature: When an user needs to be authenticated
       | notice | /Saml response created with id ".+", request ID: ".+"/                                                                        | present |
       | notice | Invalidate current state and redirect user to service provider assertion consumer url "https://service_provider/saml/acu"     | present |
 
-  Scenario: When an user request the sso return endpoint without being authenticated the user should be redirected to the application authentication endpoint
+  Scenario: When an user requests the sso return endpoint without being authenticated the user should be redirected to the application authentication endpoint
     Given a normal SAML 2.0 AuthnRequest
     And AuthnRequest is signed with sha256
     And set the subject nameId to 'unique-identifier-token'
-    And the service provider send the AuthnRequest with HTTP-Redirect binding
+    And the service provider sends the AuthnRequest with HTTP-Redirect binding
     And I clear the logs
 
     When the user is redirected to the identity provider sso return endpoint without authentication
