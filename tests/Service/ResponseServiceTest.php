@@ -147,4 +147,59 @@ class ResponseServiceTest extends \PHPUnit_Framework_TestCase
             $xml
         );
     }
+
+    /**
+     * Limit SubjectConfirmationData validity to Assertion validity.
+     *
+     * See https://www.pivotaltracker.com/story/show/158356792
+     * See https://www.pivotaltracker.com/story/show/157880479
+     */
+    public function testSubjectConfirmationNotOnOrAfterEqualsAssertionNotOnOrAfter()
+    {
+        $datetimeService = new StaticDateTimeService(
+            \DateTimeImmutable::createFromFormat(
+                \DateTime::ATOM,
+                '2016-12-08T10:42:59+0100'
+            )
+        );
+
+        $this->identityProvider->shouldReceive(['getEntityId' => 'https://identity_provider/saml/metadata']);
+
+        $this->serviceProvider->shouldReceive(
+            [
+                'getEntityId' => 'https://service_provider/saml/metadata',
+                'getAssertionConsumerUrl' => 'https://service_provider/saml/acu'
+            ]
+        );
+
+        $this->responseContext->shouldReceive(
+            [
+                'getServiceProvider' => $this->serviceProvider,
+                'getSubjectNameId' => 'subject_name_id',
+                'getRequestId' => 'sp_request_id',
+                'inErrorState' => false
+            ]
+        );
+
+        $service = new ResponseService(
+            $this->identityProvider,
+            $this->responseContext,
+            $this->assertionSigningService,
+            $datetimeService
+        );
+
+        $response = $service->createResponse();
+
+        $assertions = $response->getAssertions();
+
+        /** @var \SAML2\Assertion $assertion */
+        $assertion = reset($assertions);
+
+        $subjects = $assertion->getSubjectConfirmation();
+
+        /** @var \SAML2\XML\saml\SubjectConfirmation $subjectConfirmation */
+        $subjectConfirmation = reset($subjects);
+
+        $this->assertEquals($assertion->getNotOnOrAfter(), $subjectConfirmation->SubjectConfirmationData->NotOnOrAfter);
+    }
 }
