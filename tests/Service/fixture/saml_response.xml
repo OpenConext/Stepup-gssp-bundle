@@ -9,7 +9,7 @@
         <saml:Subject>
             <saml:NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent">subject_name_id</saml:NameID>
             <saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
-                <saml:SubjectConfirmationData InResponseTo="sp_request_id" NotOnOrAfter="2016-12-08T17:42:59Z" Recipient="https://service_provider/saml/acu"/>
+                <saml:SubjectConfirmationData InResponseTo="sp_request_id" NotOnOrAfter="2016-12-08T09:47:59Z" Recipient="https://service_provider/saml/acu"/>
             </saml:SubjectConfirmation>
         </saml:Subject>
         <saml:Conditions NotBefore="2016-12-08T09:42:59Z" NotOnOrAfter="2016-12-08T09:47:59Z">

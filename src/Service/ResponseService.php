@@ -73,7 +73,7 @@ final class ResponseService implements ResponseServiceInterface
         $confirmationData = new SubjectConfirmationData();
         $confirmationData->InResponseTo = $this->responseContext->getRequestId();
         $confirmationData->Recipient = $this->responseContext->getServiceProvider()->getAssertionConsumerUrl();
-        $confirmationData->NotOnOrAfter = $this->dateTimeService->interval('PT8H')->getTimestamp();
+        $confirmationData->NotOnOrAfter = $assertion->getNotOnOrAfter();
 
         $confirmation->SubjectConfirmationData = $confirmationData;
 
