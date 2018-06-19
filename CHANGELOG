@@ -7,6 +7,10 @@ including logging and showing an error page to the user.
    Version 2.0 - Remove error handling
       26/04/2018 10:00  2.0.0  initial release
 
+
+   Version 2.1 - Session invalidation and NotOnOrAfter improvement
+      19/06/2018 10:00  2.1.0  initial release
+
 VERSION 1  Initial release
 ===========================================
 
