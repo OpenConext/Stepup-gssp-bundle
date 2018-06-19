@@ -53,3 +53,22 @@ Feature: When an user needs to be authenticated
       | level   | message                                                                                                                               | sari    |
       | notice  | Received sso return request                                                                                                           | present |
       | warning | User was not authenticated by the application, redirect user back the authentication route "https://identity_provider/authentication" | present |
+
+  Scenario: A user cannot revisit the SSO return endpoint after successful authentication
+    Given a normal SAML 2.0 AuthnRequest
+    And AuthnRequest is signed with sha256
+    And set the subject nameId to 'unique-identifier-token'
+
+    When the service provider sends the AuthnRequest with HTTP-Redirect binding
+
+    Then the identity provider authenticates the user
+
+    When the user is redirected to the identity provider sso return endpoint
+    Then Identity provider sso return endpoint should redirect client-side a saml response to the service provider
+    And the saml response assertion should be signed
+    And the saml response status code should be "urn:oasis:names:tc:SAML:2.0:status:Success"
+    And the saml response should have an authenticating authority of the IdP EntityId with class ref 'urn:oasis:names:tc:SAML:2.0:ac:classes:MobileTwoFactorUnregistered'
+    And the saml response should have the token identifier in the Subject NameID of the Assertion section
+
+    When the user is redirected to the identity provider sso return endpoint
+    Then the return endpoint should raise an exception with "There is no request state present"

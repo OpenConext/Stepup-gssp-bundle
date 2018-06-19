@@ -38,14 +38,14 @@ use Surfnet\GsspBundle\Logger\StepupRequestIdSariLogger;
 use Surfnet\GsspBundle\Saml\AssertionSigningService;
 use Surfnet\GsspBundle\Saml\ResponseContext;
 use Surfnet\GsspBundle\Service\AuthenticationService;
-use Surfnet\GsspBundle\Service\StateBasedAuthenticationService;
-use Surfnet\GsspBundle\Service\StateBasedRegistrationService;
-use Surfnet\GsspBundle\Service\RegistrationService;
 use Surfnet\GsspBundle\Service\ConfigurationContainer;
 use Surfnet\GsspBundle\Service\DateTime\SystemDateTimeService;
+use Surfnet\GsspBundle\Service\RegistrationService;
 use Surfnet\GsspBundle\Service\ResponseService;
-use Surfnet\GsspBundle\Service\ValueStore\InMemoryValueStore;
+use Surfnet\GsspBundle\Service\StateBasedAuthenticationService;
+use Surfnet\GsspBundle\Service\StateBasedRegistrationService;
 use Surfnet\GsspBundle\Service\StateHandler;
+use Surfnet\GsspBundle\Service\ValueStore\InMemoryValueStore;
 use Surfnet\SamlBundle\Entity\IdentityProvider;
 use Surfnet\SamlBundle\Entity\ServiceProvider;
 use Surfnet\SamlBundle\Entity\StaticServiceProviderRepository;
@@ -432,7 +432,11 @@ final class GsspContext implements Context
      */
     public function requestSSOreturnEndpoint()
     {
-        $this->response = $this->ssoReturnController->ssoReturnAction();
+        try {
+            $this->response = $this->ssoReturnController->ssoReturnAction();
+        } catch (Exception $e) {
+            $this->lastException = $e;
+        }
     }
 
     /**
@@ -670,5 +674,13 @@ final class GsspContext implements Context
     public function theIdentityProviderAuthenticatesTheUser()
     {
         $this->authenticationService->authenticate();
+    }
+
+    /**
+     * @Then /^the return endpoint should raise an exception with "([^"]*)"$/
+     */
+    public function theReturnEndpointShouldRaiseAnException($message)
+    {
+        Assertion::eq($message, $this->lastException->getMessage());
     }
 }
