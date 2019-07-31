@@ -93,12 +93,15 @@ from that machine.
 
 Requirements
 -------------------
-- ansible 2.x
-- vagrant 1.9.x
+- ansible 2.6.x
+- vagrant 2.2.x
+    - vagrant-hostsupdater (1.1.1.160, global)
+    - vagrant-vbguest (0.19.0, global)
 - Virtualbox
 
 Install
 -------------------
+``` cd homestead && composer install ```
 
 ``` vagrant up ```
 

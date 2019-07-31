@@ -22,6 +22,7 @@ use Assert\AssertionFailedException;
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\TableNode;
 use Exception;
+use JakubOnderka\PhpParallelLint\RunTimeException;
 use RobRichards\XMLSecLibs\XMLSecurityKey;
 use SAML2\AuthnRequest as SAMLAuthnRequest;
 use SAML2\Certificate\KeyLoader;
@@ -470,6 +471,7 @@ final class GsspContext implements Context
      * @Then the saml response assertion should be signed
      *
      * @throws AssertionFailedException
+     * @throws RunTimeException
      */
     public function theResponseAssertionShouldBeSigned()
     {
@@ -480,7 +482,11 @@ final class GsspContext implements Context
             $assertion->getCertificates()[0]
         );
         $key = self::loadPublicKey($this->identityProvider->getSharedKey());
-        $assertion->validate($key);
+        try {
+            $assertion->validate($key);
+        } catch (Exception $e) {
+            throw new RunTimeException(sprintf('openssl_error_string: "%s" Error: %s', openssl_error_string(), $e->getMessage()));
+        }
     }
 
     /**

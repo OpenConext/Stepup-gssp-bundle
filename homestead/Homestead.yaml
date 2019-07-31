@@ -1,0 +1,15 @@
+ip: 192.168.77.43
+memory: 4096
+cpus: 2
+provider: virtualbox
+authorize: ~/.ssh/id_rsa.pub
+php: 5.6
+keys:
+    - ~/.ssh/id_rsa
+folders:
+    -
+        map: .
+        to: /home/vagrant/code
+sites: []
+name: gssp
+hostname: gssp
