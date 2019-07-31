@@ -528,7 +528,7 @@ final class GsspContext implements Context
      */
     private static function loadPublicKey($publicKey)
     {
-        $key = new XMLSecurityKey(XMLSecurityKey::RSA_SHA1, ['type' => 'public']);
+        $key = new XMLSecurityKey(XMLSecurityKey::RSA_SHA256, ['type' => 'public']);
         $key->loadKey($publicKey, true);
 
         return $key;
