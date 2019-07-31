@@ -10,8 +10,7 @@
 
 cd /home/vagrant/code
 
-sudo cp /home/vagrant/code/homestead/php.ini /etc/php/5.6/mods-available/custom.ini
-sudo phpenmod -v 5.6 custom
+sudo cp /home/vagrant/code/homestead/php.ini /etc/php/7.2/mods-available/custom.ini
+sudo phpenmod -v 7.2 custom
 composer install
-
 echo 'cd /home/vagrant/code' >> ~/.profile
