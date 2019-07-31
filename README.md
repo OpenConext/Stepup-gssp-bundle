@@ -93,12 +93,14 @@ from that machine.
 
 Requirements
 -------------------
-- ansible 2.x
-- vagrant 1.9.x
+- vagrant 2.2.x
+    - vagrant-hostsupdater (1.1.1.160, global)
+    - vagrant-vbguest (0.19.0, global)
 - Virtualbox
 
 Install
 -------------------
+``` cd homestead && composer install ```
 
 ``` vagrant up ```
 
@@ -109,7 +111,7 @@ If everything goes as planned you can develop inside the virtual machine
 Debugging
 -------------------
 Xdebug is configured when provisioning your development Vagrant box. 
-It's configured with auto connect IDE_KEY=phpstorm.
+It's configured with auto connect IDE_KEY=phpstorm and ```xon``` on cli env. 
 
 Tests en metrics
 ======================

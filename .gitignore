@@ -6,6 +6,7 @@
 #################
 vagrant.retry
 .vagrant
+homestead/vendor
 
 # Code coverage reports #
 #################
@@ -16,7 +17,7 @@ vagrant.retry
 .DS_Store
 .DS_Store?
 
-
 # Application files #
 ######################
 /vendor/
+composer.lock
