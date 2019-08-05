@@ -7,4 +7,4 @@ default:
         bundle:
             contexts:
                 - Surfnet\GsspBundle\Features\Context\GsspContext:
-            paths:    [ %paths.base%/src/Features ]
+            paths:    [ '%paths.base%/src/Features' ]
