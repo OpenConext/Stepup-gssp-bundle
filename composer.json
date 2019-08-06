@@ -22,7 +22,7 @@
     "beberlei/assert": "^3",
     "sensio/framework-extra-bundle": "^5.4",
     "symfony/monolog-bundle": "^3.4",
-    "surfnet/stepup-saml-bundle": "4.1.6-alpha.1 || ~4",
+    "surfnet/stepup-saml-bundle": "^4.1.7",
     "symfony/dependency-injection": ">=2.7,<4 || ~4.3",
     "symfony/framework-bundle": ">=2.7,<4 || ~4.3"
   },
@@ -45,12 +45,18 @@
       "@phpunit",
       "@behat"
     ],
-
-    "lint": ["@lint-php", "@lint-composer"],
+    "lint": [
+      "@lint-php",
+      "@lint-composer"
+    ],
     "lint-php": "vendor/bin/parallel-lint src tests",
     "lint-composer": "composer validate",
-
-    "static-analysis": ["@license-headers", "@phpmd", "@phpcs", "@phpcpd"],
+    "static-analysis": [
+      "@license-headers",
+      "@phpmd",
+      "@phpcs",
+      "@phpcpd"
+    ],
     "license-headers": "vendor/bin/docheader check src/ tests/",
     "phpmd": "vendor/bin/docheader check src/ tests/",
     "phpcs": [
@@ -61,11 +67,12 @@
       "vendor/bin/phpcbf --standard=phpcs.xml ./src",
       "vendor/bin/phpcbf --standard=phpcs_tests.xml ./tests"
     ],
-    "phpcpd": ["vendor/bin/phpcpd  ./src", "vendor/bin/phpcpd  ./tests"],
-
+    "phpcpd": [
+      "vendor/bin/phpcpd  ./src",
+      "vendor/bin/phpcpd  ./tests"
+    ],
     "phpunit": "vendor/bin/phpunit tests",
     "behat": "vendor/bin/behat  --config behat.yml",
-
     "coverage": [
       "@phpunit-coverage",
       "mkdir -p coverage/reports",
