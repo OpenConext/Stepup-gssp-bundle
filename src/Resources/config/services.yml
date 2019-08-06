@@ -5,7 +5,7 @@ services:
           - '@surfnet_saml.metadata_factory'
         tags: ['controller.service_arguments']
         public: true
-        deprecated: ~
+        
     Surfnet\GsspBundle\Controller\MetadataController:
         alias: surfnet_gssp.saml.metadata_controller
         public: true
@@ -20,7 +20,7 @@ services:
           - '@surfnet_gssp.logger'
         tags: ['controller.service_arguments']
         public: true
-        deprecated: ~
+        
     Surfnet\GsspBundle\Controller\SSOController:
         alias: surfnet_gssp.saml.sso_controller
         public: true
