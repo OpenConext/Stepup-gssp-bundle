@@ -59,6 +59,13 @@ interface RegistrationService
     public function register($subjectNameId);
 
     /**
+     * If the user is already registered.
+     *
+     * @return boolean
+     */
+    public function isRegistered();
+
+    /**
      * @param string $message
      *   The error message.
      * @param string $subCode

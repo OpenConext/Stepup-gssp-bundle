@@ -54,6 +54,15 @@ final class StateBasedRegistrationService implements RegistrationService
         $this->stateHandler->saveSubjectNameId($subjectNameId);
     }
 
+    public function isRegistered()
+    {
+        if (!$this->stateHandler->isRequestTypeRegistration()) {
+            $this->logger->critical('Current request does not need a registration');
+            throw RuntimeException::shouldNotRegister();
+        }
+        return $this->stateHandler->hasSubjectNameId();
+    }
+
     public function registrationRequired()
     {
         return $this->stateHandler->isRequestTypeRegistration();

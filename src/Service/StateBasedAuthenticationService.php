@@ -59,6 +59,15 @@ final class StateBasedAuthenticationService implements AuthenticationService
         $this->stateHandler->authenticate();
     }
 
+    public function isAuthenticated()
+    {
+        if (!$this->stateHandler->isRequestTypeAuthentication()) {
+            $this->logger->critical('Current request does not need a authentication');
+            throw RuntimeException::shouldNotAuthenticate();
+        }
+        return $this->stateHandler->isAuthenticated();
+    }
+
     public function reject($message, $subCode = Constants::STATUS_AUTHN_FAILED)
     {
         $this->logger->critical($message);
