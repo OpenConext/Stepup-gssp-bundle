@@ -30,7 +30,7 @@ class StateBasedAuthenticationServiceTest extends TestCase
         $stateHandler->shouldReceive('isRequestTypeAuthentication')->andReturnFalse();
         $router = \Mockery::mock(RouterInterface::class);
         $logger = \Mockery::mock(LoggerInterface::class);
-        $logger->shouldReceive('critical')->with('Current request does not need a authentication');
+        $logger->shouldReceive('critical')->with('Current request does not need an authentication');
         $registrationService = new StateBasedAuthenticationService(
             $stateHandler,
             $router,

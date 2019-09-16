@@ -52,7 +52,7 @@ final class StateBasedAuthenticationService implements AuthenticationService
     public function authenticate()
     {
         if (!$this->stateHandler->isRequestTypeAuthentication()) {
-            $this->logger->critical('Current request does not need a authentication');
+            $this->logger->critical('Current request does not need an authentication');
             throw RuntimeException::shouldNotAuthenticate();
         }
         $this->logger->notice('Application authenticates the user');
@@ -62,7 +62,7 @@ final class StateBasedAuthenticationService implements AuthenticationService
     public function isAuthenticated()
     {
         if (!$this->stateHandler->isRequestTypeAuthentication()) {
-            $this->logger->critical('Current request does not need a authentication');
+            $this->logger->critical('Current request does not need an authentication');
             throw RuntimeException::shouldNotAuthenticate();
         }
         return $this->stateHandler->isAuthenticated();
