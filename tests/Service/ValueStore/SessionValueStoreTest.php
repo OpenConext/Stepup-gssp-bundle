@@ -18,10 +18,12 @@
 namespace Tests\Surfnet\GsspBundle\Service\ValueStore;
 
 use Mockery;
+use PHPUnit\Framework\TestCase;
+use Surfnet\GsspBundle\Exception\NotFound;
 use Surfnet\GsspBundle\Service\ValueStore\SessionValueStore;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
-class SessionValueStoreTest extends \PHPUnit_Framework_TestCase
+class SessionValueStoreTest extends TestCase
 {
 
     /**
@@ -62,11 +64,11 @@ class SessionValueStoreTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Surfnet\GsspBundle\Exception\NotFound
      * @test
      */
     public function shouldThrowExceptionWhenRequestingUnknownProperties()
     {
+        $this->expectException(NotFound::class);
         /** @var \Mockery\MockInterface $session */
         $session = Mockery::mock(SessionInterface::class);
 

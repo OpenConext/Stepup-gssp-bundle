@@ -57,6 +57,13 @@ interface AuthenticationService
     public function authenticate();
 
     /**
+     * If the user is authenticated
+     *
+     * @return boolean
+     */
+    public function isAuthenticated();
+
+    /**
      * @param string $message
      *   The error message.
      * @param string $subCode

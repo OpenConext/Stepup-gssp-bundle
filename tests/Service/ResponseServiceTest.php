@@ -18,8 +18,10 @@
 namespace Tests\Surfnet\GsspBundle\Service;
 
 use Mockery\MockInterface;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
-use SAML2_Compat_ContainerSingleton;
+use SAML2\Compat\ContainerSingleton;
+use SAML2\Constants;
 use Surfnet\GsspBundle\Saml\AssertionSigningServiceInterface;
 use Surfnet\GsspBundle\Saml\ResponseContextInterface;
 use Surfnet\GsspBundle\Service\DateTime\StaticDateTimeService;
@@ -28,7 +30,7 @@ use Surfnet\SamlBundle\Entity\IdentityProvider;
 use Surfnet\SamlBundle\Entity\ServiceProvider;
 use Surfnet\SamlBundle\SAML2\BridgeContainer;
 
-class ResponseServiceTest extends \PHPUnit_Framework_TestCase
+class ResponseServiceTest extends TestCase
 {
     /**
      * @var ResponseContextInterface|MockInterface
@@ -47,11 +49,11 @@ class ResponseServiceTest extends \PHPUnit_Framework_TestCase
      */
     protected $assertionSigningService;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $logger = new NullLogger();
         $container = new BridgeContainer($logger);
-        SAML2_Compat_ContainerSingleton::setContainer($container);
+        ContainerSingleton::setContainer($container);
         $this->responseContext = \Mockery::mock(ResponseContextInterface::class);
         $this->identityProvider = \Mockery::mock(IdentityProvider::class);
         $this->serviceProvider = \Mockery::mock(ServiceProvider::class);
@@ -128,9 +130,9 @@ class ResponseServiceTest extends \PHPUnit_Framework_TestCase
                 'getRequestId' => 'sp_request_id',
                 'inErrorState' => true,
                 'getErrorStatus' => [
-                    'Code' => \SAML2_Const::STATUS_RESPONDER,
+                    'Code' => Constants::STATUS_RESPONDER,
                     'Message' => 'message',
-                    'SubCode' => \SAML2_Const::STATUS_AUTHN_FAILED
+                    'SubCode' => Constants::STATUS_AUTHN_FAILED
                 ]
             ]);
         $service = new ResponseService(
