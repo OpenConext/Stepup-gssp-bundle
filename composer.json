@@ -22,7 +22,7 @@
     "beberlei/assert": "^3",
     "sensio/framework-extra-bundle": "^5.4",
     "symfony/monolog-bundle": "^3.4",
-    "surfnet/stepup-saml-bundle": "^4.1.7",
+    "surfnet/stepup-saml-bundle": "^4.1.8",
     "symfony/dependency-injection": ">=2.7,<4 || ~4.3",
     "symfony/framework-bundle": ">=2.7,<4 || ~4.3"
   },
