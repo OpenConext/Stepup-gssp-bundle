@@ -17,7 +17,7 @@
     ]
   },
   "require": {
-    "php": ">=7.2",
+    "php": "^5.6 || >=7.2",
     "ext-openssl": "*",
     "beberlei/assert": "^3",
     "sensio/framework-extra-bundle": "^5.4",
