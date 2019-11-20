@@ -1,6 +1,9 @@
-# 3.0.1 
-- Upgrade Stepup-saml-bundle to version 4.1.8 #31 
+# 3.0.4
+- Upgrade Stepup-saml-bundle to version 4.1.8 #31
 - Version pin Symfony 3.4 dependencies #31
+
+# 3.0.1 -- 3.0.3
+- No change notes provided
 
 # 3.0.0 
 Support Symfony 4.3 #30
