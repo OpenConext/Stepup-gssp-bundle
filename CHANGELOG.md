@@ -1,3 +1,6 @@
+# 3.0.5
+- Expose Issuer on StateBasedAuthenticationService
+
 # 3.0.4
 - Upgrade Stepup-saml-bundle to version 4.1.8 #31
 - Version pin Symfony 3.4 dependencies #31
