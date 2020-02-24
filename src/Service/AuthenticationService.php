@@ -84,4 +84,11 @@ interface AuthenticationService
      * @return string
      */
     public function getNameId();
+
+    /**
+     * Get the entity id of the SP that is issuing the AuthNRequest
+     *
+     * @return string
+     */
+    public function getIssuer();
 }
