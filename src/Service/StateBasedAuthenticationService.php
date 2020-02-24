@@ -94,4 +94,12 @@ final class StateBasedAuthenticationService implements AuthenticationService
     {
         return $this->router->generate('gssp_saml_sso_return');
     }
+
+    /**
+     * @return string
+     */
+    public function getIssuer()
+    {
+        return $this->stateHandler->getRequestServiceProvider();
+    }
 }
