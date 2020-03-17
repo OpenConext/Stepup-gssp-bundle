@@ -48,6 +48,8 @@ final class StateHandler implements StateHandlerInterface
     const RESPONSE_ERROR_SUB_CODE = 'error_response_sub_code';
     const RESPONSE_ERROR_MESSAGE = 'error_response_message';
 
+    const SCOPING_REQUESTER_IDS = 'scoping_requester_ids';
+
     private $store;
 
     public function __construct(ValueStore $store)
@@ -76,6 +78,7 @@ final class StateHandler implements StateHandlerInterface
             ->setRequestServiceProvider($authnRequest->getServiceProvider())
             ->setRelayState($relayState)
             ->set(self::NAME_ID, $authnRequest->getNameId())
+            ->set(self::SCOPING_REQUESTER_IDS, $authnRequest->getScopingRequesterIds())
             ->set(self::REQUEST_TYPE, self::REQUEST_TYPE_AUTHENTICATION)
         ;
     }
@@ -172,6 +175,16 @@ final class StateHandler implements StateHandlerInterface
     public function invalidate()
     {
         $this->store->clear();
+    }
+
+    public function getScopingRequesterIds()
+    {
+        return $this->store->get(self::SCOPING_REQUESTER_IDS);
+    }
+
+    public function hasScopingRequesterIds()
+    {
+        return $this->store->has(self::SCOPING_REQUESTER_IDS);
     }
 
     private function setRelayState($relayState)

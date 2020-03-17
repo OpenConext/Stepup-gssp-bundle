@@ -90,6 +90,14 @@ final class StateBasedAuthenticationService implements AuthenticationService
         return $this->stateHandler->getSubjectNameId();
     }
 
+    public function getScopingRequesterIds()
+    {
+        if (!$this->stateHandler->hasScopingRequesterIds()) {
+            return [];
+        }
+        return $this->stateHandler->getScopingRequesterIds();
+    }
+
     private function generateSSOreturnUrl()
     {
         return $this->router->generate('gssp_saml_sso_return');

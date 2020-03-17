@@ -1,3 +1,6 @@
+# 3.0.6
+- Expose the Scoping -> RequesterIds on StateBasedAuthenticationService
+
 # 3.0.5
 - Expose Issuer on StateBasedAuthenticationService
 
