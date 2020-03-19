@@ -17,6 +17,7 @@
 
 namespace Surfnet\GsspBundle\Service;
 
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Surfnet\GsspBundle\Exception\RuntimeException;
@@ -26,47 +27,71 @@ class StateBasedAuthenticationServiceTest extends TestCase
 {
     public function testIsAuthenticateThrowWhenInInvalidAuthenticationState()
     {
-        $stateHandler = \Mockery::mock(StateHandlerInterface::class);
+        $stateHandler = m::mock(StateHandlerInterface::class);
         $stateHandler->shouldReceive('isRequestTypeAuthentication')->andReturnFalse();
-        $router = \Mockery::mock(RouterInterface::class);
-        $logger = \Mockery::mock(LoggerInterface::class);
+        $router = m::mock(RouterInterface::class);
+        $logger = m::mock(LoggerInterface::class);
         $logger->shouldReceive('critical')->with('Current request does not need an authentication');
-        $registrationService = new StateBasedAuthenticationService(
+        $authenticationService = new StateBasedAuthenticationService(
             $stateHandler,
             $router,
             $logger
         );
         $this->expectException(RuntimeException::class);
-        $registrationService->isAuthenticated();
+        $authenticationService->isAuthenticated();
     }
 
     public function testIsAuthenticateShouldReturnFalseWhenNotAuthenticated()
     {
-        $stateHandler = \Mockery::mock(StateHandlerInterface::class);
+        $stateHandler = m::mock(StateHandlerInterface::class);
         $stateHandler->shouldReceive('isRequestTypeAuthentication')->andReturnTrue();
         $stateHandler->shouldReceive('isAuthenticated')->andReturnFalse();
-        $router = \Mockery::mock(RouterInterface::class);
-        $logger = \Mockery::mock(LoggerInterface::class);
-        $registrationService = new StateBasedAuthenticationService(
+        $router = m::mock(RouterInterface::class);
+        $logger = m::mock(LoggerInterface::class);
+        $authenticationService = new StateBasedAuthenticationService(
             $stateHandler,
             $router,
             $logger
         );
-        $this->assertFalse($registrationService->isAuthenticated());
+        $this->assertFalse($authenticationService->isAuthenticated());
     }
 
     public function testIsAuthenticateShouldReturnTrueWhenAuthenticated()
     {
-        $stateHandler = \Mockery::mock(StateHandlerInterface::class);
+        $stateHandler = m::mock(StateHandlerInterface::class);
         $stateHandler->shouldReceive('isRequestTypeAuthentication')->andReturnTrue();
         $stateHandler->shouldReceive('isAuthenticated')->andReturnTrue();
-        $router = \Mockery::mock(RouterInterface::class);
-        $logger = \Mockery::mock(LoggerInterface::class);
+        $router = m::mock(RouterInterface::class);
+        $logger = m::mock(LoggerInterface::class);
         $registrationService = new StateBasedAuthenticationService(
             $stateHandler,
             $router,
             $logger
         );
         $this->assertTrue($registrationService->isAuthenticated());
+    }
+
+    public function test_can_request_scoping_requester_ids_when_not_present()
+    {
+        $stateHandler = m::mock(StateHandlerInterface::class);
+        $stateHandler->shouldReceive('hasScopingRequesterIds')->andReturnFalse();
+        $authenticationService = new StateBasedAuthenticationService(
+            $stateHandler,
+            m::mock(RouterInterface::class),
+            m::mock(LoggerInterface::class)
+        );
+        $this->assertEmpty($authenticationService->getScopingRequesterIds());
+    }
+    public function test_can_request_scoping_requester_ids_when_present()
+    {
+        $stateHandler = m::mock(StateHandlerInterface::class);
+        $stateHandler->shouldReceive('hasScopingRequesterIds')->andReturnTrue();
+        $stateHandler->shouldReceive('getScopingRequesterIds')->andReturn(['a', 'b', 'c']);
+        $authenticationService = new StateBasedAuthenticationService(
+            $stateHandler,
+            m::mock(RouterInterface::class),
+            m::mock(LoggerInterface::class)
+        );
+        $this->assertEquals(['a', 'b', 'c'], $authenticationService->getScopingRequesterIds());
     }
 }

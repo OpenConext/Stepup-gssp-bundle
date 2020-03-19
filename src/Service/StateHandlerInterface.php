@@ -82,6 +82,11 @@ interface StateHandlerInterface
     public function getSubjectNameId();
 
     /**
+     * @return string[]
+     */
+    public function getScopingRequesterIds();
+
+    /**
      * Is the current request type registration flow?
      *
      * @return bool
@@ -109,6 +114,11 @@ interface StateHandlerInterface
      * @return bool
      */
     public function hasRequestId();
+
+    /**
+     * @return bool
+     */
+    public function hasScopingRequesterIds();
 
     /**
      * Invalidate and delete the full state with all attributes.
