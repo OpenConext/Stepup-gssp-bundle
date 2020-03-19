@@ -1,3 +1,10 @@
+# 3.0.6
+For this release the StateHandlerInterface and the AuthenticationService interface have been updated. If you implement 
+these interfaces yourself, please implement these methods in your concrete implementations.
+Use the bundles implementations as inspiration or, if you do not use them, leave them unimplemented logic wise.
+
+- Expose the Scoping -> RequesterIds on StateBasedAuthenticationService
+
 # 3.0.5
 - Expose Issuer on StateBasedAuthenticationService
 

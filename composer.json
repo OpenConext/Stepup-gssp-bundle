@@ -11,10 +11,7 @@
   "autoload-dev": {
     "psr-4": {
       "Tests\\Surfnet\\GsspBundle\\": "tests/"
-    },
-    "files": [
-      "vendor/symfony/symfony/src/Symfony/Component/VarDumper/Resources/functions/dump.php"
-    ]
+    }
   },
   "require": {
     "php": "^5.6 || >=7.2",
