@@ -91,4 +91,12 @@ interface AuthenticationService
      * @return string
      */
     public function getIssuer();
+
+    /**
+     * Returns the chain of requester ids originally saved from the
+     * actual authnrequest that instantiated the authentication.
+     *
+     * @return string[]
+     */
+    public function getScopingRequesterIds();
 }
