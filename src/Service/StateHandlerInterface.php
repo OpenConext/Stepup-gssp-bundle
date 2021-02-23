@@ -17,6 +17,7 @@
 
 namespace Surfnet\GsspBundle\Service;
 
+use Surfnet\SamlBundle\SAML2\Extensions\GsspUserAttributesChunk;
 use Surfnet\SamlBundle\SAML2\ReceivedAuthnRequest;
 
 /**
@@ -85,6 +86,8 @@ interface StateHandlerInterface
      * @return string[]
      */
     public function getScopingRequesterIds();
+
+    public function getGsspUserAttributes(): ?GsspUserAttributesChunk;
 
     /**
      * Is the current request type registration flow?
