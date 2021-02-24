@@ -1,3 +1,8 @@
+# 4.0.0
+* Dropped support for PHP 5.6
+* Dropped support for Symfony 4.3 and older
+* Add support for SAML extensions
+
 # 3.0.6
 For this release the StateHandlerInterface and the AuthenticationService interface have been updated. If you implement 
 these interfaces yourself, please implement these methods in your concrete implementations.

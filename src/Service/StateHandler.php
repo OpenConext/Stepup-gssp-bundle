@@ -20,6 +20,7 @@ namespace Surfnet\GsspBundle\Service;
 use Assert\Assertion;
 use SAML2\Constants;
 use Surfnet\GsspBundle\Exception\RuntimeException;
+use Surfnet\SamlBundle\SAML2\Extensions\GsspUserAttributesChunk;
 use Surfnet\SamlBundle\SAML2\ReceivedAuthnRequest;
 
 /**
@@ -50,6 +51,8 @@ final class StateHandler implements StateHandlerInterface
 
     const SCOPING_REQUESTER_IDS = 'scoping_requester_ids';
 
+    const GSSP_USERATTRIBUTES = 'gssp_userattributes';
+
     private $store;
 
     public function __construct(ValueStore $store)
@@ -67,6 +70,10 @@ final class StateHandler implements StateHandlerInterface
             ->setRelayState($relayState)
             ->set(self::REQUEST_TYPE, self::REQUEST_TYPE_REGISTRATION)
         ;
+
+        if ($authnRequest->getExtensions() && $authnRequest->getExtensions()->getGsspUserAttributesChunk()) {
+            $this->setGsspUserAttributes($authnRequest->getExtensions()->getGsspUserAttributesChunk());
+        }
     }
 
     public function saveAuthenticationRequest(ReceivedAuthnRequest $authnRequest, $relayState)
@@ -131,6 +138,14 @@ final class StateHandler implements StateHandlerInterface
     public function getSubjectNameId()
     {
         return $this->store->get(self::NAME_ID);
+    }
+
+    public function getGsspUserAttributes(): ?GsspUserAttributesChunk
+    {
+        if ($this->store->has(self::GSSP_USERATTRIBUTES)) {
+            return GsspUserAttributesChunk::fromXML($this->store->get(self::GSSP_USERATTRIBUTES));
+        }
+        return null;
     }
 
     public function hasSubjectNameId()
@@ -200,6 +215,11 @@ final class StateHandler implements StateHandlerInterface
     private function setRequestId($originalRequestId)
     {
         return $this->set(self::REQUEST_ID, $originalRequestId);
+    }
+
+    private function setGsspUserAttributes(GsspUserAttributesChunk $chunk)
+    {
+        return $this->set(self::GSSP_USERATTRIBUTES, $chunk->toXML());
     }
 
     /**

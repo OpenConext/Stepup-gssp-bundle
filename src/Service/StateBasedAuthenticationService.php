@@ -20,6 +20,7 @@ namespace Surfnet\GsspBundle\Service;
 use Psr\Log\LoggerInterface;
 use SAML2\Constants;
 use Surfnet\GsspBundle\Exception\RuntimeException;
+use Surfnet\SamlBundle\SAML2\Extensions\GsspUserAttributesChunk;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -109,5 +110,10 @@ final class StateBasedAuthenticationService implements AuthenticationService
     public function getIssuer()
     {
         return $this->stateHandler->getRequestServiceProvider();
+    }
+
+    public function getGsspUserAttributes(): ?GsspUserAttributesChunk
+    {
+        return $this->stateHandler->getGsspUserAttributes();
     }
 }
