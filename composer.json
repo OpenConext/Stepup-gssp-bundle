@@ -14,14 +14,15 @@
     }
   },
   "require": {
-    "php": "^5.6 || >=7.2",
+    "php": "~7.2",
     "ext-openssl": "*",
     "beberlei/assert": "^3",
     "sensio/framework-extra-bundle": "^5.4",
-    "symfony/monolog-bundle": "^3.4 || ^4.3",
-    "surfnet/stepup-saml-bundle": "^4.1.8",
-    "symfony/dependency-injection": "^3.4.26 || ^4.3",
-    "symfony/framework-bundle": "^3.4.26 || ^4.3"
+    "symfony/monolog-bundle": "^3.6.0",
+    "surfnet/stepup-saml-bundle": "^4.2.0",
+    "symfony/dependency-injection": "^4.4",
+    "symfony/framework-bundle": "^4.4",
+    "symfony/symfony": "^4.4"
   },
   "require-dev": {
     "behat/behat": "^3.5",
