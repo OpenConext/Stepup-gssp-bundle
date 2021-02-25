@@ -21,8 +21,7 @@
     "symfony/monolog-bundle": "^3.6.0",
     "surfnet/stepup-saml-bundle": "^4.2.0",
     "symfony/dependency-injection": "^4.4",
-    "symfony/framework-bundle": "^4.4",
-    "symfony/symfony": "^4.4"
+    "symfony/framework-bundle": "^4.4"
   },
   "require-dev": {
     "behat/behat": "^3.5",
