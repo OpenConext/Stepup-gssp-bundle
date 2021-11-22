@@ -27,7 +27,7 @@ use Surfnet\GsspBundle\Service\ConfigurationContainer;
 use Surfnet\SamlBundle\Http\RedirectBinding;
 use Surfnet\SamlBundle\SAML2\AuthnRequest;
 use Surfnet\SamlBundle\SAML2\ReceivedAuthnRequest;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -37,7 +37,7 @@ use Symfony\Component\HttpFoundation\Request;
  * @Route(service="surfnet_gssp.saml.sso_controller")
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-final class SSOController extends Controller
+final class SSOController extends AbstractController
 {
     private $httpBinding;
     private $registrationRoute;
@@ -80,6 +80,7 @@ final class SSOController extends Controller
         try {
             $this->logger->info('Processing AuthnRequest');
             $originalRequest = $this->httpBinding->receiveSignedAuthnRequestFrom($request);
+
             $this->logger->notice(sprintf(
                 'AuthnRequest processing complete, received AuthnRequest from "%s", request ID: "%s"',
                 $originalRequest->getServiceProvider(),
