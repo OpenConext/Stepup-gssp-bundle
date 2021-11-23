@@ -26,7 +26,7 @@ use Surfnet\GsspBundle\Saml\ResponseContextInterface;
 use Surfnet\GsspBundle\Service\StateHandlerInterface;
 use Surfnet\GsspBundle\Service\ConfigurationContainer;
 use Surfnet\GsspBundle\Service\ResponseServiceInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -35,7 +35,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @Route(service="surfnet_gssp.saml.sso_return_controller")
  */
-final class SSOReturnController extends Controller
+final class SSOReturnController extends AbstractController
 {
     private $registrationRoute;
     private $stateHandler;
