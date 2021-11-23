@@ -1,3 +1,8 @@
+# 4.0.2
+
+**Deprecation warning updates**
+ - Use the AbstractController base controller
+
 # 4.0.0
 * Dropped support for PHP 5.6
 * Dropped support for Symfony 4.3 and older
