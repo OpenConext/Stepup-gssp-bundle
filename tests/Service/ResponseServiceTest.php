@@ -202,6 +202,9 @@ class ResponseServiceTest extends TestCase
         /** @var \SAML2\XML\saml\SubjectConfirmation $subjectConfirmation */
         $subjectConfirmation = reset($subjects);
 
-        $this->assertEquals($assertion->getNotOnOrAfter(), $subjectConfirmation->SubjectConfirmationData->NotOnOrAfter);
+        $this->assertEquals(
+            $assertion->getNotOnOrAfter(),
+            $subjectConfirmation->getSubjectConfirmationData()->getNotOnOrAfter()
+        );
     }
 }
