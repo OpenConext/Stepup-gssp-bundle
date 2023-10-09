@@ -86,10 +86,12 @@ final class StateBasedAuthenticationService implements AuthenticationService
         return new RedirectResponse($url);
     }
 
-    public function getNameId()
+    public function getNameId(): string
     {
         if (!$this->stateHandler->hasSubjectNameId()) {
-            return null;
+            throw new RuntimeException(
+                'No SubjectNameId present in state, but it should be in order to handle a GSSP authentication.'
+            );
         }
         return $this->stateHandler->getSubjectNameId();
     }
