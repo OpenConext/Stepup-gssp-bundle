@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types = 1);
+
 /**
  * Copyright 2017 SURFnet B.V.
  *
@@ -38,6 +41,9 @@ final class InMemoryValueStore implements ValueStore
         return $this->values[$key];
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ShortMethodName)
+     */
     public function is($key, $value)
     {
         if (!$this->has($key)) {

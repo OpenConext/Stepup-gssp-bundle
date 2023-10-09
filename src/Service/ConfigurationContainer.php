@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types = 1);
+
 /**
  * Copyright 2017 SURFnet B.V.
  *
@@ -37,7 +40,7 @@ final class ConfigurationContainer
     private $authenticationRoute;
 
     /**
-     * @param array[] $configuration
+     * @param string[] $configuration
      *
      * @throws \Assert\AssertionFailedException
      */

@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types = 1);
+
 /**
  * Copyright 2017 SURFnet B.V.
  *
@@ -48,6 +51,9 @@ final class SessionValueStore implements ValueStore
         return $this->session->get(self::SESSION_PATH.$key);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ShortMethodName)
+     */
     public function is($key, $value)
     {
         return $this->has($key) && $this->get($key) === $value;
