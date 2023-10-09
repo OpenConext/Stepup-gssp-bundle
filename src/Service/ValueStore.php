@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types = 1);
+
 /**
  * Copyright 2017 SURFnet B.V.
  *
@@ -26,6 +29,7 @@ interface ValueStore
      * @param mixed $value
      *
      * @return bool
+     * @SuppressWarnings(PHPMD.ShortMethodName)
      */
     public function is($key, $value);
 

@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types = 1);
+
 /**
  * Copyright 2017 SURFnet B.V.
  *
@@ -18,6 +21,8 @@
 namespace Surfnet\GsspBundle\Service\DateTime;
 
 use Assert\Assertion;
+use DateTimeImmutable;
+use DateTimeZone;
 
 final class SystemDateTimeService extends AbstractDateTimeService
 {
@@ -26,11 +31,11 @@ final class SystemDateTimeService extends AbstractDateTimeService
     public function __construct($timezone = 'UTC')
     {
         Assertion::string($timezone);
-        $this->timezone = new \DateTimeZone($timezone);
+        $this->timezone = new DateTimeZone($timezone);
     }
 
     public function getCurrent()
     {
-        return new \DateTimeImmutable('now', $this->timezone);
+        return new DateTimeImmutable('now', $this->timezone);
     }
 }
