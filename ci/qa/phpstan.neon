@@ -2,8 +2,9 @@ includes:
     - ./phpstan-baseline.neon
     - ../../vendor/phpstan/phpstan-symfony/extension.neon
 parameters:
-	level: 1
+	level: 2
 	paths:
 		- ../../src
 	excludePaths:
 		- ../../src/Resources
+		- ../../src/Features
