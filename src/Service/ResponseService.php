@@ -20,6 +20,8 @@ namespace Surfnet\GsspBundle\Service;
 use SAML2\Assertion;
 use SAML2\Constants;
 use SAML2\Response;
+use SAML2\XML\saml\Issuer;
+use SAML2\XML\saml\NameID;
 use SAML2\XML\saml\SubjectConfirmation;
 use SAML2\XML\saml\SubjectConfirmationData;
 use Surfnet\GsspBundle\Saml\AssertionSigningServiceInterface;
@@ -46,7 +48,7 @@ final class ResponseService implements ResponseServiceInterface
         $this->dateTimeService = $dateTimeService;
     }
 
-    public function createResponse()
+    public function createResponse(): Response
     {
         $response = $this->createNewAuthnResponse();
 
@@ -61,26 +63,26 @@ final class ResponseService implements ResponseServiceInterface
         return $response;
     }
 
-    private function addSubjectConfirmationFor(Assertion $assertion)
+    private function addSubjectConfirmationFor(Assertion $assertion): void
     {
         $confirmation = new SubjectConfirmation();
-        $confirmation->Method = Constants::CM_BEARER;
-        $assertion->setNameId([
-            'Value' => $this->responseContext->getSubjectNameId(),
-            'Format' => Constants::NAMEID_PERSISTENT,
-        ]);
+        $confirmation->setMethod(Constants::CM_BEARER);
+        $nameId = new NameID();
+        $nameId->setValue($this->responseContext->getSubjectNameId());
+        $nameId->setFormat(Constants::NAMEID_PERSISTENT);
+        $assertion->setNameId($nameId);
 
         $confirmationData = new SubjectConfirmationData();
-        $confirmationData->InResponseTo = $this->responseContext->getRequestId();
-        $confirmationData->Recipient = $this->responseContext->getServiceProvider()->getAssertionConsumerUrl();
-        $confirmationData->NotOnOrAfter = $assertion->getNotOnOrAfter();
+        $confirmationData->setInResponseTo($this->responseContext->getRequestId());
+        $confirmationData->setRecipient($this->responseContext->getServiceProvider()->getAssertionConsumerUrl());
+        $confirmationData->setNotOnOrAfter($assertion->getNotOnOrAfter());
 
-        $confirmation->SubjectConfirmationData = $confirmationData;
+        $confirmation->setSubjectConfirmationData($confirmationData);
 
         $assertion->setSubjectConfirmation([$confirmation]);
     }
 
-    private function addAuthenticationStatementTo(Assertion $assertion)
+    private function addAuthenticationStatementTo(Assertion $assertion): void
     {
         $assertion->setAuthnInstant($this->dateTimeService->getCurrent()->getTimestamp());
         $assertion->setAuthnContextClassRef('urn:oasis:names:tc:SAML:2.0:ac:classes:MobileTwoFactorUnregistered');
@@ -89,15 +91,17 @@ final class ResponseService implements ResponseServiceInterface
         $assertion->setAuthenticatingAuthority(
             array_merge(
                 (empty($authority) ? [] : $authority),
-                [$assertion->getIssuer()]
+                [$assertion->getIssuer()->getValue()]
             )
         );
     }
 
-    private function createNewAuthnResponse()
+    private function createNewAuthnResponse(): Response
     {
         $response = new Response();
-        $response->setIssuer($this->hostedIdentityProvider->getEntityId());
+        $issuer = new Issuer();
+        $issuer->setValue($this->hostedIdentityProvider->getEntityId());
+        $response->setIssuer($issuer);
         $response->setIssueInstant($this->dateTimeService->getCurrent()->getTimestamp());
         $response->setDestination($this->responseContext->getServiceProvider()->getAssertionConsumerUrl());
         $response->setInResponseTo($this->responseContext->getRequestId());
@@ -105,12 +109,14 @@ final class ResponseService implements ResponseServiceInterface
         return $response;
     }
 
-    private function createAssertion()
+    private function createAssertion(): Assertion
     {
         $assertion = new Assertion();
         $assertion->setNotBefore($this->dateTimeService->getCurrent()->getTimestamp());
         $assertion->setNotOnOrAfter($this->dateTimeService->interval('PT5M')->getTimestamp());
-        $assertion->setIssuer($this->hostedIdentityProvider->getEntityId());
+        $issuer = new Issuer();
+        $issuer->setValue($this->hostedIdentityProvider->getEntityId());
+        $assertion->setIssuer($issuer);
         $assertion->setIssueInstant($this->dateTimeService->getCurrent()->getTimestamp());
 
         $this->assertionSigningService->signAssertion($assertion);
