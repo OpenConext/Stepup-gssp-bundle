@@ -23,6 +23,7 @@ namespace Surfnet\GsspBundle\Service;
 use Assert\Assertion;
 use SAML2\Constants;
 use Surfnet\GsspBundle\Exception\RuntimeException;
+use Surfnet\SamlBundle\SAML2\Extensions\Chunk;
 use Surfnet\SamlBundle\SAML2\Extensions\GsspUserAttributesChunk;
 use Surfnet\SamlBundle\SAML2\ReceivedAuthnRequest;
 
@@ -74,8 +75,14 @@ final class StateHandler implements StateHandlerInterface
             ->set(self::REQUEST_TYPE, self::REQUEST_TYPE_REGISTRATION)
         ;
 
-        if ($authnRequest->getExtensions() && $authnRequest->getExtensions()->getGsspUserAttributesChunk()) {
-            $this->setGsspUserAttributes($authnRequest->getExtensions()->getGsspUserAttributesChunk());
+        if ($authnRequest->getExtensions()->getGsspUserAttributesChunk()) {
+            $chunk = $authnRequest->getExtensions()->getGsspUserAttributesChunk();
+            if (!$chunk instanceof GsspUserAttributesChunk) {
+                throw new RuntimeException(
+                    'Unable to store GsspUserAttributes in state, as no GSSP chunk found in AuthNRequest'
+                );
+            }
+            $this->setGsspUserAttributes($chunk);
         }
     }
 
