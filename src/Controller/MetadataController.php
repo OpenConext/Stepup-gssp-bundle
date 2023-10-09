@@ -25,26 +25,22 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Surfnet\SamlBundle\Http\XMLResponse;
 use Surfnet\SamlBundle\Metadata\MetadataFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @Route(service="surfnet_gssp.saml.metadata_controller")
  */
 final class MetadataController extends AbstractController
 {
-    private $metadataFactory;
-
-    public function __construct(MetadataFactory $metadataFactory)
+    public function __construct(private readonly MetadataFactory $metadataFactory)
     {
-        $this->metadataFactory = $metadataFactory;
     }
 
     /**
      * @Method("GET")
      * @Route("/saml/metadata", name="gssp_saml_metadata")
      */
-    public function metadataAction(Request $request)
+    public function metadata(): XMLResponse
     {
-        return new XMLResponse($this->metadataFactory->generate());
+        return new XMLResponse((string) $this->metadataFactory->generate());
     }
 }

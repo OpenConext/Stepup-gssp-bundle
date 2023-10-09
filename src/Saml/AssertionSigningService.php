@@ -20,30 +20,26 @@ declare(strict_types = 1);
 
 namespace Surfnet\GsspBundle\Saml;
 
+use Exception;
 use RobRichards\XMLSecLibs\XMLSecurityKey;
 use SAML2\Assertion;
 use SAML2\Certificate\KeyLoader;
 use SAML2\Certificate\PrivateKeyLoader;
+use SAML2\Certificate\X509;
 use SAML2\Configuration\PrivateKey;
 use Surfnet\SamlBundle\Entity\IdentityProvider;
 
 final class AssertionSigningService implements AssertionSigningServiceInterface
 {
-    /**
-     * @var \Surfnet\SamlBundle\Entity\IdentityProvider
-     */
-    private $identityProvider;
-
-    public function __construct(IdentityProvider $identityProvider)
+    public function __construct(private IdentityProvider $identityProvider)
     {
-        $this->identityProvider = $identityProvider;
     }
 
     /**
      * @param Assertion $assertion
      * @return Assertion
      */
-    public function signAssertion(Assertion $assertion)
+    public function signAssertion(Assertion $assertion): Assertion
     {
         $assertion->setSignatureKey($this->loadPrivateKey());
         $assertion->setCertificates([$this->getPublicCertificate()]);
@@ -53,8 +49,10 @@ final class AssertionSigningService implements AssertionSigningServiceInterface
 
     /**
      * @return XMLSecurityKey
+     * @throws Exception
+     * @throws Exception
      */
-    private function loadPrivateKey()
+    private function loadPrivateKey(): XMLSecurityKey
     {
         $key        = $this->identityProvider->getPrivateKey(PrivateKey::NAME_DEFAULT);
         $keyLoader  = new PrivateKeyLoader();
@@ -69,11 +67,11 @@ final class AssertionSigningService implements AssertionSigningServiceInterface
     /**
      * @return string
      */
-    private function getPublicCertificate()
+    private function getPublicCertificate(): string
     {
         $keyLoader = new KeyLoader();
         $keyLoader->loadCertificateFile($this->identityProvider->getCertificateFile());
-        /** @var \SAML2\Certificate\X509 $publicKey */
+        /** @var X509 $publicKey */
         $publicKey = $keyLoader->getKeys()->getOnlyElement();
 
         return $publicKey->getCertificate();

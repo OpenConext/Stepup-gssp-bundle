@@ -22,10 +22,7 @@ namespace Surfnet\GsspBundle\Monolog\Processor;
 
 class RequestIdProcessor
 {
-    /**
-     * @var string
-     */
-    private $requestId;
+    private string $requestId;
 
     public function __construct()
     {
@@ -35,10 +32,8 @@ class RequestIdProcessor
     /**
      * Adds the random request ID onto the records extra data.
      *
-     * @param array $record
-     * @return array
      */
-    public function __invoke(array $record)
+    public function __invoke(array $record): array
     {
         $record['extra']['request_id'] = $this->requestId;
 

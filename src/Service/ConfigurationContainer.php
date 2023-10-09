@@ -21,30 +21,27 @@ declare(strict_types = 1);
 namespace Surfnet\GsspBundle\Service;
 
 use Assert\Assertion;
+use Assert\AssertionFailedException;
 
 final class ConfigurationContainer
 {
 
     /**
      * The gssp middleware route that does the actual registration.
-     *
-     * @var string
      */
-    private $registrationRoute;
+    private readonly string $registrationRoute;
 
     /**
      * The gssp middleware route that does the actual authentication.
-     *
-     * @var string
      */
-    private $authenticationRoute;
+    private readonly string $authenticationRoute;
 
     /**
      * @param string[] $configuration
      *
-     * @throws \Assert\AssertionFailedException
+     * @throws AssertionFailedException
      */
-    public function __construct($configuration)
+    public function __construct(array $configuration)
     {
         Assertion::keyExists($configuration, 'registration_route');
         Assertion::string($configuration['registration_route']);

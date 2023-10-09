@@ -21,20 +21,29 @@ declare(strict_types = 1);
 namespace Surfnet\GsspBundle\Service\DateTime;
 
 use Assert\Assertion;
+use Assert\AssertionFailedException;
 use DateTimeImmutable;
 use DateTimeZone;
+use Exception;
 
 final class SystemDateTimeService extends AbstractDateTimeService
 {
-    private $timezone;
+    private readonly DateTimeZone $timezone;
 
-    public function __construct($timezone = 'UTC')
+    /**
+     * @throws AssertionFailedException
+     * @throws Exception
+     */
+    public function __construct(string $timezone = 'UTC')
     {
         Assertion::string($timezone);
         $this->timezone = new DateTimeZone($timezone);
     }
 
-    public function getCurrent()
+    /**
+     * @throws Exception
+     */
+    public function getCurrent(): DateTimeImmutable
     {
         return new DateTimeImmutable('now', $this->timezone);
     }

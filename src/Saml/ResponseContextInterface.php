@@ -25,69 +25,35 @@ use Surfnet\SamlBundle\Entity\ServiceProvider;
 
 interface ResponseContextInterface
 {
-    /**
-     * @return string
-     */
-    public function getAssertionConsumerUrl();
+    public function getAssertionConsumerUrl(): string;
 
-    /**
-     * @return null|string
-     */
-    public function getIssuer();
+    public function getIssuer(): ?string;
 
-    /**
-     * @return null|string
-     */
-    public function getInResponseTo();
+    public function getInResponseTo(): ?string;
 
-    /**
-     * @return IdentityProvider
-     */
-    public function getIdentityProvider();
+    public function getIdentityProvider(): IdentityProvider;
 
-    /**
-     * @return ServiceProvider
-     */
-    public function getServiceProvider();
+    public function getServiceProvider(): ServiceProvider;
 
-    /**
-     * @return null|string
-     */
-    public function getRelayState();
+    public function getRelayState(): ?string;
 
-    /**
-     * @return string
-     */
-    public function getSubjectNameId();
+    public function getSubjectNameId(): string;
 
     /**
      * Does the current state have an error?
      *
      * When there is an error the SSO return endpoint send an saml error back to the SP.
-     *
-     * @return bool
      */
-    public function inErrorState();
+    public function inErrorState(): bool;
 
     /**
      * Return saml response status.
-     *
-     * @return array
      */
-    public function getErrorStatus();
+    public function getErrorStatus(): array;
 
-    /**
-     * @return string
-     */
-    public function getRequestId();
+    public function getRequestId(): string;
 
-    /**
-     * @return bool
-     */
-    public function hasRequest();
+    public function hasRequest(): bool;
 
-    /**
-     * @return bool
-     */
-    public function isRegistered();
+    public function isRegistered(): bool;
 }

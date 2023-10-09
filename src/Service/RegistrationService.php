@@ -47,39 +47,25 @@ use Symfony\Component\HttpFoundation\Response;
  */
 interface RegistrationService
 {
-    /**
+    /*
      * If there is need for a registration.
-     *
-     * @return bool
      */
-    public function registrationRequired();
+    public function registrationRequired(): bool;
 
-    /**
+    /*
      * Register the user, this will set the saml subject nameId.
-     *
-     * @param string $subjectNameId
      */
-    public function register($subjectNameId);
+    public function register(string $subjectNameId): void;
 
-    /**
+    /*
      * If the user is already registered.
-     *
-     * @return boolean
      */
-    public function isRegistered();
+    public function isRegistered(): bool;
 
-    /**
-     * @param string $message
-     *   The error message.
-     * @param string $subCode
-     *   Saml response sub code.
-     */
-    public function reject($message, $subCode = Constants::STATUS_AUTHN_FAILED);
+    public function reject(string $message, string $subCode = Constants::STATUS_AUTHN_FAILED): void;
 
-    /**
+    /*
      * Creates the response that handles the redirect back to the service provider.
-     *
-     * @return Response
      */
-    public function replyToServiceProvider();
+    public function replyToServiceProvider(): Response;
 }

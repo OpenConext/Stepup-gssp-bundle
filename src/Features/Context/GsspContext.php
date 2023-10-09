@@ -27,14 +27,17 @@ use Behat\Gherkin\Node\TableNode;
 use Exception;
 use JakubOnderka\PhpParallelLint\RunTimeException;
 use Mockery;
+use Mockery\MockInterface;
 use RobRichards\XMLSecLibs\XMLSecurityKey;
 use SAML2\AuthnRequest as SAMLAuthnRequest;
 use SAML2\Certificate\KeyLoader;
 use SAML2\Certificate\PrivateKeyLoader;
+use SAML2\Certificate\X509;
 use SAML2\Compat\ContainerSingleton;
 use SAML2\Configuration\PrivateKey;
 use SAML2\Constants;
 use SAML2\DOMDocumentFactory;
+use SAML2\EncryptedAssertion;
 use SAML2\Message;
 use SAML2\Response as SAMLResponse;
 use SAML2\XML\saml\Issuer;
@@ -78,24 +81,12 @@ use Twig\Environment;
  */
 final class GsspContext implements Context
 {
+    private ?BufferingLogger $logger = null;
+    private ?ResponseContext $responseContext = null;
+    private ?StateBasedRegistrationService $registrationService = null;
+    private ?StateBasedAuthenticationService $authenticationService = null;
     /**
-     * @var BufferingLogger
-     */
-    private $logger;
-    /**
-     * @var ResponseContext
-     */
-    private $responseContext;
-    /**
-     * @var RegistrationService
-     */
-    private $registrationService;
-    /**
-     * @var AuthenticationService
-     */
-    private $authenticationService;
-    /**
-     * @var \Mockery\MockInterface|Environment
+     * @var MockInterface|Environment
      */
     private $twigEnvironment;
     /**
@@ -111,50 +102,26 @@ final class GsspContext implements Context
     /**
      * Last controller twig render parameters
      */
-    private $twigParameters = [];
-    /**
-     * @var SSOController
-     */
-    private $ssoController;
-    /**
-     * @var SSOReturnController
-     */
-    private $ssoReturnController;
-    /**
-     * @var IdentityProvider
-     */
-    private $identityProvider;
-    /**
-     * @var SAMLAuthnRequest
-     */
-    private $authnRequest;
-    /**
-     * @var BridgeContainer
-     */
-    private $container;
-    /**
-     * @var ServiceProvider
-     */
-    private $serviceProvider;
+    private array $twigParameters = [];
+    private ?SSOController $ssoController = null;
+    private ?SSOReturnController $ssoReturnController = null;
+    private ?IdentityProvider $identityProvider = null;
+    private ?SAMLAuthnRequest $authnRequest = null;
+    private ?BridgeContainer $container = null;
+    private ?ServiceProvider $serviceProvider = null;
 
-    /**
-     * @var SAMLResponse
-     */
-    private $ssoReturnResponse;
+    private ?Message $ssoReturnResponse = null;
 
-    /**
-     * @var Exception
-     */
-    private $lastException;
+    private ?Exception $lastException = null;
 
     /**
      * Every scenario we start with a clean slate.
      *
      * @BeforeScenario
-     * @throws \Assert\AssertionFailedException
+     * @throws AssertionFailedException
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function bootstrapDependencies()
+    public function bootstrapDependencies(): void
     {
         // Empty state variables.
         $this->ssoReturnResponse = null;
@@ -273,9 +240,9 @@ final class GsspContext implements Context
         $this->twigEnvironment = Mockery::mock(Environment::class);
         $this->twigEnvironment->shouldReceive('render')->andReturnUsing(
             function (
-                $template,
+                string $template,
                 $parameters = []
-            ) {
+            ): string {
                 $this->twigParameters = $parameters;
                 $this->twigTemplate = $template;
 
@@ -296,9 +263,9 @@ final class GsspContext implements Context
      *
      * @Given a normal SAML 2.0 AuthnRequest
      *
-     * @throws \Exception
+     * @throws Exception
      */
-    public function createANormalAuthnRequest()
+    public function createANormalAuthnRequest(): void
     {
         $request = new SAMLAuthnRequest();
         $request->setAssertionConsumerServiceURL($this->serviceProvider->getAssertionConsumerUrl());
@@ -320,9 +287,9 @@ final class GsspContext implements Context
      * @param string $acu
      *   The assertion consumer service url
      *
-     * @throws \Exception
+     * @throws Exception
      */
-    public function createANormalAuthnRequestFromServiceProvider($entityId, $acu)
+    public function createANormalAuthnRequestFromServiceProvider(string $entityId, string $acu): void
     {
         $request = new SAMLAuthnRequest();
         $request->setAssertionConsumerServiceURL($acu);
@@ -339,14 +306,12 @@ final class GsspContext implements Context
      *
      * @Given AuthnRequest is signed with sha256
      *
-     * @throws \Exception
+     * @throws Exception
      */
-    public function signAuthnRequest()
+    public function signAuthnRequest(): void
     {
         $this->authnRequest->setSignatureKey(
-            self::loadPrivateKey(
-                $this->serviceProvider->getPrivateKey(PrivateKey::NAME_DEFAULT)
-            )
+            self::loadPrivateKey($this->serviceProvider->getPrivateKey(PrivateKey::NAME_DEFAULT))
         );
     }
 
@@ -355,7 +320,7 @@ final class GsspContext implements Context
      *
      * @When the service provider sends the AuthnRequest with HTTP-Redirect binding
      */
-    public function callIdentityProviderSSOActionWithAuthnRequest()
+    public function callIdentityProviderSSOActionWithAuthnRequest(): void
     {
         $request = AuthnRequest::createNew($this->authnRequest);
         $query = $request->buildRequestQuery();
@@ -371,9 +336,9 @@ final class GsspContext implements Context
      *
      * @When the service provider sends an unsigned AuthnRequest with HTTP-Redirect binding
      *
-     * @throws \Exception
+     * @throws Exception
      */
-    public function callIdentityProviderSSOActionWithAuthnRequestWithoutSignature()
+    public function callIdentityProviderSSOActionWithAuthnRequestWithoutSignature(): void
     {
         $request = AuthnRequest::createNew($this->authnRequest);
 
@@ -392,9 +357,9 @@ final class GsspContext implements Context
      *
      * @When the service provider sends an invalided signed AuthnRequest with HTTP-Redirect binding
      *
-     * @throws \Exception
+     * @throws Exception
      */
-    public function callIdentityProviderSSOActionWithAuthnRequestWithIncorrectSignature()
+    public function callIdentityProviderSSOActionWithAuthnRequestWithIncorrectSignature(): void
     {
         $request = AuthnRequest::createNew($this->authnRequest);
 
@@ -413,7 +378,7 @@ final class GsspContext implements Context
      *
      * @throws AssertionFailedException
      */
-    public function responseShouldBeAnUnrecoverableError($expected)
+    public function responseShouldBeAnUnrecoverableError($expected): void
     {
         $actual = '';
 
@@ -430,7 +395,7 @@ final class GsspContext implements Context
     /**
      * @Then the identity provider register the user with an unique identifier token
      */
-    public function assignAUniqueIdentifierToTheToken()
+    public function assignAUniqueIdentifierToTheToken(): void
     {
         $this->registrationService->register('unique-identifier-token');
         $this->registrationService->replyToServiceProvider();
@@ -442,9 +407,9 @@ final class GsspContext implements Context
      * @Then the user is redirected to the identity provider sso return endpoint without authentication
      *
      * @throws AssertionFailedException
-     * @throws \Exception
+     * @throws Exception
      */
-    public function requestSSOreturnEndpoint()
+    public function requestSSOreturnEndpoint(): void
     {
         try {
             $this->response = $this->ssoReturnController->ssoReturnAction();
@@ -457,15 +422,15 @@ final class GsspContext implements Context
      * @Then Identity provider sso return endpoint should redirect client-side a saml response to the service provider
      *
      * @throws AssertionFailedException
-     * @throws \Exception
+     * @throws Exception
      */
-    public function shouldReturnSamlResponse()
+    public function shouldReturnSamlResponse(): void
     {
         $parameters = $this->twigParameters;
         Assertion::eq('@SurfnetGssp/StepupGssp/ssoReturn.html.twig', $this->twigTemplate);
         Assertion::eq('', $parameters['relayState']);
         Assertion::eq('https://service_provider/saml/acu', $parameters['acu']);
-        $decodedSamlRequest = base64_decode($parameters['response']);
+        $decodedSamlRequest = base64_decode((string) $parameters['response']);
         $document = DOMDocumentFactory::fromString($decodedSamlRequest);
         $this->ssoReturnResponse = Message::fromXML($document->firstChild);
         Assertion::eq('@SurfnetGssp/StepupGssp/ssoReturn.html.twig-response', $this->response->getContent());
@@ -474,7 +439,7 @@ final class GsspContext implements Context
     /**
      * @Then the saml response status code should be :code
      */
-    public function theResponseStatusCodeShouldBe($code)
+    public function theResponseStatusCodeShouldBe($code): void
     {
         $status = $this->ssoReturnResponse->getStatus();
         Assertion::eq($code, $status['Code']);
@@ -486,7 +451,7 @@ final class GsspContext implements Context
      * @throws AssertionFailedException
      * @throws RunTimeException
      */
-    public function theResponseAssertionShouldBeSigned()
+    public function theResponseAssertionShouldBeSigned(): void
     {
         $assertion = $this->getSsoAssertionResponse();
         Assertion::eq('http://www.w3.org/2001/04/xmldsig-more#rsa-sha256', $assertion->getSignatureMethod());
@@ -505,7 +470,7 @@ final class GsspContext implements Context
     /**
      * @Then the saml response should have an authenticating authority of the IdP EntityId with class ref :classRef
      */
-    public function theResponseShouldHaveAnAuthenticatingAuthorityOfTheIdpWithClassRef($classRef)
+    public function theResponseShouldHaveAnAuthenticatingAuthorityOfTheIdpWithClassRef($classRef): void
     {
         $assertion = $this->getSsoAssertionResponse();
         Assertion::eq($classRef, $assertion->getAuthnContextClassRef());
@@ -515,7 +480,7 @@ final class GsspContext implements Context
     /**
      * @Then the saml response should have the token identifier in the Subject NameID of the Assertion section
      */
-    public function theResponseShouldHaveTheTokenIdentifierInTheSubjectNameIdOfTheAssertionSection()
+    public function theResponseShouldHaveTheTokenIdentifierInTheSubjectNameIdOfTheAssertionSection(): void
     {
         $assertion = $this->getSsoAssertionResponse();
         $nameId = $assertion->getNameId();
@@ -524,11 +489,10 @@ final class GsspContext implements Context
     }
 
     /**
-     * @param PrivateKey $key
      * @return PrivateKey|XMLSecurityKey
-     * @throws \Exception
+     * @throws Exception
      */
-    private static function loadPrivateKey(PrivateKey $key)
+    private function loadPrivateKey(PrivateKey $key): XMLSecurityKey
     {
         $keyLoader = new PrivateKeyLoader();
         $privateKey = $keyLoader->loadPrivateKey($key);
@@ -543,9 +507,9 @@ final class GsspContext implements Context
      * @param PrivateKey $publicKey
      * @return PrivateKey|XMLSecurityKey
      *
-     * @throws \Exception
+     * @throws Exception
      */
-    private static function loadPublicKey($publicKey)
+    private function loadPublicKey($publicKey): XMLSecurityKey
     {
         $key = new XMLSecurityKey(XMLSecurityKey::RSA_SHA256, ['type' => 'public']);
         $key->loadKey($publicKey, true);
@@ -557,20 +521,20 @@ final class GsspContext implements Context
     /**
      * @return string
      */
-    private function loadIdpPublicCertificate()
+    private function loadIdpPublicCertificate(): string
     {
         $keyLoader = new KeyLoader();
         $keyLoader->loadCertificateFile($this->identityProvider->getCertificateFile());
-        /** @var \SAML2\Certificate\X509 $publicKey */
+        /** @var X509 $publicKey */
         $publicKey = $keyLoader->getKeys()->getOnlyElement();
 
         return $publicKey->getCertificate();
     }
 
     /**
-     * @return mixed|\SAML2\Assertion|\SAML2\EncryptedAssertion
+     * @return mixed|\SAML2\Assertion|EncryptedAssertion
      */
-    private function getSsoAssertionResponse()
+    private function getSsoAssertionResponse(): \SAML2\Assertion|EncryptedAssertion|bool
     {
         $assertions = $this->ssoReturnResponse->getAssertions();
 
@@ -578,14 +542,13 @@ final class GsspContext implements Context
     }
 
     /**
-     * @param array $parameters
      *
      * @When /^an user requests the identity provider sso endpoint$/
      * @When /^the user requests the identity provider sso endpoint$/
      */
-    public function callIdentityProviderSSOAction(array $parameters = [])
+    public function callIdentityProviderSSOAction(array $parameters = []): void
     {
-        $request = Request::create('http://identity_provider/saml/sso', 'GET', $parameters);
+        $request = Request::create('http://identity_provider/saml/sso', Request::METHOD_GET, $parameters);
 
         unset($this->lastException);
 
@@ -599,9 +562,9 @@ final class GsspContext implements Context
     /**
      * @Then /^the response should be an redirect the application registration endpoint$/
      *
-     * @throws \Assert\AssertionFailedException
+     * @throws AssertionFailedException
      */
-    public function theResponseShouldBeAnRedirectTheApplicationRegistrationEndpoint()
+    public function theResponseShouldBeAnRedirectTheApplicationRegistrationEndpoint(): void
     {
         Assertion::isInstanceOf($this->response, RedirectResponse::class);
         /** @var RedirectResponse $response */
@@ -612,9 +575,9 @@ final class GsspContext implements Context
     /**
      * @Then /^the response should be an redirect the application authentication endpoint$/
      *
-     * @throws \Assert\AssertionFailedException
+     * @throws AssertionFailedException
      */
-    public function theResponseShouldBeAnRedirectTheApplicationAuthenticationEndpoint()
+    public function theResponseShouldBeAnRedirectTheApplicationAuthenticationEndpoint(): void
     {
         Assertion::isInstanceOf($this->response, RedirectResponse::class);
         /** @var RedirectResponse $response */
@@ -625,9 +588,9 @@ final class GsspContext implements Context
     /**
      * @Then /^there should not be an unique identifier token assigned$/
      *
-     * @throws \Assert\AssertionFailedException
+     * @throws AssertionFailedException
      */
-    public function thereShouldNotBeAnUniqueIdentifierTokenAssigned()
+    public function thereShouldNotBeAnUniqueIdentifierTokenAssigned(): void
     {
         Assertion::false($this->responseContext->isRegistered());
     }
@@ -635,7 +598,7 @@ final class GsspContext implements Context
     /**
      * @When /^I clear the logs$/
      */
-    public function clearTheLogs()
+    public function clearTheLogs(): void
     {
         $this->logger->cleanLogs();
     }
@@ -643,17 +606,17 @@ final class GsspContext implements Context
     /**
      * @Given /^the logs are:$/
      *
-     * @throws \Assert\AssertionFailedException
+     * @throws AssertionFailedException
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    public function theLogsAre(TableNode $table)
+    public function theLogsAre(TableNode $table): void
     {
         $logs = $this->logger->cleanLogs();
         $rows = array_values($table->getColumnsHash());
         foreach ($rows as $index => $row) {
             Assertion::true(isset($logs[$index]), sprintf('Missing message %s', $row['message']));
-            list($level, $message, $context) = $logs[$index];
-            if (preg_match('/^\/.*\/$/', $row['message']) === 1) {
+            [$level, $message, $context] = $logs[$index];
+            if (preg_match('/^\/.*\/$/', (string) $row['message']) === 1) {
                 Assertion::regex($message, $row['message']);
             } else {
                 Assertion::eq($message, $row['message']);
@@ -674,7 +637,7 @@ final class GsspContext implements Context
     /**
      * @Then the identity provider rejects the request with the error :message
      */
-    public function theIdentityProviderSetsAnError($message)
+    public function theIdentityProviderSetsAnError($message): void
     {
         $this->registrationService->reject($message);
         $this->registrationService->replyToServiceProvider();
@@ -683,7 +646,7 @@ final class GsspContext implements Context
     /**
      * @Given set the subject nameId to :nameId
      */
-    public function setTheSubjectNameIdTo($nameId)
+    public function setTheSubjectNameIdTo(string $nameId): void
     {
         $nameIdVo = new NameID();
         $nameIdVo->setValue($nameId);
@@ -694,7 +657,7 @@ final class GsspContext implements Context
     /**
      * @Then /^the identity provider authenticates the user$/
      */
-    public function theIdentityProviderAuthenticatesTheUser()
+    public function theIdentityProviderAuthenticatesTheUser(): void
     {
         $this->authenticationService->authenticate();
     }
@@ -702,7 +665,7 @@ final class GsspContext implements Context
     /**
      * @Then /^the return endpoint should raise an exception with "([^"]*)"$/
      */
-    public function theReturnEndpointShouldRaiseAnException($message)
+    public function theReturnEndpointShouldRaiseAnException($message): void
     {
         Assertion::eq($message, $this->lastException->getMessage());
     }

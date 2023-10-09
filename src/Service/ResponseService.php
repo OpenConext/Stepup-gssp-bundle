@@ -33,22 +33,12 @@ use Surfnet\SamlBundle\Entity\IdentityProvider;
 
 final class ResponseService implements ResponseServiceInterface
 {
-
-    private $hostedIdentityProvider;
-    private $responseContext;
-    private $assertionSigningService;
-    private $dateTimeService;
-
     public function __construct(
-        IdentityProvider $hostedIdentityProvider,
-        ResponseContextInterface $responseContext,
-        AssertionSigningServiceInterface $assertionSigningService,
-        DateTimeService $dateTimeService
+        private readonly IdentityProvider $hostedIdentityProvider,
+        private readonly ResponseContextInterface $responseContext,
+        private readonly AssertionSigningServiceInterface $assertionSigningService,
+        private readonly DateTimeService $dateTimeService
     ) {
-        $this->hostedIdentityProvider = $hostedIdentityProvider;
-        $this->responseContext = $responseContext;
-        $this->assertionSigningService = $assertionSigningService;
-        $this->dateTimeService = $dateTimeService;
     }
 
     public function createResponse(): Response
@@ -90,12 +80,8 @@ final class ResponseService implements ResponseServiceInterface
         $assertion->setAuthnInstant($this->dateTimeService->getCurrent()->getTimestamp());
         $assertion->setAuthnContextClassRef('urn:oasis:names:tc:SAML:2.0:ac:classes:MobileTwoFactorUnregistered');
 
-        $authority = $assertion->getAuthenticatingAuthority();
         $assertion->setAuthenticatingAuthority(
-            array_merge(
-                (empty($authority) ? [] : $authority),
-                [$assertion->getIssuer()->getValue()]
-            )
+            [$assertion->getIssuer()->getValue()]
         );
     }
 
