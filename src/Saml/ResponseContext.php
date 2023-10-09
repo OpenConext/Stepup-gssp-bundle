@@ -27,113 +27,70 @@ use Surfnet\SamlBundle\Entity\ServiceProviderRepository;
 
 final class ResponseContext implements ResponseContextInterface
 {
-    private $hostedIdentityProvider;
-    private $stateHandler;
-    private $serviceProviderRepository;
-
     public function __construct(
-        IdentityProvider $identityProvider,
-        ServiceProviderRepository $serviceProviderRepository,
-        StateHandlerInterface $stateHandler
+        private readonly IdentityProvider $hostedIdentityProvider,
+        private readonly ServiceProviderRepository $serviceProviderRepository,
+        private readonly StateHandlerInterface $stateHandler
     ) {
-        $this->hostedIdentityProvider = $identityProvider;
-        $this->stateHandler           = $stateHandler;
-        $this->serviceProviderRepository = $serviceProviderRepository;
     }
 
-    /**
-     * @return string
-     */
-    public function getAssertionConsumerUrl()
+    public function getAssertionConsumerUrl(): string
     {
         return $this->getServiceProvider()->getAssertionConsumerUrl();
     }
 
-    /**
-     * @return null|string
-     */
-    public function getIssuer()
+    public function getIssuer(): ?string
     {
         return $this->hostedIdentityProvider->getEntityId();
     }
 
-    /**
-     * @return null|string
-     */
-    public function getInResponseTo()
+    public function getInResponseTo(): ?string
     {
         return $this->stateHandler->getRequestId();
     }
 
-    /**
-     * @return IdentityProvider
-     */
-    public function getIdentityProvider()
+    public function getIdentityProvider(): IdentityProvider
     {
         return $this->hostedIdentityProvider;
     }
 
-    /**
-     * @return ServiceProvider
-     */
-    public function getServiceProvider()
+    public function getServiceProvider(): ServiceProvider
     {
         $serviceProviderId = $this->stateHandler->getRequestServiceProvider();
         return $this->serviceProviderRepository->getServiceProvider($serviceProviderId);
     }
 
-    /**
-     * @return null|string
-     */
-    public function getRelayState()
+    public function getRelayState(): ?string
     {
         return $this->stateHandler->getRelayState();
     }
 
-    /**
-     * @return string
-     */
-    public function getSubjectNameId()
+    public function getSubjectNameId(): string
     {
         return $this->stateHandler->getSubjectNameId();
     }
 
-    /**
-     * @return bool
-     */
-    public function inErrorState()
+    public function inErrorState(): bool
     {
         return $this->stateHandler->hasErrorStatus();
     }
 
-    /**
-     * @return array
-     */
-    public function getErrorStatus()
+    public function getErrorStatus(): array
     {
         return $this->stateHandler->getErrorStatus();
     }
 
-    /**
-     * @return string
-     */
-    public function getRequestId()
+    public function getRequestId(): string
     {
         return $this->stateHandler->getRequestId();
     }
 
-    /**
-     * @return bool
-     */
-    public function hasRequest()
+    public function hasRequest(): bool
     {
         return $this->stateHandler->hasRequestId();
     }
 
-    /**
-     * @return bool
-     */
-    public function isRegistered()
+    public function isRegistered(): bool
     {
         return $this->stateHandler->isRequestTypeRegistration() && $this->stateHandler->hasSubjectNameId();
     }

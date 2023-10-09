@@ -20,10 +20,8 @@ declare(strict_types = 1);
 
 namespace Surfnet\GsspBundle\Service;
 
-use Assert\Assertion;
 use SAML2\Constants;
 use Surfnet\GsspBundle\Exception\RuntimeException;
-use Surfnet\SamlBundle\SAML2\Extensions\Chunk;
 use Surfnet\SamlBundle\SAML2\Extensions\GsspUserAttributesChunk;
 use Surfnet\SamlBundle\SAML2\ReceivedAuthnRequest;
 
@@ -32,42 +30,39 @@ use Surfnet\SamlBundle\SAML2\ReceivedAuthnRequest;
  */
 final class StateHandler implements StateHandlerInterface
 {
-    const REQUEST_ID = 'request_id';
-    const REQUEST_SERVICE_PROVIDER = 'service_provider';
-    const REQUEST_RELAY_STATE = 'relay_state';
+    public const REQUEST_ID = 'request_id';
+    public const REQUEST_SERVICE_PROVIDER = 'service_provider';
+    public const REQUEST_RELAY_STATE = 'relay_state';
 
-    const REQUEST_TYPE = 'request_type';
-    const REQUEST_TYPE_AUTHENTICATION = 'request_type_authentication';
-    const REQUEST_TYPE_REGISTRATION = 'request_type_registration';
+    public const REQUEST_TYPE = 'request_type';
+    public const REQUEST_TYPE_AUTHENTICATION = 'request_type_authentication';
+    public const REQUEST_TYPE_REGISTRATION = 'request_type_registration';
 
     /**
      * This can be the request subject name id or the response registered named id.
      */
-    const NAME_ID = 'name_id';
+    public const NAME_ID = 'name_id';
 
-    const RESPONSE_TYPE = 'response_type';
-    const RESPONSE_TYPE_USER_REGISTERED = 'response_type_user_registered';
-    const RESPONSE_TYPE_USER_AUTHENTICATED = 'response_type_user_authenticated';
-    const RESPONSE_TYPE_ERROR = 'response_type_error';
+    public const RESPONSE_TYPE = 'response_type';
+    public const RESPONSE_TYPE_USER_REGISTERED = 'response_type_user_registered';
+    public const RESPONSE_TYPE_USER_AUTHENTICATED = 'response_type_user_authenticated';
+    public const RESPONSE_TYPE_ERROR = 'response_type_error';
 
-    const RESPONSE_ERROR_SUB_CODE = 'error_response_sub_code';
-    const RESPONSE_ERROR_MESSAGE = 'error_response_message';
+    public const RESPONSE_ERROR_SUB_CODE = 'error_response_sub_code';
+    public const RESPONSE_ERROR_MESSAGE = 'error_response_message';
 
-    const SCOPING_REQUESTER_IDS = 'scoping_requester_ids';
+    public const SCOPING_REQUESTER_IDS = 'scoping_requester_ids';
 
-    const GSSP_USERATTRIBUTES = 'gssp_userattributes';
+    public const GSSP_USERATTRIBUTES = 'gssp_userattributes';
 
-    private $store;
-
-    public function __construct(ValueStore $store)
+    public function __construct(private readonly ValueStore $store)
     {
-        $this->store = $store;
     }
 
-    public function saveRegistrationRequest(ReceivedAuthnRequest $authnRequest, $relayState)
+    public function saveRegistrationRequest(ReceivedAuthnRequest $authnRequest, string $relayState): void
     {
         $this->assertRequestTypeNotSet();
-        Assertion::string($relayState);
+        $this->assertHasServiceProvider($authnRequest);
 
         $this->setRequestId($authnRequest->getRequestId())
             ->setRequestServiceProvider($authnRequest->getServiceProvider())
@@ -75,7 +70,7 @@ final class StateHandler implements StateHandlerInterface
             ->set(self::REQUEST_TYPE, self::REQUEST_TYPE_REGISTRATION)
         ;
 
-        if ($authnRequest->getExtensions()->getGsspUserAttributesChunk()) {
+        if ($authnRequest->getExtensions()->getGsspUserAttributesChunk() instanceof GsspUserAttributesChunk) {
             $chunk = $authnRequest->getExtensions()->getGsspUserAttributesChunk();
             if (!$chunk instanceof GsspUserAttributesChunk) {
                 throw new RuntimeException(
@@ -86,10 +81,10 @@ final class StateHandler implements StateHandlerInterface
         }
     }
 
-    public function saveAuthenticationRequest(ReceivedAuthnRequest $authnRequest, $relayState)
+    public function saveAuthenticationRequest(ReceivedAuthnRequest $authnRequest, string $relayState): void
     {
         $this->assertRequestTypeNotSet();
-        Assertion::string($relayState);
+        $this->assertHasServiceProvider($authnRequest);
 
         $this->setRequestId($authnRequest->getRequestId())
             ->setRequestServiceProvider($authnRequest->getServiceProvider())
@@ -100,7 +95,7 @@ final class StateHandler implements StateHandlerInterface
         ;
     }
 
-    public function saveSubjectNameId($nameId)
+    public function saveSubjectNameId(string $nameId): StateHandlerInterface
     {
         if (!$this->store->is(self::REQUEST_TYPE, self::REQUEST_TYPE_REGISTRATION)) {
             throw new RuntimeException('Can only set subject name id when a registration is required');
@@ -108,7 +103,7 @@ final class StateHandler implements StateHandlerInterface
         return $this->set(self::NAME_ID, $nameId);
     }
 
-    public function setErrorStatus($message, $subCode)
+    public function setErrorStatus(string $message, string $subCode): StateHandlerInterface
     {
         if (!$this->hasRequestType()) {
             throw new RuntimeException('Can only return a error response to the identity provider when we have a pending request');
@@ -117,7 +112,7 @@ final class StateHandler implements StateHandlerInterface
         return $this->set(self::RESPONSE_ERROR_SUB_CODE, $subCode);
     }
 
-    public function authenticate()
+    public function authenticate(): StateHandlerInterface
     {
         if (!$this->store->is(self::REQUEST_TYPE, self::REQUEST_TYPE_AUTHENTICATION)) {
             throw new RuntimeException('Can only authenticate the user when an authentication is required');
@@ -125,27 +120,27 @@ final class StateHandler implements StateHandlerInterface
         return $this->set(self::RESPONSE_TYPE_USER_AUTHENTICATED, true);
     }
 
-    public function getRequestId()
+    public function getRequestId(): string
     {
         return $this->store->get(self::REQUEST_ID);
     }
 
-    public function hasRequestId()
+    public function hasRequestId(): bool
     {
         return $this->store->has(self::REQUEST_ID);
     }
 
-    public function getRequestServiceProvider()
+    public function getRequestServiceProvider(): string
     {
         return $this->store->get(self::REQUEST_SERVICE_PROVIDER);
     }
 
-    public function getRelayState()
+    public function getRelayState(): ?string
     {
         return $this->store->get(self::REQUEST_RELAY_STATE);
     }
 
-    public function getSubjectNameId()
+    public function getSubjectNameId(): string
     {
         return $this->store->get(self::NAME_ID);
     }
@@ -158,32 +153,32 @@ final class StateHandler implements StateHandlerInterface
         return null;
     }
 
-    public function hasSubjectNameId()
+    public function hasSubjectNameId(): bool
     {
         return $this->store->has(self::NAME_ID);
     }
 
-    public function isRequestTypeRegistration()
+    public function isRequestTypeRegistration(): bool
     {
         return $this->store->is(self::REQUEST_TYPE, self::REQUEST_TYPE_REGISTRATION);
     }
 
-    public function isRequestTypeAuthentication()
+    public function isRequestTypeAuthentication(): bool
     {
         return $this->store->is(self::REQUEST_TYPE, self::REQUEST_TYPE_AUTHENTICATION);
     }
 
-    public function hasRequestType()
+    public function hasRequestType(): bool
     {
         return $this->store->has(self::REQUEST_TYPE);
     }
 
-    public function hasErrorStatus()
+    public function hasErrorStatus(): bool
     {
         return $this->store->has(self::RESPONSE_ERROR_SUB_CODE) || $this->store->has(self::RESPONSE_ERROR_MESSAGE);
     }
 
-    public function getErrorStatus()
+    public function getErrorStatus(): array
     {
         return [
             'Code' => Constants::STATUS_RESPONDER,
@@ -192,65 +187,63 @@ final class StateHandler implements StateHandlerInterface
         ];
     }
 
-    public function isAuthenticated()
+    public function isAuthenticated(): bool
     {
         return $this->store->is(self::RESPONSE_TYPE_USER_AUTHENTICATED, true);
     }
 
-    public function invalidate()
+    public function invalidate(): void
     {
         $this->store->clear();
     }
 
-    public function getScopingRequesterIds()
+    public function getScopingRequesterIds(): array
     {
         return $this->store->get(self::SCOPING_REQUESTER_IDS);
     }
 
-    public function hasScopingRequesterIds()
+    public function hasScopingRequesterIds(): bool
     {
         return $this->store->has(self::SCOPING_REQUESTER_IDS);
     }
 
-    private function setRelayState($relayState)
+    private function setRelayState(string $relayState): self
     {
         return $this->set(self::REQUEST_RELAY_STATE, $relayState);
     }
 
-    private function setRequestServiceProvider($serviceProvider)
+    private function setRequestServiceProvider(string $serviceProvider): self
     {
         return $this->set(self::REQUEST_SERVICE_PROVIDER, $serviceProvider);
     }
 
-    private function setRequestId($originalRequestId)
+    private function setRequestId(string $originalRequestId): self
     {
         return $this->set(self::REQUEST_ID, $originalRequestId);
     }
 
-    private function setGsspUserAttributes(GsspUserAttributesChunk $chunk)
+    private function setGsspUserAttributes(GsspUserAttributesChunk $chunk): self
     {
         return $this->set(self::GSSP_USERATTRIBUTES, $chunk->toXML());
     }
 
-    /**
-     * Convenience function that directly returns this reference.
-     *
-     * @param string $key
-     * @param mixed $value
-     *    Any scalar
-     *
-     * @return $this
-     */
-    private function set($key, $value)
+    private function set(string $key, mixed $value): self
     {
         $this->store->set($key, $value);
         return $this;
     }
 
-    private function assertRequestTypeNotSet()
+    private function assertRequestTypeNotSet(): void
     {
         if ($this->store->has(self::REQUEST_TYPE)) {
             throw RuntimeException::requestTypeAlreadyKnown($this->store->get(self::REQUEST_TYPE));
+        }
+    }
+
+    private function assertHasServiceProvider(ReceivedAuthnRequest $authnRequest): void
+    {
+        if (!$authnRequest->getServiceProvider()) {
+            throw new RuntimeException('No Service Provider (Issuer) found in the AuthNRequest');
         }
     }
 }

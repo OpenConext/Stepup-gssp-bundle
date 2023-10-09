@@ -33,21 +33,14 @@ use Symfony\Component\Routing\RouterInterface;
  */
 final class StateBasedRegistrationService implements RegistrationService
 {
-    private $stateHandler;
-    private $router;
-    private $logger;
-
     public function __construct(
-        StateHandlerInterface $stateHandler,
-        RouterInterface $router,
-        LoggerInterface $logger
+        private readonly StateHandlerInterface $stateHandler,
+        private readonly RouterInterface $router,
+        private readonly LoggerInterface $logger
     ) {
-        $this->stateHandler = $stateHandler;
-        $this->router = $router;
-        $this->logger = $logger;
     }
 
-    public function register($subjectNameId)
+    public function register(string $subjectNameId): void
     {
         if (!$this->stateHandler->isRequestTypeRegistration()) {
             $this->logger->critical('Current request does not need a registration');
@@ -57,7 +50,7 @@ final class StateBasedRegistrationService implements RegistrationService
         $this->stateHandler->saveSubjectNameId($subjectNameId);
     }
 
-    public function isRegistered()
+    public function isRegistered(): bool
     {
         if (!$this->stateHandler->isRequestTypeRegistration()) {
             $this->logger->critical('Current request does not need a registration');
@@ -66,25 +59,25 @@ final class StateBasedRegistrationService implements RegistrationService
         return $this->stateHandler->hasSubjectNameId();
     }
 
-    public function registrationRequired()
+    public function registrationRequired(): bool
     {
         return $this->stateHandler->isRequestTypeRegistration();
     }
 
-    public function reject($message, $subCode = Constants::STATUS_AUTHN_FAILED)
+    public function reject(string $message, string $subCode = Constants::STATUS_AUTHN_FAILED): void
     {
         $this->logger->critical($message);
         $this->stateHandler->setErrorStatus($message, $subCode);
     }
 
-    public function replyToServiceProvider()
+    public function replyToServiceProvider(): RedirectResponse
     {
-        $url = $this->generateSSOreturnUrl();
+        $url = $this->generateSsoReturnUrl();
         $this->logger->notice(sprintf('Created redirect response for sso return endpoint "%s"', $url));
         return new RedirectResponse($url);
     }
 
-    private function generateSSOreturnUrl()
+    private function generateSsoReturnUrl(): string
     {
         return $this->router->generate('gssp_saml_sso_return');
     }

@@ -20,6 +20,7 @@ declare(strict_types = 1);
 
 namespace Surfnet\GsspBundle\Controller;
 
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -42,24 +43,13 @@ use Symfony\Component\HttpFoundation\Request;
  */
 final class SSOController extends AbstractController
 {
-    private $httpBinding;
-    private $registrationRoute;
-    private $stateHandler;
-    private $responseContext;
-    private $logger;
-
     public function __construct(
-        RedirectBinding $httpBinding,
-        ConfigurationContainer $configuration,
-        StateHandlerInterface $stateHandler,
-        ResponseContextInterface $responseContext,
-        LoggerInterface $logger
+        private readonly RedirectBinding $httpBinding,
+        private readonly ConfigurationContainer $registrationRoute,
+        private readonly StateHandlerInterface $stateHandler,
+        private readonly ResponseContextInterface $responseContext,
+        private readonly LoggerInterface $logger
     ) {
-        $this->registrationRoute = $configuration;
-        $this->stateHandler = $stateHandler;
-        $this->responseContext = $responseContext;
-        $this->httpBinding = $httpBinding;
-        $this->logger = $logger;
     }
 
     /**
@@ -68,9 +58,9 @@ final class SSOController extends AbstractController
      * If the request is valid the user will be redirected to the application registration route.
      *
      * @Route("/saml/sso", name="gssp_saml_sso", methods={"GET"})
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
-    public function ssoAction(Request $request)
+    public function sso(Request $request): RedirectResponse
     {
         $this->logger->notice('Received sso request');
 
@@ -109,16 +99,14 @@ final class SSOController extends AbstractController
         return $this->registrationAction($request, $originalRequest);
     }
 
-    private function authenticationAction(Request $request, ReceivedAuthnRequest $originalRequest)
+    private function authenticationAction(Request $request, ReceivedAuthnRequest $originalRequest): RedirectResponse
     {
         $this->stateHandler->saveAuthenticationRequest(
             $originalRequest,
             $this->getRelayStateFromRequest($request)
         );
 
-        $this->logger->info(sprintf(
-            'AuthnRequest stored in state'
-        ));
+        $this->logger->info('AuthnRequest stored in state');
 
         $route = $this->generateUrl($this->registrationRoute->getAuthenticationRoute());
 
@@ -130,16 +118,14 @@ final class SSOController extends AbstractController
         return new RedirectResponse($route);
     }
 
-    private function registrationAction(Request $request, ReceivedAuthnRequest $originalRequest)
+    private function registrationAction(Request $request, ReceivedAuthnRequest $originalRequest): RedirectResponse
     {
         $this->stateHandler->saveRegistrationRequest(
             $originalRequest,
             $this->getRelayStateFromRequest($request)
         );
 
-        $this->logger->info(sprintf(
-            'AuthnRequest stored in state'
-        ));
+        $this->logger->info('AuthnRequest stored in state');
 
         $route = $this->generateUrl($this->registrationRoute->getRegistrationRoute());
 
@@ -160,8 +146,8 @@ final class SSOController extends AbstractController
      *
      * The conclusion is that IDP does not need to and cannot verify integrity of the relay-state.
      */
-    private function getRelayStateFromRequest(Request $request)
+    private function getRelayStateFromRequest(Request $request): string
     {
-        return $request->get(AuthnRequest::PARAMETER_RELAY_STATE, '');
+        return (string) $request->get(AuthnRequest::PARAMETER_RELAY_STATE, '');
     }
 }

@@ -1,3 +1,46 @@
 parameters:
 	ignoreErrors:
-		[]
+		-
+			message: "#^Method Surfnet\\\\GsspBundle\\\\Logger\\\\StepupRequestIdSariLogger\\:\\:log\\(\\) has parameter \\$context with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: ../../src/Logger/StepupRequestIdSariLogger.php
+
+		-
+			message: "#^Method Surfnet\\\\GsspBundle\\\\Monolog\\\\Processor\\\\RequestIdProcessor\\:\\:__invoke\\(\\) has parameter \\$record with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: ../../src/Monolog/Processor/RequestIdProcessor.php
+
+		-
+			message: "#^Method Surfnet\\\\GsspBundle\\\\Monolog\\\\Processor\\\\RequestIdProcessor\\:\\:__invoke\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: ../../src/Monolog/Processor/RequestIdProcessor.php
+
+		-
+			message: "#^Method Surfnet\\\\GsspBundle\\\\Saml\\\\ResponseContext\\:\\:getErrorStatus\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: ../../src/Saml/ResponseContext.php
+
+		-
+			message: "#^Method Surfnet\\\\GsspBundle\\\\Saml\\\\ResponseContextInterface\\:\\:getErrorStatus\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: ../../src/Saml/ResponseContextInterface.php
+
+		-
+			message: "#^Method Surfnet\\\\GsspBundle\\\\Service\\\\StateHandler\\:\\:getErrorStatus\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: ../../src/Service/StateHandler.php
+
+		-
+			message: "#^Method Surfnet\\\\GsspBundle\\\\Service\\\\StateHandler\\:\\:getScopingRequesterIds\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: ../../src/Service/StateHandler.php
+
+		-
+			message: "#^Method Surfnet\\\\GsspBundle\\\\Service\\\\StateHandlerInterface\\:\\:getErrorStatus\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: ../../src/Service/StateHandlerInterface.php
+
+		-
+			message: "#^Method Surfnet\\\\GsspBundle\\\\Service\\\\StateHandlerInterface\\:\\:getScopingRequesterIds\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: ../../src/Service/StateHandlerInterface.php

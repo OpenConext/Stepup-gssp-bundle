@@ -20,14 +20,13 @@ declare(strict_types = 1);
 
 namespace Surfnet\GsspBundle\Service\DateTime;
 
+use DateTimeImmutable;
+
 final class StaticDateTimeService extends AbstractDateTimeService
 {
 
-    private $dateTime;
-
-    public function __construct(\DateTimeImmutable $dateTime)
+    public function __construct(private readonly DateTimeImmutable $dateTime)
     {
-        $this->dateTime = $dateTime;
     }
 
     public function getCurrent()
