@@ -26,23 +26,20 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 final class SessionValueStore implements ValueStore
 {
-    const SESSION_PATH = 'surfnet/gssp/request/';
+    public const SESSION_PATH = 'surfnet/gssp/request/';
 
-    private $session;
-
-    public function __construct(SessionInterface $session)
+    public function __construct(private readonly SessionInterface $session)
     {
-        $this->session = $session;
     }
 
-    public function set($key, $value)
+    public function set(string $key, mixed $value): self
     {
         $this->session->set(self::SESSION_PATH.$key, $value);
 
         return $this;
     }
 
-    public function get($key)
+    public function get(string $key): mixed
     {
         if (!$this->has($key)) {
             throw NotFound::stateProperty($key);
@@ -54,17 +51,17 @@ final class SessionValueStore implements ValueStore
     /**
      * @SuppressWarnings(PHPMD.ShortMethodName)
      */
-    public function is($key, $value)
+    public function is(string $key, mixed $value): bool
     {
         return $this->has($key) && $this->get($key) === $value;
     }
 
-    public function has($key)
+    public function has(string $key): bool
     {
         return $this->session->has(self::SESSION_PATH.$key);
     }
 
-    public function clear()
+    public function clear(): self
     {
         $this->session->invalidate();
         return $this;

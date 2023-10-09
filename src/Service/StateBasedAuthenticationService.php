@@ -34,26 +34,19 @@ use Symfony\Component\Routing\RouterInterface;
  */
 final class StateBasedAuthenticationService implements AuthenticationService
 {
-    private $stateHandler;
-    private $router;
-    private $logger;
-
     public function __construct(
-        StateHandlerInterface $stateHandler,
-        RouterInterface $router,
-        LoggerInterface $logger
+        private readonly StateHandlerInterface $stateHandler,
+        private readonly RouterInterface $router,
+        private readonly LoggerInterface $logger
     ) {
-        $this->stateHandler = $stateHandler;
-        $this->router = $router;
-        $this->logger = $logger;
     }
 
-    public function authenticationRequired()
+    public function authenticationRequired(): bool
     {
         return $this->stateHandler->isRequestTypeAuthentication();
     }
 
-    public function authenticate()
+    public function authenticate(): void
     {
         if (!$this->stateHandler->isRequestTypeAuthentication()) {
             $this->logger->critical('Current request does not need an authentication');
@@ -63,7 +56,7 @@ final class StateBasedAuthenticationService implements AuthenticationService
         $this->stateHandler->authenticate();
     }
 
-    public function isAuthenticated()
+    public function isAuthenticated(): bool
     {
         if (!$this->stateHandler->isRequestTypeAuthentication()) {
             $this->logger->critical('Current request does not need an authentication');
@@ -72,15 +65,15 @@ final class StateBasedAuthenticationService implements AuthenticationService
         return $this->stateHandler->isAuthenticated();
     }
 
-    public function reject($message, $subCode = Constants::STATUS_AUTHN_FAILED)
+    public function reject(string $message, string $subCode = Constants::STATUS_AUTHN_FAILED): void
     {
         $this->logger->critical($message);
         $this->stateHandler->setErrorStatus($message, $subCode);
     }
 
-    public function replyToServiceProvider()
+    public function replyToServiceProvider(): RedirectResponse
     {
-        $url = $this->generateSSOreturnUrl();
+        $url = $this->generateSsoReturnUrl();
         $this->logger->notice(sprintf('Created redirect response for sso return endpoint "%s"', $url));
 
         return new RedirectResponse($url);
@@ -96,7 +89,7 @@ final class StateBasedAuthenticationService implements AuthenticationService
         return $this->stateHandler->getSubjectNameId();
     }
 
-    public function getScopingRequesterIds()
+    public function getScopingRequesterIds(): array
     {
         if (!$this->stateHandler->hasScopingRequesterIds()) {
             return [];
@@ -104,7 +97,7 @@ final class StateBasedAuthenticationService implements AuthenticationService
         return $this->stateHandler->getScopingRequesterIds();
     }
 
-    private function generateSSOreturnUrl()
+    private function generateSsoReturnUrl(): string
     {
         return $this->router->generate('gssp_saml_sso_return');
     }
@@ -112,7 +105,7 @@ final class StateBasedAuthenticationService implements AuthenticationService
     /**
      * @return string
      */
-    public function getIssuer()
+    public function getIssuer(): string
     {
         return $this->stateHandler->getRequestServiceProvider();
     }

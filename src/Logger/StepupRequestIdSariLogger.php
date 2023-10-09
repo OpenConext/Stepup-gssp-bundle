@@ -22,6 +22,7 @@ namespace Surfnet\GsspBundle\Logger;
 
 use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
+use Stringable;
 use Surfnet\GsspBundle\Service\StateHandlerInterface;
 use Surfnet\SamlBundle\Monolog\SamlAuthenticationLogger;
 
@@ -30,24 +31,17 @@ use Surfnet\SamlBundle\Monolog\SamlAuthenticationLogger;
  */
 final class StepupRequestIdSariLogger extends AbstractLogger
 {
-    private $logger;
-    private $stateHandler;
-    private $sariLogger;
-
     public function __construct(
-        LoggerInterface $logger,
-        SamlAuthenticationLogger $sariLogger,
-        StateHandlerInterface $stateHandler
+        private readonly LoggerInterface $logger,
+        private readonly SamlAuthenticationLogger $sariLogger,
+        private readonly StateHandlerInterface $stateHandler
     ) {
-        $this->logger = $logger;
-        $this->stateHandler = $stateHandler;
-        $this->sariLogger = $sariLogger;
     }
 
     /**
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    public function log($level, $message, array $context = array())
+    public function log(mixed $level, string|Stringable $message, array $context = []): void
     {
         if ($this->isRequiredToLogWithSari()) {
             $this->createSariLogger()->log($level, $message, $context);
@@ -56,12 +50,12 @@ final class StepupRequestIdSariLogger extends AbstractLogger
         $this->logger->log($level, $message, $context);
     }
 
-    private function isRequiredToLogWithSari()
+    private function isRequiredToLogWithSari(): bool
     {
         return $this->stateHandler->hasRequestId();
     }
 
-    private function createSariLogger()
+    private function createSariLogger(): SamlAuthenticationLogger
     {
         return $this->sariLogger->forAuthentication(
             $this->stateHandler->getRequestId()
