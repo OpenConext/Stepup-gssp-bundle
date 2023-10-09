@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types = 1);
+
 /**
  * Copyright 2017 SURFnet B.V.
  *
@@ -23,6 +26,7 @@ use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\TableNode;
 use Exception;
 use JakubOnderka\PhpParallelLint\RunTimeException;
+use Mockery;
 use RobRichards\XMLSecLibs\XMLSecurityKey;
 use SAML2\AuthnRequest as SAMLAuthnRequest;
 use SAML2\Certificate\KeyLoader;
@@ -57,15 +61,18 @@ use Surfnet\SamlBundle\Monolog\SamlAuthenticationLogger;
 use Surfnet\SamlBundle\SAML2\AuthnRequest;
 use Surfnet\SamlBundle\SAML2\BridgeContainer;
 use Surfnet\SamlBundle\Signing\SignatureVerifier;
-use Symfony\Component\Debug\BufferingLogger;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\ErrorHandler\BufferingLogger;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
+use Twig\Environment;
 
 /**
+ * @SuppressWarnings(PHPMD.TooManyFields)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
@@ -145,6 +152,7 @@ final class GsspContext implements Context
      *
      * @BeforeScenario
      * @throws \Assert\AssertionFailedException
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function bootstrapDependencies()
     {
@@ -199,7 +207,7 @@ final class GsspContext implements Context
         $serviceProviders = new StaticServiceProviderRepository([$this->serviceProvider]);
         $keyLoader = new KeyLoader();
         $signatureVerifier = new SignatureVerifier($keyLoader, $logger);
-        $redirectBinding = new RedirectBinding($logger, $signatureVerifier, $serviceProviders);
+        $redirectBinding = new RedirectBinding($signatureVerifier, $serviceProviders);
         $configuration = new ConfigurationContainer(
             [
                 'registration_route' => 'registration_route_action',
@@ -207,7 +215,7 @@ final class GsspContext implements Context
             ]
         );
 
-        $router = \Mockery::mock(RouterInterface::class);
+        $router = Mockery::mock(RouterInterface::class);
         $router->shouldReceive('generate')
             ->with('registration_route_action', [], UrlGeneratorInterface::ABSOLUTE_PATH)
             ->andReturn('https://identity_provider/registration')
@@ -259,10 +267,10 @@ final class GsspContext implements Context
             $this->responseContext,
             $logger
         );
-        $container = \Mockery::mock(ContainerInterface::class);
+        $container = Mockery::mock(ContainerInterface::class);
         $container->shouldReceive('has')->with('templating')->andReturn(false);
         $container->shouldReceive('has')->with('twig')->andReturn(true);
-        $this->twigEnvironment = \Mockery::mock(Twig_Environment::class);
+        $this->twigEnvironment = Mockery::mock(Environment::class);
         $this->twigEnvironment->shouldReceive('render')->andReturnUsing(
             function (
                 $template,
@@ -636,6 +644,7 @@ final class GsspContext implements Context
      * @Given /^the logs are:$/
      *
      * @throws \Assert\AssertionFailedException
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function theLogsAre(TableNode $table)
     {
