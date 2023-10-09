@@ -39,46 +39,28 @@
     "symfony/phpunit-bridge": "^6.4"
   },
   "scripts": {
-    "test": [
-      "@lint",
-      "@static-analysis",
-      "@phpunit",
+    "check": [
+      "@composer-validate",
+      "@docheader",
+      "@phplint",
+      "@phpcpd",
+      "@phpcs",
+      "@phpmd",
+      "@phpstan",
+      "@test",
       "@behat"
     ],
-    "lint": [
-      "@lint-php",
-      "@lint-composer"
-    ],
-    "lint-php": "vendor/bin/parallel-lint src tests",
-    "lint-composer": "composer validate",
-    "static-analysis": [
-      "@license-headers",
-      "@phpmd",
-      "@phpcs",
-      "@phpcpd"
-    ],
-    "license-headers": "vendor/bin/docheader check src/ tests/",
-    "phpmd": "vendor/bin/docheader check src/ tests/",
-    "phpcs": [
-      "vendor/bin/phpcs --standard=phpcs.xml --report=full --warning-severity=0 ./src",
-      "vendor/bin/phpcs --standard=phpcs_tests.xml --report=full --warning-severity=0 ./tests"
-    ],
-    "phpcbf": [
-      "vendor/bin/phpcbf --standard=phpcs.xml ./src",
-      "vendor/bin/phpcbf --standard=phpcs_tests.xml ./tests"
-    ],
-    "phpcpd": [
-      "vendor/bin/phpcpd  ./src",
-      "vendor/bin/phpcpd  ./tests"
-    ],
-    "phpunit": "vendor/bin/phpunit tests",
-    "behat": "vendor/bin/behat  --config behat.yml",
-    "coverage": [
-      "@phpunit-coverage",
-      "mkdir -p coverage/reports",
-      "vendor/bin/phpcov merge coverage/reports --html coverage"
-    ],
-    "phpunit-coverage": "vendor/bin/phpunit tests --coverage-php coverage/reports/unit.cov"
+    "behat": "./ci/qa/behat",
+    "composer-validate": "./ci/qa/validate",
+    "phplint": "./ci/qa/phplint",
+    "phpcs": "./ci/qa/phpcs",
+    "phpcpd": "./ci/qa/phpcpd",
+    "phpmd": "./ci/qa/phpmd",
+    "phpstan": "./ci/qa/phpstan",
+    "phpstan-baseline": "./ci/qa/phpstan-update-baseline",
+    "test": "./ci/qa/phpunit",
+    "phpcbf": "./ci/qa/phpcbf",
+    "docheader": "./ci/qa/docheader"
   },
   "config": {
     "sort-packages": true,

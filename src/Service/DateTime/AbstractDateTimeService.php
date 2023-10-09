@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types = 1);
+
 /**
  * Copyright 2017 SURFnet B.V.
  *
@@ -17,6 +20,7 @@
 
 namespace Surfnet\GsspBundle\Service\DateTime;
 
+use DateInterval;
 use Surfnet\GsspBundle\Service\DateTimeService;
 
 abstract class AbstractDateTimeService implements DateTimeService
@@ -32,6 +36,6 @@ abstract class AbstractDateTimeService implements DateTimeService
     public function interval($interval)
     {
         $time = $this->getCurrent();
-        return $time->add(new \DateInterval($interval));
+        return $time->add(new DateInterval($interval));
     }
 }

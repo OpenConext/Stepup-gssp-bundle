@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types = 1);
+
 /**
  * Copyright 2017 SURFnet B.V.
  *
@@ -41,6 +44,9 @@ final class StepupRequestIdSariLogger extends AbstractLogger
         $this->sariLogger = $sariLogger;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ElseExpression)
+     */
     public function log($level, $message, array $context = array())
     {
         if ($this->isRequiredToLogWithSari()) {
