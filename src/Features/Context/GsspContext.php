@@ -33,6 +33,8 @@ use SAML2\Constants;
 use SAML2\DOMDocumentFactory;
 use SAML2\Message;
 use SAML2\Response as SAMLResponse;
+use SAML2\XML\saml\Issuer;
+use SAML2\XML\saml\NameID;
 use Surfnet\GsspBundle\Controller\SSOController;
 use Surfnet\GsspBundle\Controller\SSOReturnController;
 use Surfnet\GsspBundle\Logger\StepupRequestIdSariLogger;
@@ -62,7 +64,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Twig_Environment;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -294,7 +295,9 @@ final class GsspContext implements Context
         $request = new SAMLAuthnRequest();
         $request->setAssertionConsumerServiceURL($this->serviceProvider->getAssertionConsumerUrl());
         $request->setDestination($this->identityProvider->getSsoUrl());
-        $request->setIssuer($this->serviceProvider->getEntityId());
+        $issuer = new Issuer();
+        $issuer->setValue($this->serviceProvider->getEntityId());
+        $request->setIssuer($issuer);
         $request->setProtocolBinding(Constants::BINDING_HTTP_REDIRECT);
         $this->authnRequest = $request;
     }
@@ -316,7 +319,9 @@ final class GsspContext implements Context
         $request = new SAMLAuthnRequest();
         $request->setAssertionConsumerServiceURL($acu);
         $request->setDestination($this->identityProvider->getSsoUrl());
-        $request->setIssuer($entityId);
+        $issuer = new Issuer();
+        $issuer->setValue($entityId);
+        $request->setIssuer($issuer);
         $request->setProtocolBinding(Constants::BINDING_HTTP_REDIRECT);
         $this->authnRequest = $request;
     }
@@ -506,8 +511,8 @@ final class GsspContext implements Context
     {
         $assertion = $this->getSsoAssertionResponse();
         $nameId = $assertion->getNameId();
-        Assertion::eq('unique-identifier-token', $nameId->value);
-        Assertion::eq(Constants::NAMEID_PERSISTENT, $nameId->Format);
+        Assertion::eq('unique-identifier-token', $nameId->getValue());
+        Assertion::eq(Constants::NAMEID_PERSISTENT, $nameId->getFormat());
     }
 
     /**
@@ -671,7 +676,10 @@ final class GsspContext implements Context
      */
     public function setTheSubjectNameIdTo($nameId)
     {
-        $this->authnRequest->setNameId(['Value' => $nameId, 'Format' => Constants::NAMEID_PERSISTENT]);
+        $nameIdVo = new NameID();
+        $nameIdVo->setValue($nameId);
+        $nameIdVo->setFormat(Constants::NAMEID_PERSISTENT);
+        $this->authnRequest->setNameId($nameIdVo);
     }
 
     /**
