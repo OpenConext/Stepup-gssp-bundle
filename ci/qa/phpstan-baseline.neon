@@ -36,6 +36,11 @@ parameters:
 			path: ../../src/Service/StateHandler.php
 
 		-
+			message: "#^Parameter \\#1 \\$serviceProvider of method Surfnet\\\\GsspBundle\\\\Service\\\\StateHandler\\:\\:setRequestServiceProvider\\(\\) expects string, string\\|null given\\.$#"
+			count: 2
+			path: ../../src/Service/StateHandler.php
+
+		-
 			message: "#^Method Surfnet\\\\GsspBundle\\\\Service\\\\StateHandlerInterface\\:\\:getErrorStatus\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: ../../src/Service/StateHandlerInterface.php

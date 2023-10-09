@@ -154,7 +154,7 @@ final class SSOReturnController extends AbstractController
 
     private function getResponseAsXML(SAMLResponse $response): string
     {
-        $xml = $response->toUnsignedXML()->ownerDocument->saveXML();
+        $xml = $response->toUnsignedXML()->ownerDocument?->saveXML();
         if (!$xml) {
             throw new RuntimeException('The SAML Response could not be converted to XML');
         }

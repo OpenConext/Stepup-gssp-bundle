@@ -27,6 +27,7 @@ use SAML2\Certificate\KeyLoader;
 use SAML2\Certificate\PrivateKeyLoader;
 use SAML2\Certificate\X509;
 use SAML2\Configuration\PrivateKey;
+use Surfnet\GsspBundle\Exception\RuntimeException;
 use Surfnet\SamlBundle\Entity\IdentityProvider;
 
 final class AssertionSigningService implements AssertionSigningServiceInterface
@@ -70,7 +71,11 @@ final class AssertionSigningService implements AssertionSigningServiceInterface
     private function getPublicCertificate(): string
     {
         $keyLoader = new KeyLoader();
-        $keyLoader->loadCertificateFile($this->identityProvider->getCertificateFile());
+        $idpCertificate = $this->identityProvider->getCertificateFile();
+        if (!$idpCertificate) {
+            throw new RuntimeException('The IdP did not have a Certificate, unable to load it');
+        }
+        $keyLoader->loadCertificateFile($idpCertificate);
         /** @var X509 $publicKey */
         $publicKey = $keyLoader->getKeys()->getOnlyElement();
 
