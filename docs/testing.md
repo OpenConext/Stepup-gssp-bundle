@@ -44,8 +44,6 @@ Tools: Behat
 
 ## Security testing
 
-Using an automated tool, the list of dependencies of the project is being checked against a database of known
-vulnerabilities as part of every CI build. If any of the dependencies contains a known vulnerability, the build will
-fail.
-
-Tools: SensioLabs Security Checker
+GitHub actions are used to run a nightly security check. This signals the team via Slack for any outages but no longer 
+halts the development process. As in, the test-integration build is not halted when security vulnerabilities are 
+identified. Take note that you still should take these notifications very seriously and frequently evaluate & fix them!
