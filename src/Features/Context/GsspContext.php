@@ -95,7 +95,7 @@ final class GsspContext implements Context
      */
     private $authenticationService;
     /**
-     * @var \Mockery\MockInterface|Twig_Environment
+     * @var \Mockery\MockInterface|Environment
      */
     private $twigEnvironment;
     /**
