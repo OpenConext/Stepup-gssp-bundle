@@ -21,6 +21,5 @@ homestead/vendor
 ######################
 /vendor/
 composer.lock
-
-## ci/qa
+.phpunit.result.cache
 ci/qa/.phpunit.result.cache
