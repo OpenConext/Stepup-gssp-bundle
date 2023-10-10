@@ -29,6 +29,7 @@ use SAML2\Certificate\X509;
 use SAML2\Configuration\PrivateKey;
 use Surfnet\GsspBundle\Exception\RuntimeException;
 use Surfnet\SamlBundle\Entity\IdentityProvider;
+use function is_string;
 
 final class AssertionSigningService implements AssertionSigningServiceInterface
 {
@@ -55,7 +56,10 @@ final class AssertionSigningService implements AssertionSigningServiceInterface
      */
     private function loadPrivateKey(): XMLSecurityKey
     {
-        $key        = $this->identityProvider->getPrivateKey(PrivateKey::NAME_DEFAULT);
+        $key = $this->identityProvider->getPrivateKey(PrivateKey::NAME_DEFAULT);
+        if (!$key instanceof PrivateKey) {
+            throw new RuntimeException('Private Key must be of type PrivateKey');
+        }
         $keyLoader  = new PrivateKeyLoader();
         $privateKey = $keyLoader->loadPrivateKey($key);
 
