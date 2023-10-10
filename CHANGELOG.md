@@ -1,6 +1,13 @@
-# 5.0.0 .. 5.0.5
+# 5.0.1 .. 5.0.11
 Make the bundle SF6 proof. And upgrade code to be PHP 8.2 compatible
 All homestead and vagrant references have been removed.
+Minor changes required by the users of this bundle have been addressed mostly in #44
+
+# 5.0.0
+- Upgrade Composer dependencies to require Symfony 5 or 6
+- Require PHP ^8.1
+- Migrated to Github Actions for QA
+- Removed the Vagrant 'dev' environment
 
 # 4.0.3
 - Install new Stepup-saml-bundle 
