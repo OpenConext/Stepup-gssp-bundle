@@ -257,11 +257,12 @@ final class StateHandler implements StateHandlerInterface
 
     private function assertRequestTypeNotSet(): void
     {
-        if (!is_string($this->store->get(self::REQUEST_TYPE))) {
-            throw new TypeError(sprintf('The "%s" must be of type string', self::REQUEST_TYPE));
-        }
-
+        // Request_type may not be set
         if ($this->store->has(self::REQUEST_TYPE)) {
+            // If it is set, it must be of type string.
+            if (!is_string($this->store->get(self::REQUEST_TYPE))) {
+                throw new TypeError(sprintf('The "%s" must be of type string', self::REQUEST_TYPE));
+            }
             throw RuntimeException::requestTypeAlreadyKnown($this->store->get(self::REQUEST_TYPE));
         }
     }
