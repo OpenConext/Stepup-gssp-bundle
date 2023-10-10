@@ -148,6 +148,9 @@ final class SSOController extends AbstractController
      */
     private function getRelayStateFromRequest(Request $request): string
     {
-        return (string) $request->get(AuthnRequest::PARAMETER_RELAY_STATE, '');
+        if (!is_string($request->get(AuthnRequest::PARAMETER_RELAY_STATE))) {
+            return '';
+        }
+        return $request->get(AuthnRequest::PARAMETER_RELAY_STATE);
     }
 }
