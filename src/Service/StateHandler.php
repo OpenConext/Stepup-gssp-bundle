@@ -24,6 +24,9 @@ use SAML2\Constants;
 use Surfnet\GsspBundle\Exception\RuntimeException;
 use Surfnet\SamlBundle\SAML2\Extensions\GsspUserAttributesChunk;
 use Surfnet\SamlBundle\SAML2\ReceivedAuthnRequest;
+use TypeError;
+use function is_string;
+use function sprintf;
 
 /**
  * Knows and preserves the integrity of the GSSP application state.
@@ -122,6 +125,9 @@ final class StateHandler implements StateHandlerInterface
 
     public function getRequestId(): string
     {
+        if (!is_string($this->store->get(self::REQUEST_ID))) {
+            throw new TypeError(sprintf('The "%s" must be of type string', self::REQUEST_ID));
+        }
         return $this->store->get(self::REQUEST_ID);
     }
 
@@ -132,21 +138,34 @@ final class StateHandler implements StateHandlerInterface
 
     public function getRequestServiceProvider(): string
     {
+        if (!is_string($this->store->get(self::REQUEST_SERVICE_PROVIDER))) {
+            throw new TypeError(sprintf('The "%s" must be of type string', self::REQUEST_SERVICE_PROVIDER));
+        }
         return $this->store->get(self::REQUEST_SERVICE_PROVIDER);
     }
 
     public function getRelayState(): ?string
     {
-        return $this->store->get(self::REQUEST_RELAY_STATE);
+        $relayState = $this->store->get(self::REQUEST_RELAY_STATE);
+        if (is_string($relayState) || is_null($relayState)) {
+            return $relayState;
+        }
+        throw new TypeError(sprintf('The "%s" must be of type string|null', self::REQUEST_RELAY_STATE));
     }
 
     public function getSubjectNameId(): string
     {
+        if (!is_string($this->store->get(self::NAME_ID))) {
+            throw new TypeError(sprintf('The "%s" must be of type string', self::NAME_ID));
+        }
         return $this->store->get(self::NAME_ID);
     }
 
     public function getGsspUserAttributes(): ?GsspUserAttributesChunk
     {
+        if (!is_string($this->store->get(self::GSSP_USERATTRIBUTES))) {
+            throw new TypeError(sprintf('The "%s" must be of type string', self::GSSP_USERATTRIBUTES));
+        }
         if ($this->store->has(self::GSSP_USERATTRIBUTES)) {
             return GsspUserAttributesChunk::fromXML($this->store->get(self::GSSP_USERATTRIBUTES));
         }
@@ -199,6 +218,9 @@ final class StateHandler implements StateHandlerInterface
 
     public function getScopingRequesterIds(): array
     {
+        if (!is_array($this->store->get(self::SCOPING_REQUESTER_IDS))) {
+            throw new RuntimeException(sprintf('%s must be of type array', self::SCOPING_REQUESTER_IDS));
+        }
         return $this->store->get(self::SCOPING_REQUESTER_IDS);
     }
 
@@ -235,6 +257,10 @@ final class StateHandler implements StateHandlerInterface
 
     private function assertRequestTypeNotSet(): void
     {
+        if (!is_string($this->store->get(self::REQUEST_TYPE))) {
+            throw new TypeError(sprintf('The "%s" must be of type string', self::REQUEST_TYPE));
+        }
+
         if ($this->store->has(self::REQUEST_TYPE)) {
             throw RuntimeException::requestTypeAlreadyKnown($this->store->get(self::REQUEST_TYPE));
         }
