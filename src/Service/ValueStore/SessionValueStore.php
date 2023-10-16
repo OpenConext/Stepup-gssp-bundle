@@ -23,14 +23,18 @@ namespace Surfnet\GsspBundle\Service\ValueStore;
 use Surfnet\GsspBundle\Exception\NotFound;
 use Surfnet\GsspBundle\Exception\RuntimeException;
 use Surfnet\GsspBundle\Service\ValueStore;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 final class SessionValueStore implements ValueStore
 {
     public const SESSION_PATH = 'surfnet/gssp/request/';
 
-    public function __construct(private readonly SessionInterface $session)
+    private readonly SessionInterface $session;
+
+    public function __construct(RequestStack $requestStack)
     {
+        $this->session = $requestStack->getSession();
     }
 
     public function set(string $key, mixed $value): self
