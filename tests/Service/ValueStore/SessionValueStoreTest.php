@@ -24,6 +24,7 @@ use Mockery;
 use PHPUnit\Framework\TestCase;
 use Surfnet\GsspBundle\Exception\NotFound;
 use Surfnet\GsspBundle\Service\ValueStore\SessionValueStore;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class SessionValueStoreTest extends TestCase
@@ -36,8 +37,9 @@ class SessionValueStoreTest extends TestCase
     {
         /** @var \Mockery\MockInterface $session */
         $session = Mockery::spy(SessionInterface::class);
-
-        $valueStore = new SessionValueStore($session);
+        $reqStack = Mockery::mock(RequestStack::class);
+        $reqStack->shouldReceive('getSession')->andReturn($session);
+        $valueStore = new SessionValueStore($reqStack);
 
         $valueStore->set('test', 1);
         $valueStore->set('value2', 'two');
@@ -61,7 +63,10 @@ class SessionValueStoreTest extends TestCase
         $session->shouldReceive('get')->withArgs(['surfnet/gssp/request/test'])->andReturn(1);
         $session->shouldReceive('get')->withArgs(['surfnet/gssp/request/value2'])->andReturn(2);
 
-        $valueStore = new SessionValueStore($session);
+        $reqStack = Mockery::mock(RequestStack::class);
+        $reqStack->shouldReceive('getSession')->andReturn($session);
+        $valueStore = new SessionValueStore($reqStack);
+
         $this->assertEquals(1, $valueStore->get('test'));
         $this->assertEquals(2, $valueStore->get('value2'));
     }
@@ -77,7 +82,10 @@ class SessionValueStoreTest extends TestCase
 
         $session->shouldReceive('has')->withArgs(['surfnet/gssp/request/test'])->andReturn(false);
 
-        $valueStore = new SessionValueStore($session);
+        $reqStack = Mockery::mock(RequestStack::class);
+        $reqStack->shouldReceive('getSession')->andReturn($session);
+        $valueStore = new SessionValueStore($reqStack);
+
         $valueStore->get('test');
     }
 
@@ -91,7 +99,10 @@ class SessionValueStoreTest extends TestCase
         $session->shouldReceive('has')->withArgs(['surfnet/gssp/request/value1'])->andReturn(true);
         $session->shouldReceive('has')->withArgs(['surfnet/gssp/request/value2'])->andReturn(false);
 
-        $valueStore = new SessionValueStore($session);
+        $reqStack = Mockery::mock(RequestStack::class);
+        $reqStack->shouldReceive('getSession')->andReturn($session);
+        $valueStore = new SessionValueStore($reqStack);
+
         $this->assertTrue($valueStore->has('value1'));
         $this->assertFalse($valueStore->has('value2'));
     }
@@ -110,8 +121,10 @@ class SessionValueStoreTest extends TestCase
         $session->shouldReceive('get')->withArgs(['surfnet/gssp/request/value1'])->andReturn(1);
         $session->shouldReceive('get')->withArgs(['surfnet/gssp/request/value2'])->andReturn(2);
 
+        $reqStack = Mockery::mock(RequestStack::class);
+        $reqStack->shouldReceive('getSession')->andReturn($session);
+        $valueStore = new SessionValueStore($reqStack);
 
-        $valueStore = new SessionValueStore($session);
         $this->assertTrue($valueStore->is('value1', 1));
         $this->assertFalse($valueStore->is('value2', 'false'));
         $this->assertFalse($valueStore->is('value3', 3));
