@@ -43,7 +43,7 @@ services:
         class: Surfnet\GsspBundle\Service\ValueStore\SessionValueStore
         public: true
         arguments:
-          - '@session'
+          - '@request_stack'
 
     surfnet_gssp.state_handler.service:
         class: Surfnet\GsspBundle\Service\StateHandler
