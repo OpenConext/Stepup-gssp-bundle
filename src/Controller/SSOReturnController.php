@@ -27,9 +27,9 @@ use RuntimeException;
 use SAML2\Response as SAMLResponse;
 use Surfnet\GsspBundle\Exception\UnrecoverableErrorException;
 use Surfnet\GsspBundle\Saml\ResponseContextInterface;
-use Surfnet\GsspBundle\Service\StateHandlerInterface;
 use Surfnet\GsspBundle\Service\ConfigurationContainer;
 use Surfnet\GsspBundle\Service\ResponseServiceInterface;
+use Surfnet\GsspBundle\Service\StateHandlerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -37,8 +37,6 @@ use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * Sends back the SAML return response to the service provider.
- *
- * @Route(service="surfnet_gssp.saml.sso_return_controller")
  */
 final class SSOReturnController extends AbstractController
 {
@@ -57,9 +55,9 @@ final class SSOReturnController extends AbstractController
      * This will redirect the user back the service provider with a saml response. The replyToServiceProvider from
      * the RegistrationService and the AuthenticationService will redirect to this.
      *
-     * @Route("/saml/sso_return", name="gssp_saml_sso_return", methods={"POST", "GET"})
      * @throws Exception
      */
+    #[Route(path: '/saml/sso_return', name: 'gssp_saml_sso_return', methods: ['POST', 'GET'])]
     public function ssoReturn(): Response
     {
         $this->logger->notice('Received sso return request');

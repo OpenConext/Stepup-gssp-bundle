@@ -1,9 +1,8 @@
 Stepup-gssp-bundle
 ===================
 
-<a href="#">
-    <img src="https://travis-ci.org/OpenConext/Stepup-gssp-bundle.svg?branch=master" alt="build:">
-</a></br>
+[![Run tests (static analysis, lint and unit tests)](https://github.com/OpenConext/Stepup-gssp-example/actions/workflows/test-integration.yml/badge.svg)](https://github.com/OpenConext/Stepup-gssp-example/actions/workflows/test-integration.yml)
+[![Run acceptance tests (Behat)](https://github.com/OpenConext/Stepup-gssp-example/actions/workflows/test-acceptance.yml/badge.svg)](https://github.com/OpenConext/Stepup-gssp-example/actions/workflows/test-acceptance.yml)
 
 Generic SAML Stepup Provider bundle.
 
@@ -88,25 +87,15 @@ Development environment
 
 The purpose of the development environment is only for running the different test and metric tools.
 
-To get started, first setup the development environment. The dev. env. is a virtual machine. Every task described is run
-from that machine.  
+To get started, first setup the development environment. The development environment is a docker container. That is
+controlled via the [OpenConext-devconf](https://github.com/OpenConext/OpenConext-devconf/) project. 
+
+Every task described below should be run from that container.  
 
 Requirements
 -------------------
-- vagrant 2.2.x
-    - vagrant-hostsupdater (1.1.1.160, global)
-    - vagrant-vbguest (0.19.0, global)
-- Virtualbox
-
-Install
--------------------
-``` cd homestead && composer install ```
-
-``` vagrant up ```
-
-If everything goes as planned you can develop inside the virtual machine
-
-``` vagrant ssh ```
+- Docker
+- OpenConext-devconf
 
 Debugging
 -------------------

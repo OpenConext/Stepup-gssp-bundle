@@ -57,7 +57,7 @@ final class ConfigurationContainer
      *
      * @return string
      */
-    public function getAuthenticationRoute()
+    public function getAuthenticationRoute(): string
     {
         return $this->authenticationRoute;
     }
@@ -67,7 +67,7 @@ final class ConfigurationContainer
      *
      * @return string
      */
-    public function getRegistrationRoute()
+    public function getRegistrationRoute(): string
     {
         return $this->registrationRoute;
     }

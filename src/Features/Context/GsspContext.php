@@ -65,7 +65,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\ErrorHandler\BufferingLogger;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
@@ -88,14 +87,12 @@ final class GsspContext implements Context
     private $twigEnvironment;
     /**
      * Last controller response.
-     *
-     * @var Response
      */
-    private $response;
+    private null|\Symfony\Component\HttpFoundation\Response|\Symfony\Component\HttpFoundation\RedirectResponse $response = null;
     /**
      * Last controller twig render template
      */
-    private $twigTemplate;
+    private ?string $twigTemplate = null;
     /**
      * Last controller twig render parameters
      */
@@ -380,7 +377,7 @@ final class GsspContext implements Context
     {
         $actual = '';
 
-        if ($this->lastException) {
+        if ($this->lastException instanceof \Exception) {
             $actual = $this->lastException->getMessage();
         }
 
@@ -549,7 +546,7 @@ final class GsspContext implements Context
         $uri = 'https://identity_provider/saml/sso';
         $delimiter = '?';
         foreach ($parameters as $parameterName => $value) {
-            $uri .= $delimiter . $parameterName . '=' . urlencode($value);
+            $uri .= $delimiter . $parameterName . '=' . urlencode((string) $value);
             $delimiter = '&';
         }
         $request = Request::create($uri);
