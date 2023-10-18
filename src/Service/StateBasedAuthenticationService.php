@@ -35,9 +35,9 @@ use Symfony\Component\Routing\RouterInterface;
 final class StateBasedAuthenticationService implements AuthenticationService
 {
     public function __construct(
-        private readonly StateHandlerInterface $stateHandler,
-        private readonly RouterInterface $router,
-        private readonly LoggerInterface $logger
+        private StateHandlerInterface $stateHandler,
+        private RouterInterface $router,
+        private LoggerInterface $logger
     ) {
     }
 

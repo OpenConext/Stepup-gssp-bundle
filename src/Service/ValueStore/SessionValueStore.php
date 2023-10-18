@@ -21,7 +21,6 @@ declare(strict_types = 1);
 namespace Surfnet\GsspBundle\Service\ValueStore;
 
 use Surfnet\GsspBundle\Exception\NotFound;
-use Surfnet\GsspBundle\Exception\RuntimeException;
 use Surfnet\GsspBundle\Service\ValueStore;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
