@@ -58,7 +58,7 @@ final class StateHandler implements StateHandlerInterface
 
     public const GSSP_USERATTRIBUTES = 'gssp_userattributes';
 
-    public function __construct(private readonly ValueStore $store)
+    public function __construct(private ValueStore $store)
     {
     }
 

@@ -25,9 +25,6 @@ use Surfnet\SamlBundle\Metadata\MetadataFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route(service="surfnet_gssp.saml.metadata_controller")
- */
 final class MetadataController extends AbstractController
 {
     public function __construct(private readonly MetadataFactory $metadataFactory)
@@ -36,8 +33,8 @@ final class MetadataController extends AbstractController
 
     /**
      * @Method("GET")
-     * @Route("/saml/metadata", name="gssp_saml_metadata")
      */
+    #[Route(path: '/saml/metadata', name: 'gssp_saml_metadata')]
     public function metadata(): XMLResponse
     {
         return new XMLResponse((string) $this->metadataFactory->generate());

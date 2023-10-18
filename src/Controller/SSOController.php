@@ -25,8 +25,8 @@ use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Surfnet\GsspBundle\Exception\UnrecoverableErrorException;
 use Surfnet\GsspBundle\Saml\ResponseContextInterface;
-use Surfnet\GsspBundle\Service\StateHandlerInterface;
 use Surfnet\GsspBundle\Service\ConfigurationContainer;
+use Surfnet\GsspBundle\Service\StateHandlerInterface;
 use Surfnet\SamlBundle\Http\RedirectBinding;
 use Surfnet\SamlBundle\SAML2\AuthnRequest;
 use Surfnet\SamlBundle\SAML2\ReceivedAuthnRequest;
@@ -38,7 +38,6 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * Handles the SAML AuthnRequest from the service provider.
  *
- * @Route(service="surfnet_gssp.saml.sso_controller")
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 final class SSOController extends AbstractController
@@ -57,9 +56,9 @@ final class SSOController extends AbstractController
      *
      * If the request is valid the user will be redirected to the application registration route.
      *
-     * @Route("/saml/sso", name="gssp_saml_sso", methods={"GET"})
      * @throws InvalidArgumentException
      */
+    #[Route(path: '/saml/sso', name: 'gssp_saml_sso', methods: ['GET'])]
     public function sso(Request $request): RedirectResponse
     {
         $this->logger->notice('Received sso request');
