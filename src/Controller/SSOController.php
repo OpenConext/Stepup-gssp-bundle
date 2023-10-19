@@ -30,7 +30,6 @@ use Surfnet\GsspBundle\Service\StateHandlerInterface;
 use Surfnet\SamlBundle\Http\RedirectBinding;
 use Surfnet\SamlBundle\SAML2\AuthnRequest;
 use Surfnet\SamlBundle\SAML2\ReceivedAuthnRequest;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -40,7 +39,7 @@ use Symfony\Component\Routing\Annotation\Route;
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-final class SSOController extends AbstractController
+final class SSOController
 {
     public function __construct(
         private readonly RedirectBinding $httpBinding,
