@@ -1,7 +1,20 @@
 services:
+    _defaults:
+      autowire: true
+      autoconfigure: true
+
     Surfnet\GsspBundle\Controller\:
       resource: '../../Controller'
       tags: ['controller.service_arguments']
+
+    Surfnet\GsspBundle\Controller\SSOController:
+      arguments:
+        $registrationRoute: '@surfnet_gssp.configuration_container'
+
+    Surfnet\GsspBundle\Controller\SSOReturnController:
+      arguments:
+        $registrationRoute: '@surfnet_gssp.configuration_container'
+
 
     surfnet_gssp.value_store.service:
         class: Surfnet\GsspBundle\Service\ValueStore\SessionValueStore
