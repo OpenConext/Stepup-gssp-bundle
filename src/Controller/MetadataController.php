@@ -22,10 +22,9 @@ namespace Surfnet\GsspBundle\Controller;
 
 use Surfnet\SamlBundle\Http\XMLResponse;
 use Surfnet\SamlBundle\Metadata\MetadataFactory;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
-final class MetadataController extends AbstractController
+final class MetadataController
 {
     public function __construct(private readonly MetadataFactory $metadataFactory)
     {
