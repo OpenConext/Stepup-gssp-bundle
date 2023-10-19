@@ -4,11 +4,9 @@ services:
         arguments:
           - '@surfnet_saml.metadata_factory'
         tags: ['controller.service_arguments']
-        public: true
-        
+
     Surfnet\GsspBundle\Controller\MetadataController:
         alias: surfnet_gssp.saml.metadata_controller
-        public: true
 
     surfnet_gssp.saml.sso_controller:
         class: Surfnet\GsspBundle\Controller\SSOController
@@ -19,11 +17,9 @@ services:
           - '@surfnet_gssp.saml.reponse_context'
           - '@surfnet_gssp.logger'
         tags: ['controller.service_arguments']
-        public: true
-        
+
     Surfnet\GsspBundle\Controller\SSOController:
         alias: surfnet_gssp.saml.sso_controller
-        public: true
 
     surfnet_gssp.saml.sso_return_controller:
         class: Surfnet\GsspBundle\Controller\SSOReturnController
@@ -34,10 +30,9 @@ services:
           - '@surfnet_gssp.saml.reponse_context'
           - '@surfnet_gssp.logger'
         tags: ['controller.service_arguments']
-        public: true
+
     Surfnet\GsspBundle\Controller\SSOReturnController:
         alias: surfnet_gssp.saml.sso_return_controller
-        public: true
 
     surfnet_gssp.value_store.service:
         class: Surfnet\GsspBundle\Service\ValueStore\SessionValueStore
