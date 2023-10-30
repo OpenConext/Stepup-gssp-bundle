@@ -14,7 +14,7 @@
     }
   },
   "require": {
-    "php": "^8.1",
+    "php": "^8.2",
     "ext-openssl": "*",
     "beberlei/assert": "^3",
     "symfony/monolog-bundle": "^3.8",
