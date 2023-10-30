@@ -30,6 +30,7 @@ use Surfnet\GsspBundle\Saml\ResponseContextInterface;
 use Surfnet\GsspBundle\Service\ConfigurationContainer;
 use Surfnet\GsspBundle\Service\ResponseServiceInterface;
 use Surfnet\GsspBundle\Service\StateHandlerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -37,7 +38,7 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * Sends back the SAML return response to the service provider.
  */
-final class SSOReturnController
+final class SSOReturnController extends AbstractController
 {
     public function __construct(
         private readonly ConfigurationContainer $registrationRoute,
