@@ -10,6 +10,9 @@ services:
     Surfnet\GsspBundle\Controller\SSOController:
       arguments:
         $registrationRoute: '@surfnet_gssp.configuration_container'
+        $stateHandler: '@surfnet_gssp.state_handler.service'
+        $responseContext: '@surfnet_gssp.saml.reponse_context'
+      tags: ['controller.service_arguments']
 
     Surfnet\GsspBundle\Controller\SSOReturnController:
       arguments:
