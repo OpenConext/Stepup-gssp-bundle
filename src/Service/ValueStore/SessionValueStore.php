@@ -67,7 +67,7 @@ final class SessionValueStore implements ValueStore
 
     public function clear(): self
     {
-        $this->session->invalidate();
+        $this->session->clear();
         return $this;
     }
 }
