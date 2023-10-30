@@ -18,7 +18,6 @@ services:
       arguments:
         $registrationRoute: '@surfnet_gssp.configuration_container'
 
-
     surfnet_gssp.value_store.service:
         class: Surfnet\GsspBundle\Service\ValueStore\SessionValueStore
         public: true
