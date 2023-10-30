@@ -1,3 +1,6 @@
+# 5.0.0 .. 5.0.5
+Make the bundle SF6 proof. And upgrade code to be PHP 8.2 compatible
+
 # 4.0.3
 - Install new Stepup-saml-bundle 
 
