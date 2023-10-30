@@ -17,6 +17,10 @@ services:
     Surfnet\GsspBundle\Controller\SSOReturnController:
       arguments:
         $registrationRoute: '@surfnet_gssp.configuration_container'
+        $stateHandler: '@surfnet_gssp.state_handler.service'
+        $responseService: '@surfnet_gssp.service.response'
+        $responseContext: '@surfnet_gssp.saml.reponse_context'
+      tags: ['controller.service_arguments']
 
     surfnet_gssp.value_store.service:
         class: Surfnet\GsspBundle\Service\ValueStore\SessionValueStore
