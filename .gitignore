@@ -2,12 +2,6 @@
 #############
 .idea
 
-# Vagrant files #
-#################
-vagrant.retry
-.vagrant
-homestead/vendor
-
 # Code coverage reports #
 #################
 /coverage/*
