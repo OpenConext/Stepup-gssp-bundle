@@ -30,10 +30,7 @@ final class MetadataController
     {
     }
 
-    /**
-     * @Method("GET")
-     */
-    #[Route(path: '/saml/metadata', name: 'gssp_saml_metadata')]
+    #[Route(path: '/saml/metadata', name: 'gssp_saml_metadata', methods: ['GET'])]
     public function metadata(): XMLResponse
     {
         return new XMLResponse((string) $this->metadataFactory->generate());
