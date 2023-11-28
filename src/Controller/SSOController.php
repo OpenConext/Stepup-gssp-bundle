@@ -33,7 +33,6 @@ use Surfnet\SamlBundle\SAML2\ReceivedAuthnRequest;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * Handles the SAML AuthnRequest from the service provider.
