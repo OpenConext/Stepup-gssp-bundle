@@ -39,7 +39,6 @@ use SAML2\Constants;
 use SAML2\DOMDocumentFactory;
 use SAML2\EncryptedAssertion;
 use SAML2\Message;
-use SAML2\Response as SAMLResponse;
 use SAML2\XML\saml\Issuer;
 use SAML2\XML\saml\NameID;
 use Surfnet\GsspBundle\Controller\SSOController;
@@ -47,10 +46,8 @@ use Surfnet\GsspBundle\Controller\SSOReturnController;
 use Surfnet\GsspBundle\Logger\StepupRequestIdSariLogger;
 use Surfnet\GsspBundle\Saml\AssertionSigningService;
 use Surfnet\GsspBundle\Saml\ResponseContext;
-use Surfnet\GsspBundle\Service\AuthenticationService;
 use Surfnet\GsspBundle\Service\ConfigurationContainer;
 use Surfnet\GsspBundle\Service\DateTime\SystemDateTimeService;
-use Surfnet\GsspBundle\Service\RegistrationService;
 use Surfnet\GsspBundle\Service\ResponseService;
 use Surfnet\GsspBundle\Service\StateBasedAuthenticationService;
 use Surfnet\GsspBundle\Service\StateBasedRegistrationService;
@@ -68,7 +65,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\ErrorHandler\BufferingLogger;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
@@ -91,14 +87,12 @@ final class GsspContext implements Context
     private $twigEnvironment;
     /**
      * Last controller response.
-     *
-     * @var Response
      */
-    private $response;
+    private null|\Symfony\Component\HttpFoundation\Response|\Symfony\Component\HttpFoundation\RedirectResponse $response = null;
     /**
      * Last controller twig render template
      */
-    private $twigTemplate;
+    private ?string $twigTemplate = null;
     /**
      * Last controller twig render parameters
      */
@@ -160,6 +154,7 @@ final class GsspContext implements Context
         $this->identityProvider = new IdentityProvider(
             [
                 'entityId' => 'https://identity_provider/saml/metadata',
+                'ssoUrl' => 'https://identity_provider/saml/sso',
                 'certificateFile' => sprintf('%s/src/Resources/keys/development_publickey.cer', $samlBundle),
                 'privateKeys' => [
                     new PrivateKey(
@@ -382,7 +377,7 @@ final class GsspContext implements Context
     {
         $actual = '';
 
-        if ($this->lastException) {
+        if ($this->lastException instanceof \Exception) {
             $actual = $this->lastException->getMessage();
         }
 
@@ -412,7 +407,7 @@ final class GsspContext implements Context
     public function requestSSOreturnEndpoint(): void
     {
         try {
-            $this->response = $this->ssoReturnController->ssoReturnAction();
+            $this->response = $this->ssoReturnController->ssoReturn();
         } catch (Exception $e) {
             $this->lastException = $e;
         }
@@ -548,12 +543,18 @@ final class GsspContext implements Context
      */
     public function callIdentityProviderSSOAction(array $parameters = []): void
     {
-        $request = Request::create('http://identity_provider/saml/sso', Request::METHOD_GET, $parameters);
+        $uri = 'https://identity_provider/saml/sso';
+        $delimiter = '?';
+        foreach ($parameters as $parameterName => $value) {
+            $uri .= $delimiter . $parameterName . '=' . urlencode((string) $value);
+            $delimiter = '&';
+        }
+        $request = Request::create($uri);
 
         unset($this->lastException);
 
         try {
-            $this->response = $this->ssoController->ssoAction($request);
+            $this->response = $this->ssoController->sso($request);
         } catch (Exception $e) {
             $this->lastException = $e;
         }

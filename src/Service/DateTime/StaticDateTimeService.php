@@ -29,7 +29,7 @@ final class StaticDateTimeService extends AbstractDateTimeService
     {
     }
 
-    public function getCurrent()
+    public function getCurrent(): \DateTimeImmutable
     {
         return $this->dateTime;
     }

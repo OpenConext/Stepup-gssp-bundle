@@ -1,49 +1,32 @@
 services:
-    surfnet_gssp.saml.metadata_controller:
-        class: Surfnet\GsspBundle\Controller\MetadataController
-        arguments:
-          - '@surfnet_saml.metadata_factory'
-        tags: ['controller.service_arguments']
-        public: true
-        
-    Surfnet\GsspBundle\Controller\MetadataController:
-        alias: surfnet_gssp.saml.metadata_controller
-        public: true
+    _defaults:
+      autowire: true
+      autoconfigure: true
 
-    surfnet_gssp.saml.sso_controller:
-        class: Surfnet\GsspBundle\Controller\SSOController
-        arguments:
-          - '@surfnet_saml.http.redirect_binding'
-          - '@surfnet_gssp.configuration_container'
-          - '@surfnet_gssp.state_handler.service'
-          - '@surfnet_gssp.saml.reponse_context'
-          - '@surfnet_gssp.logger'
-        tags: ['controller.service_arguments']
-        public: true
-        
+    Surfnet\GsspBundle\Controller\:
+      resource: '../../Controller'
+      tags: ['controller.service_arguments']
+
     Surfnet\GsspBundle\Controller\SSOController:
-        alias: surfnet_gssp.saml.sso_controller
-        public: true
+      arguments:
+        $registrationRoute: '@surfnet_gssp.configuration_container'
+        $stateHandler: '@surfnet_gssp.state_handler.service'
+        $responseContext: '@surfnet_gssp.saml.reponse_context'
+      tags: ['controller.service_arguments']
 
-    surfnet_gssp.saml.sso_return_controller:
-        class: Surfnet\GsspBundle\Controller\SSOReturnController
-        arguments:
-          - '@surfnet_gssp.configuration_container'
-          - '@surfnet_gssp.state_handler.service'
-          - '@surfnet_gssp.service.response'
-          - '@surfnet_gssp.saml.reponse_context'
-          - '@surfnet_gssp.logger'
-        tags: ['controller.service_arguments']
-        public: true
     Surfnet\GsspBundle\Controller\SSOReturnController:
-        alias: surfnet_gssp.saml.sso_return_controller
-        public: true
+      arguments:
+        $registrationRoute: '@surfnet_gssp.configuration_container'
+        $stateHandler: '@surfnet_gssp.state_handler.service'
+        $responseService: '@surfnet_gssp.service.response'
+        $responseContext: '@surfnet_gssp.saml.reponse_context'
+      tags: ['controller.service_arguments']
 
     surfnet_gssp.value_store.service:
         class: Surfnet\GsspBundle\Service\ValueStore\SessionValueStore
         public: true
         arguments:
-          - '@session'
+          - '@request_stack'
 
     surfnet_gssp.state_handler.service:
         class: Surfnet\GsspBundle\Service\StateHandler

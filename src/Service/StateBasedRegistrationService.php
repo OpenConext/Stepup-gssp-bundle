@@ -34,9 +34,9 @@ use Symfony\Component\Routing\RouterInterface;
 final class StateBasedRegistrationService implements RegistrationService
 {
     public function __construct(
-        private readonly StateHandlerInterface $stateHandler,
-        private readonly RouterInterface $router,
-        private readonly LoggerInterface $logger
+        private StateHandlerInterface $stateHandler,
+        private RouterInterface $router,
+        private LoggerInterface $logger
     ) {
     }
 

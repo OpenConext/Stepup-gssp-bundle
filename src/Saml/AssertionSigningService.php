@@ -29,7 +29,6 @@ use SAML2\Certificate\X509;
 use SAML2\Configuration\PrivateKey;
 use Surfnet\GsspBundle\Exception\RuntimeException;
 use Surfnet\SamlBundle\Entity\IdentityProvider;
-use function is_string;
 
 final class AssertionSigningService implements AssertionSigningServiceInterface
 {
