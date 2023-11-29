@@ -24,12 +24,12 @@ use RuntimeException as CoreRuntimeException;
 
 class RuntimeException extends CoreRuntimeException implements Exception
 {
-    public static function shouldNotRegister()
+    public static function shouldNotRegister(): self
     {
         return new self('The current application context does not require a registration');
     }
 
-    public static function requestTypeAlreadyKnown($previous)
+    public static function requestTypeAlreadyKnown(string $previous): self
     {
         return new self(sprintf(
             'Request type is already known as "%s"',
@@ -37,7 +37,7 @@ class RuntimeException extends CoreRuntimeException implements Exception
         ));
     }
 
-    public static function shouldNotAuthenticate()
+    public static function shouldNotAuthenticate(): self
     {
         return new self('The current application context does not require authentication');
     }

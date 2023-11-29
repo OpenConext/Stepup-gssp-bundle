@@ -20,50 +20,31 @@ declare(strict_types = 1);
 
 namespace Surfnet\GsspBundle\Service;
 
+use Surfnet\GsspBundle\Exception\NotFound;
+
 interface ValueStore
 {
     /**
      * Is the property the given value.
      *
-     * @param string $key
-     * @param mixed $value
-     *
-     * @return bool
      * @SuppressWarnings(PHPMD.ShortMethodName)
      */
-    public function is($key, $value);
+    public function is(string $key, mixed $value): bool;
 
     /**
      * Is there property with the given key defined.
-     *
-     * @param string $key
-     *
-     * @return bool
      */
-    public function has($key);
+    public function has(string $key): bool;
+
+    public function set(string $key, mixed $value): self;
 
     /**
-     * @param string $key
-     * @param mixed $value
-     *    Any scalar
-     *
-     * @return $this
+     * @throws NotFound
      */
-    public function set($key, $value);
-
-    /**
-     * @param string $key
-     * @return mixed
-     *    Any scalar
-     *
-     * @throws \Surfnet\GsspBundle\Exception\NotFound
-     */
-    public function get($key);
+    public function get(string $key): mixed;
 
     /**
      * Clear all properties inside the store.
-     *
-     * @return $this
      */
-    public function clear();
+    public function clear(): self;
 }

@@ -20,44 +20,33 @@ declare(strict_types = 1);
 
 namespace Surfnet\GsspBundle\Controller;
 
+use Exception;
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use SAML2\Response as SAMLResponse;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Surfnet\GsspBundle\Exception\UnrecoverableErrorException;
 use Surfnet\GsspBundle\Saml\ResponseContextInterface;
-use Surfnet\GsspBundle\Service\StateHandlerInterface;
 use Surfnet\GsspBundle\Service\ConfigurationContainer;
 use Surfnet\GsspBundle\Service\ResponseServiceInterface;
+use Surfnet\GsspBundle\Service\StateHandlerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * Sends back the SAML return response to the service provider.
- *
- * @Route(service="surfnet_gssp.saml.sso_return_controller")
  */
 final class SSOReturnController extends AbstractController
 {
-    private $registrationRoute;
-    private $stateHandler;
-    private $responseService;
-    private $responseContext;
-    private $logger;
-
     public function __construct(
-        ConfigurationContainer $configuration,
-        StateHandlerInterface $stateHandler,
-        ResponseServiceInterface $responseService,
-        ResponseContextInterface $responseContext,
-        LoggerInterface $logger
+        private readonly ConfigurationContainer $registrationRoute,
+        private readonly StateHandlerInterface $stateHandler,
+        private readonly ResponseServiceInterface $responseService,
+        private readonly ResponseContextInterface $responseContext,
+        private readonly LoggerInterface $logger
     ) {
-        $this->registrationRoute = $configuration;
-        $this->stateHandler = $stateHandler;
-        $this->responseService = $responseService;
-        $this->responseContext = $responseContext;
-        $this->logger = $logger;
     }
 
     /**
@@ -66,10 +55,10 @@ final class SSOReturnController extends AbstractController
      * This will redirect the user back the service provider with a saml response. The replyToServiceProvider from
      * the RegistrationService and the AuthenticationService will redirect to this.
      *
-     * @Route("/saml/sso_return", name="gssp_saml_sso_return", methods={"POST", "GET"})
-     * @throws \Exception
+     * @throws Exception
      */
-    public function ssoReturnAction()
+    #[Route(path: '/saml/sso_return', name: 'gssp_saml_sso_return', methods: ['POST', 'GET'])]
+    public function ssoReturn(): Response
     {
         $this->logger->notice('Received sso return request');
 
@@ -93,7 +82,7 @@ final class SSOReturnController extends AbstractController
         throw new UnrecoverableErrorException('Application state invalid');
     }
 
-    private function ssoRegistrationReturnAction()
+    private function ssoRegistrationReturnAction(): Response
     {
         // This should not happen, the user is not yet registered, redirect back to the application.
         if (!$this->responseContext->isRegistered()) {
@@ -108,7 +97,7 @@ final class SSOReturnController extends AbstractController
         return $this->createSamlResponse();
     }
 
-    private function ssoAuthenticationReturnAction()
+    private function ssoAuthenticationReturnAction(): Response
     {
         // This should not happen, if the user is not authenticated, redirect back to the application.
         if (!$this->stateHandler->isAuthenticated()) {
@@ -125,8 +114,8 @@ final class SSOReturnController extends AbstractController
     /**
      * @return Response
      *
-     * @throws \Exception
-     * @throws \InvalidArgumentException
+     * @throws Exception
+     * @throws InvalidArgumentException
      */
     private function createSamlResponse()
     {
@@ -161,12 +150,12 @@ final class SSOReturnController extends AbstractController
         return $response;
     }
 
-    /**
-     * @param SAMLResponse $response
-     * @return string
-     */
-    private function getResponseAsXML(SAMLResponse $response)
+    private function getResponseAsXML(SAMLResponse $response): string
     {
-        return base64_encode($response->toUnsignedXML()->ownerDocument->saveXML());
+        $xml = $response->toUnsignedXML()->ownerDocument?->saveXML();
+        if (!$xml) {
+            throw new RuntimeException('The SAML Response could not be converted to XML');
+        }
+        return base64_encode($xml);
     }
 }

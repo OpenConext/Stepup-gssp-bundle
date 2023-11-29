@@ -50,51 +50,35 @@ interface AuthenticationService
 {
     /**
      * If there is need for user authentication.
-     *
-     * @return bool
      */
-    public function authenticationRequired();
+    public function authenticationRequired(): bool;
 
     /**
      * Authenticates the user.
      */
-    public function authenticate();
+    public function authenticate(): void;
 
     /**
      * If the user is authenticated
-     *
-     * @return boolean
      */
-    public function isAuthenticated();
+    public function isAuthenticated(): bool;
 
-    /**
-     * @param string $message
-     *   The error message.
-     * @param string $subCode
-     *   Saml response sub code.
-     */
-    public function reject($message, $subCode = Constants::STATUS_AUTHN_FAILED);
+    public function reject(string $message, string $subCode = Constants::STATUS_AUTHN_FAILED): void;
 
-    /**
+    /*
      * Creates the response that handles the redirect back to the service provider.
-     *
-     * @return Response
      */
-    public function replyToServiceProvider();
+    public function replyToServiceProvider(): Response;
 
-    /**
+    /*
      * Returns the current name id.
-     *
-     * @return string
      */
-    public function getNameId();
+    public function getNameId(): string;
 
-    /**
+    /*
      * Get the entity id of the SP that is issuing the AuthNRequest
-     *
-     * @return string
      */
-    public function getIssuer();
+    public function getIssuer(): string;
 
     /**
      * Returns the chain of requester ids originally saved from the
@@ -102,7 +86,7 @@ interface AuthenticationService
      *
      * @return string[]
      */
-    public function getScopingRequesterIds();
+    public function getScopingRequesterIds(): array;
 
     public function getGsspUserAttributes(): ?GsspUserAttributesChunk;
 }

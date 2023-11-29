@@ -22,28 +22,44 @@ namespace Surfnet\GsspBundle\Service\ValueStore;
 
 use Surfnet\GsspBundle\Exception\NotFound;
 use Surfnet\GsspBundle\Service\ValueStore;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 final class SessionValueStore implements ValueStore
 {
-    const SESSION_PATH = 'surfnet/gssp/request/';
+    public const SESSION_PATH = 'surfnet/gssp/request/';
 
-    private $session;
+    private ?SessionInterface $session;
 
-    public function __construct(SessionInterface $session)
+    public function __construct(private readonly RequestStack $requestStack)
     {
-        $this->session = $session;
+        $this->session = null;
     }
 
-    public function set($key, $value)
+
+    private function isSessionInitialized(): bool
     {
+        return !is_null($this->session);
+    }
+
+    private function initSession(): void
+    {
+        if (!$this->isSessionInitialized()) {
+            $this->session = $this->requestStack->getSession();
+        }
+    }
+
+    public function set(string $key, mixed $value): self
+    {
+        $this->initSession();
         $this->session->set(self::SESSION_PATH.$key, $value);
 
         return $this;
     }
 
-    public function get($key)
+    public function get(string $key): mixed
     {
+        $this->initSession();
         if (!$this->has($key)) {
             throw NotFound::stateProperty($key);
         }
@@ -54,18 +70,22 @@ final class SessionValueStore implements ValueStore
     /**
      * @SuppressWarnings(PHPMD.ShortMethodName)
      */
-    public function is($key, $value)
+    public function is(string $key, mixed $value): bool
     {
+        $this->initSession();
         return $this->has($key) && $this->get($key) === $value;
     }
 
-    public function has($key)
+    public function has(string $key): bool
     {
+        $this->initSession();
         return $this->session->has(self::SESSION_PATH.$key);
     }
 
-    public function clear()
+    public function clear(): self
     {
-        $this->session->invalidate();
+        $this->initSession();
+        $this->session->clear();
+        return $this;
     }
 }

@@ -20,30 +20,27 @@ declare(strict_types = 1);
 
 namespace Surfnet\GsspBundle\Saml;
 
+use Exception;
 use RobRichards\XMLSecLibs\XMLSecurityKey;
 use SAML2\Assertion;
 use SAML2\Certificate\KeyLoader;
 use SAML2\Certificate\PrivateKeyLoader;
+use SAML2\Certificate\X509;
 use SAML2\Configuration\PrivateKey;
+use Surfnet\GsspBundle\Exception\RuntimeException;
 use Surfnet\SamlBundle\Entity\IdentityProvider;
 
 final class AssertionSigningService implements AssertionSigningServiceInterface
 {
-    /**
-     * @var \Surfnet\SamlBundle\Entity\IdentityProvider
-     */
-    private $identityProvider;
-
-    public function __construct(IdentityProvider $identityProvider)
+    public function __construct(private IdentityProvider $identityProvider)
     {
-        $this->identityProvider = $identityProvider;
     }
 
     /**
      * @param Assertion $assertion
      * @return Assertion
      */
-    public function signAssertion(Assertion $assertion)
+    public function signAssertion(Assertion $assertion): Assertion
     {
         $assertion->setSignatureKey($this->loadPrivateKey());
         $assertion->setCertificates([$this->getPublicCertificate()]);
@@ -53,10 +50,15 @@ final class AssertionSigningService implements AssertionSigningServiceInterface
 
     /**
      * @return XMLSecurityKey
+     * @throws Exception
+     * @throws Exception
      */
-    private function loadPrivateKey()
+    private function loadPrivateKey(): XMLSecurityKey
     {
-        $key        = $this->identityProvider->getPrivateKey(PrivateKey::NAME_DEFAULT);
+        $key = $this->identityProvider->getPrivateKey(PrivateKey::NAME_DEFAULT);
+        if (!$key instanceof PrivateKey) {
+            throw new RuntimeException('Private Key must be of type PrivateKey');
+        }
         $keyLoader  = new PrivateKeyLoader();
         $privateKey = $keyLoader->loadPrivateKey($key);
 
@@ -69,11 +71,15 @@ final class AssertionSigningService implements AssertionSigningServiceInterface
     /**
      * @return string
      */
-    private function getPublicCertificate()
+    private function getPublicCertificate(): string
     {
         $keyLoader = new KeyLoader();
-        $keyLoader->loadCertificateFile($this->identityProvider->getCertificateFile());
-        /** @var \SAML2\Certificate\X509 $publicKey */
+        $idpCertificate = $this->identityProvider->getCertificateFile();
+        if (!$idpCertificate) {
+            throw new RuntimeException('The IdP did not have a Certificate, unable to load it');
+        }
+        $keyLoader->loadCertificateFile($idpCertificate);
+        /** @var X509 $publicKey */
         $publicKey = $keyLoader->getKeys()->getOnlyElement();
 
         return $publicKey->getCertificate();

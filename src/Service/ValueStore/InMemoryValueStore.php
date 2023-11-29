@@ -25,15 +25,18 @@ use Surfnet\GsspBundle\Service\ValueStore;
 
 final class InMemoryValueStore implements ValueStore
 {
-    private $values = [];
+    /**
+     * @var mixed[]
+     */
+    private array $values = [];
 
-    public function set($key, $value)
+    public function set(string $key, mixed $value): self
     {
         $this->values[$key] = $value;
         return $this;
     }
 
-    public function get($key)
+    public function get(string $key): mixed
     {
         if (!isset($this->values[$key])) {
             throw NotFound::stateProperty($key);
@@ -44,7 +47,7 @@ final class InMemoryValueStore implements ValueStore
     /**
      * @SuppressWarnings(PHPMD.ShortMethodName)
      */
-    public function is($key, $value)
+    public function is(string $key, mixed $value): bool
     {
         if (!$this->has($key)) {
             return false;
@@ -52,12 +55,12 @@ final class InMemoryValueStore implements ValueStore
         return $this->values[$key] === $value;
     }
 
-    public function has($key)
+    public function has(string $key): bool
     {
         return isset($this->values[$key]);
     }
 
-    public function clear()
+    public function clear(): self
     {
         $this->values = [];
         return $this;

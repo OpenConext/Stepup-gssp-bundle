@@ -20,11 +20,14 @@ declare(strict_types = 1);
 
 namespace Surfnet\GsspBundle\Service;
 
+use Exception;
+use SAML2\Response;
+
 interface ResponseServiceInterface
 {
     /**
-     * @return \SAML2\Response
-     * @throws \Exception
+     * @return Response
+     * @throws Exception
      */
     public function createResponse();
 }

@@ -23,12 +23,12 @@ namespace Surfnet\GsspBundle\Exception;
 final class NotFound extends RuntimeException
 {
 
-    public static function identityProvider($entityId)
+    public static function identityProvider(string $entityId): self
     {
         return new self(sprintf('Identity provider "%s" not found', $entityId));
     }
 
-    public static function stateProperty($property)
+    public static function stateProperty(string $property): self
     {
         return new self(sprintf('State property was not stored "%s"', $property));
     }

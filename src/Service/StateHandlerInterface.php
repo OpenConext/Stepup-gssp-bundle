@@ -28,121 +28,60 @@ use Surfnet\SamlBundle\SAML2\ReceivedAuthnRequest;
  */
 interface StateHandlerInterface
 {
-    /**
+    /*
      * Stores the state of a registration request.
-     *
-     * @param ReceivedAuthnRequest $authnRequest
-     * @param string $relayState
      */
-    public function saveRegistrationRequest(ReceivedAuthnRequest $authnRequest, $relayState);
+    public function saveRegistrationRequest(ReceivedAuthnRequest $authnRequest, string $relayState): void;
 
-    /**
+    /*
      * Stores the state of a authentication request.
-     *
-     * @param ReceivedAuthnRequest $authnRequest
-     * @param string $relayState
      */
-    public function saveAuthenticationRequest(ReceivedAuthnRequest $authnRequest, $relayState);
+    public function saveAuthenticationRequest(ReceivedAuthnRequest $authnRequest, string $relayState): void;
 
-    /**
-     * @param string $message
-     *   The error message.
-     * @param string $subCode
-     *   Saml response sub code.
-     *
-     * @return $this
-     */
-    public function setErrorStatus($message, $subCode);
+    public function setErrorStatus(string $message, string $subCode): self;
 
-    /**
-     * @param $nameId
-     * @return $this
-     */
-    public function saveSubjectNameId($nameId);
+    public function saveSubjectNameId(string $nameId): self;
 
-    /**
-     * @return self
-     */
-    public function authenticate();
+    public function authenticate(): self;
 
-    /**
-     * @return string
-     */
-    public function getRequestId();
+    public function getRequestId(): string;
 
-    /**
-     * @return string
-     */
-    public function getRequestServiceProvider();
+    public function getRequestServiceProvider(): string;
 
-    /**
-     * @return string
-     */
-    public function getRelayState();
+    public function getRelayState(): ?string;
 
-    /**
-     * @return string
-     */
-    public function getSubjectNameId();
+    public function getSubjectNameId(): string;
 
-    /**
-     * @return string[]
-     */
-    public function getScopingRequesterIds();
+    public function getScopingRequesterIds(): array;
 
     public function getGsspUserAttributes(): ?GsspUserAttributesChunk;
 
-    /**
+    /*
      * Is the current request type registration flow?
-     *
-     * @return bool
      */
-    public function isRequestTypeRegistration();
+    public function isRequestTypeRegistration(): bool;
 
-    /**
+    /*
      * Is the current request type authentication flow?
-     *
-     * @return bool
      */
-    public function isRequestTypeAuthentication();
+    public function isRequestTypeAuthentication(): bool;
 
-    /**
-     * @return bool
-     */
-    public function hasRequestType();
+    public function hasRequestType(): bool;
 
-    /**
-     * @return bool
-     */
-    public function hasSubjectNameId();
+    public function hasSubjectNameId(): bool;
 
-    /**
-     * @return bool
-     */
-    public function hasRequestId();
+    public function hasRequestId(): bool;
 
-    /**
-     * @return bool
-     */
-    public function hasScopingRequesterIds();
+    public function hasScopingRequesterIds(): bool;
 
     /**
      * Invalidate and delete the full state with all attributes.
      */
-    public function invalidate();
+    public function invalidate(): void;
 
-    /**
-     * @return bool
-     */
-    public function hasErrorStatus();
+    public function hasErrorStatus(): bool;
 
-    /**
-     * @return array
-     */
-    public function getErrorStatus();
+    public function getErrorStatus(): array;
 
-    /**
-     * @return bool
-     */
-    public function isAuthenticated();
+    public function isAuthenticated(): bool;
 }

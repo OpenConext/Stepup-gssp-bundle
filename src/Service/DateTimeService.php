@@ -20,17 +20,19 @@ declare(strict_types = 1);
 
 namespace Surfnet\GsspBundle\Service;
 
+use DateTimeImmutable;
+
 interface DateTimeService
 {
     /**
-     * @return \DateTimeImmutable
+     * @return DateTimeImmutable
      */
     public function getCurrent();
 
     /**
      * @param string $interval
      *      a \DateInterval compatible interval to skew the time with
-     * @return \DateTimeImmutable
+     * @return DateTimeImmutable
      */
     public function interval($interval);
 }

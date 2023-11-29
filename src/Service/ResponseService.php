@@ -27,28 +27,19 @@ use SAML2\XML\saml\Issuer;
 use SAML2\XML\saml\NameID;
 use SAML2\XML\saml\SubjectConfirmation;
 use SAML2\XML\saml\SubjectConfirmationData;
+use Surfnet\GsspBundle\Exception\RuntimeException;
 use Surfnet\GsspBundle\Saml\AssertionSigningServiceInterface;
 use Surfnet\GsspBundle\Saml\ResponseContextInterface;
 use Surfnet\SamlBundle\Entity\IdentityProvider;
 
 final class ResponseService implements ResponseServiceInterface
 {
-
-    private $hostedIdentityProvider;
-    private $responseContext;
-    private $assertionSigningService;
-    private $dateTimeService;
-
     public function __construct(
-        IdentityProvider $hostedIdentityProvider,
-        ResponseContextInterface $responseContext,
-        AssertionSigningServiceInterface $assertionSigningService,
-        DateTimeService $dateTimeService
+        private IdentityProvider $hostedIdentityProvider,
+        private ResponseContextInterface $responseContext,
+        private AssertionSigningServiceInterface $assertionSigningService,
+        private DateTimeService $dateTimeService
     ) {
-        $this->hostedIdentityProvider = $hostedIdentityProvider;
-        $this->responseContext = $responseContext;
-        $this->assertionSigningService = $assertionSigningService;
-        $this->dateTimeService = $dateTimeService;
     }
 
     public function createResponse(): Response
@@ -90,20 +81,20 @@ final class ResponseService implements ResponseServiceInterface
         $assertion->setAuthnInstant($this->dateTimeService->getCurrent()->getTimestamp());
         $assertion->setAuthnContextClassRef('urn:oasis:names:tc:SAML:2.0:ac:classes:MobileTwoFactorUnregistered');
 
-        $authority = $assertion->getAuthenticatingAuthority();
         $assertion->setAuthenticatingAuthority(
-            array_merge(
-                (empty($authority) ? [] : $authority),
-                [$assertion->getIssuer()->getValue()]
-            )
+            [$assertion->getIssuer()->getValue()]
         );
     }
 
     private function createNewAuthnResponse(): Response
     {
         $response = new Response();
+        $entityId = $this->hostedIdentityProvider->getEntityId();
+        if (!$entityId) {
+            throw new RuntimeException('The hosted identity provider does not have an EntityID');
+        }
         $issuer = new Issuer();
-        $issuer->setValue($this->hostedIdentityProvider->getEntityId());
+        $issuer->setValue($entityId);
         $response->setIssuer($issuer);
         $response->setIssueInstant($this->dateTimeService->getCurrent()->getTimestamp());
         $response->setDestination($this->responseContext->getServiceProvider()->getAssertionConsumerUrl());
@@ -114,11 +105,16 @@ final class ResponseService implements ResponseServiceInterface
 
     private function createAssertion(): Assertion
     {
+        $entityId = $this->hostedIdentityProvider->getEntityId();
+        if (!$entityId) {
+            throw new RuntimeException('The hosted identity provider does not have an EntityID');
+        }
+
         $assertion = new Assertion();
         $assertion->setNotBefore($this->dateTimeService->getCurrent()->getTimestamp());
         $assertion->setNotOnOrAfter($this->dateTimeService->interval('PT5M')->getTimestamp());
         $issuer = new Issuer();
-        $issuer->setValue($this->hostedIdentityProvider->getEntityId());
+        $issuer->setValue($entityId);
         $assertion->setIssuer($issuer);
         $assertion->setIssueInstant($this->dateTimeService->getCurrent()->getTimestamp());
 

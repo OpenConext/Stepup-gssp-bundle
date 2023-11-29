@@ -21,6 +21,8 @@ declare(strict_types = 1);
 namespace Surfnet\GsspBundle\Service\DateTime;
 
 use DateInterval;
+use DateTimeImmutable;
+use Exception;
 use Surfnet\GsspBundle\Service\DateTimeService;
 
 abstract class AbstractDateTimeService implements DateTimeService
@@ -29,9 +31,9 @@ abstract class AbstractDateTimeService implements DateTimeService
     /**
      * @param string $interval
      *      a \DateInterval compatible interval to skew the time with
-     * @return \DateTimeImmutable
+     * @return DateTimeImmutable
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function interval($interval)
     {

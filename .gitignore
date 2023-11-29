@@ -2,12 +2,6 @@
 #############
 .idea
 
-# Vagrant files #
-#################
-vagrant.retry
-.vagrant
-homestead/vendor
-
 # Code coverage reports #
 #################
 /coverage/*
@@ -21,3 +15,4 @@ homestead/vendor
 ######################
 /vendor/
 composer.lock
+.phpunit.result.cache
