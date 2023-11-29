@@ -6,12 +6,7 @@ parameters:
 			path: ../../src/Logger/StepupRequestIdSariLogger.php
 
 		-
-			message: "#^Method Surfnet\\\\GsspBundle\\\\Monolog\\\\Processor\\\\RequestIdProcessor\\:\\:__invoke\\(\\) has parameter \\$record with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: ../../src/Monolog/Processor/RequestIdProcessor.php
-
-		-
-			message: "#^Method Surfnet\\\\GsspBundle\\\\Monolog\\\\Processor\\\\RequestIdProcessor\\:\\:__invoke\\(\\) return type has no value type specified in iterable type array\\.$#"
+			message: "#^Cannot access offset 'request_id' on array\\|DateTimeImmutable\\|int\\|string\\|null\\.$#"
 			count: 1
 			path: ../../src/Monolog/Processor/RequestIdProcessor.php
 
@@ -49,3 +44,23 @@ parameters:
 			message: "#^Method Surfnet\\\\GsspBundle\\\\Service\\\\StateHandlerInterface\\:\\:getScopingRequesterIds\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: ../../src/Service/StateHandlerInterface.php
+
+		-
+			message: "#^Cannot call method clear\\(\\) on Symfony\\\\Component\\\\HttpFoundation\\\\Session\\\\SessionInterface\\|null\\.$#"
+			count: 1
+			path: ../../src/Service/ValueStore/SessionValueStore.php
+
+		-
+			message: "#^Cannot call method get\\(\\) on Symfony\\\\Component\\\\HttpFoundation\\\\Session\\\\SessionInterface\\|null\\.$#"
+			count: 1
+			path: ../../src/Service/ValueStore/SessionValueStore.php
+
+		-
+			message: "#^Cannot call method has\\(\\) on Symfony\\\\Component\\\\HttpFoundation\\\\Session\\\\SessionInterface\\|null\\.$#"
+			count: 1
+			path: ../../src/Service/ValueStore/SessionValueStore.php
+
+		-
+			message: "#^Cannot call method set\\(\\) on Symfony\\\\Component\\\\HttpFoundation\\\\Session\\\\SessionInterface\\|null\\.$#"
+			count: 1
+			path: ../../src/Service/ValueStore/SessionValueStore.php

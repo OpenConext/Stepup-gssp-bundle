@@ -21,20 +21,37 @@ declare(strict_types = 1);
 namespace Surfnet\GsspBundle\Service\ValueStore;
 
 use Surfnet\GsspBundle\Exception\NotFound;
-use Surfnet\GsspBundle\Exception\RuntimeException;
 use Surfnet\GsspBundle\Service\ValueStore;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 final class SessionValueStore implements ValueStore
 {
     public const SESSION_PATH = 'surfnet/gssp/request/';
 
-    public function __construct(private readonly SessionInterface $session)
+    private ?SessionInterface $session;
+
+    public function __construct(private readonly RequestStack $requestStack)
     {
+        $this->session = null;
+    }
+
+
+    private function isSessionInitialized(): bool
+    {
+        return !is_null($this->session);
+    }
+
+    private function initSession(): void
+    {
+        if (!$this->isSessionInitialized()) {
+            $this->session = $this->requestStack->getSession();
+        }
     }
 
     public function set(string $key, mixed $value): self
     {
+        $this->initSession();
         $this->session->set(self::SESSION_PATH.$key, $value);
 
         return $this;
@@ -42,6 +59,7 @@ final class SessionValueStore implements ValueStore
 
     public function get(string $key): mixed
     {
+        $this->initSession();
         if (!$this->has($key)) {
             throw NotFound::stateProperty($key);
         }
@@ -54,17 +72,20 @@ final class SessionValueStore implements ValueStore
      */
     public function is(string $key, mixed $value): bool
     {
+        $this->initSession();
         return $this->has($key) && $this->get($key) === $value;
     }
 
     public function has(string $key): bool
     {
+        $this->initSession();
         return $this->session->has(self::SESSION_PATH.$key);
     }
 
     public function clear(): self
     {
-        $this->session->invalidate();
+        $this->initSession();
+        $this->session->clear();
         return $this;
     }
 }

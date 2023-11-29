@@ -1,3 +1,7 @@
+# 5.0.0 .. 5.0.5
+Make the bundle SF6 proof. And upgrade code to be PHP 8.2 compatible
+All homestead and vagrant references have been removed.
+
 # 4.0.3
 - Install new Stepup-saml-bundle 
 

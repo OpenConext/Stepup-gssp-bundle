@@ -20,25 +20,17 @@ declare(strict_types = 1);
 
 namespace Surfnet\GsspBundle\Controller;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Surfnet\SamlBundle\Http\XMLResponse;
 use Surfnet\SamlBundle\Metadata\MetadataFactory;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route(service="surfnet_gssp.saml.metadata_controller")
- */
-final class MetadataController extends AbstractController
+final class MetadataController
 {
     public function __construct(private readonly MetadataFactory $metadataFactory)
     {
     }
 
-    /**
-     * @Method("GET")
-     * @Route("/saml/metadata", name="gssp_saml_metadata")
-     */
+    #[Route(path: '/saml/metadata', name: 'gssp_saml_metadata', methods: ['GET'])]
     public function metadata(): XMLResponse
     {
         return new XMLResponse((string) $this->metadataFactory->generate());
