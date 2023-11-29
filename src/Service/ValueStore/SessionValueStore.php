@@ -29,15 +29,29 @@ final class SessionValueStore implements ValueStore
 {
     public const SESSION_PATH = 'surfnet/gssp/request/';
 
-    private readonly SessionInterface $session;
+    private ?SessionInterface $session;
 
-    public function __construct(RequestStack $requestStack)
+    public function __construct(private readonly RequestStack $requestStack)
     {
-        $this->session = $requestStack->getSession();
+        $this->session = null;
+    }
+
+
+    private function isSessionInitialized(): bool
+    {
+        return !is_null($this->session);
+    }
+
+    private function initSession(): void
+    {
+        if (!$this->isSessionInitialized()) {
+            $this->session = $this->requestStack->getSession();
+        }
     }
 
     public function set(string $key, mixed $value): self
     {
+        $this->initSession();
         $this->session->set(self::SESSION_PATH.$key, $value);
 
         return $this;
@@ -45,6 +59,7 @@ final class SessionValueStore implements ValueStore
 
     public function get(string $key): mixed
     {
+        $this->initSession();
         if (!$this->has($key)) {
             throw NotFound::stateProperty($key);
         }
@@ -57,16 +72,19 @@ final class SessionValueStore implements ValueStore
      */
     public function is(string $key, mixed $value): bool
     {
+        $this->initSession();
         return $this->has($key) && $this->get($key) === $value;
     }
 
     public function has(string $key): bool
     {
+        $this->initSession();
         return $this->session->has(self::SESSION_PATH.$key);
     }
 
     public function clear(): self
     {
+        $this->initSession();
         $this->session->clear();
         return $this;
     }
