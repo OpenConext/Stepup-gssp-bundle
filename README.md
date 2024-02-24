@@ -56,7 +56,7 @@ surfnet_gssp:
 
 See [Saml bundle documentation](https://github.com/OpenConext/Stepup-saml-bundle) for more information about the 'surfnet_saml' configuration above.
 
-See the controller for working examples of the 'surfnet_gssp' routes in [Example controller]([https://github.com/OpenConext/Stepup-gssp-example/blob/master/src/AppBundle/Controller/DefaultController.php](https://github.com/OpenConext/Stepup-gssp-example/blob/main/src/Surfnet/Gssp/Infrastructure/Controller/DefaultController.php))
+See the controller for working examples of the 'surfnet_gssp' routes in [Example controller](https://github.com/OpenConext/Stepup-gssp-example/blob/main/src/Surfnet/Gssp/Infrastructure/Controller/DefaultController.php)
 
 The AuthenticationService and the RegistrationService is the API for the application to interact with this bundle. 
 Both services document an example how to use them in a controller action.
