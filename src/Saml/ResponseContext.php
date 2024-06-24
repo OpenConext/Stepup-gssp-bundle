@@ -28,9 +28,9 @@ use Surfnet\SamlBundle\Entity\ServiceProviderRepository;
 final class ResponseContext implements ResponseContextInterface
 {
     public function __construct(
-        private IdentityProvider $hostedIdentityProvider,
-        private ServiceProviderRepository $serviceProviderRepository,
-        private StateHandlerInterface $stateHandler
+        private readonly IdentityProvider $hostedIdentityProvider,
+        private readonly ServiceProviderRepository $serviceProviderRepository,
+        private readonly StateHandlerInterface $stateHandler
     ) {
     }
 

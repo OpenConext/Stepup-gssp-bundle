@@ -25,8 +25,6 @@ use Surfnet\GsspBundle\Exception\RuntimeException;
 use Surfnet\SamlBundle\SAML2\Extensions\GsspUserAttributesChunk;
 use Surfnet\SamlBundle\SAML2\ReceivedAuthnRequest;
 use TypeError;
-use function is_string;
-use function sprintf;
 
 /**
  * Knows and preserves the integrity of the GSSP application state.

@@ -25,11 +25,12 @@ use DateTimeImmutable;
 final class StaticDateTimeService extends AbstractDateTimeService
 {
 
-    public function __construct(private readonly DateTimeImmutable $dateTime)
-    {
+    public function __construct(
+        private readonly DateTimeImmutable $dateTime
+    ) {
     }
 
-    public function getCurrent(): \DateTimeImmutable
+    public function getCurrent(): DateTimeImmutable
     {
         return $this->dateTime;
     }
