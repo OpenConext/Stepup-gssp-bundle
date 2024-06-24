@@ -1,7 +1,7 @@
 {
   "name": "surfnet/stepup-gssp-bundle",
   "license": "Apache-2.0",
-  "description": "A Symfony 5|6 bundle to aid the creation of GSSP (Generic SAML Step-up Provider) device support.",
+  "description": "A Symfony 6 bundle to aid the creation of GSSP (Generic SAML Step-up Provider) device support.",
   "type": "symfony-bundle",
   "autoload": {
     "psr-4": {
@@ -14,13 +14,13 @@
     }
   },
   "require": {
-    "php": "^8.1",
+    "php": "^8.2",
     "ext-openssl": "*",
     "beberlei/assert": "^3",
     "symfony/monolog-bundle": "^3.8",
     "surfnet/stepup-saml-bundle": "^6.0",
-    "symfony/dependency-injection": "^5.4|^6.3",
-    "symfony/framework-bundle": "^5.4|^6.3"
+    "symfony/dependency-injection": "^6.4",
+    "symfony/framework-bundle": "^6.4"
   },
   "require-dev": {
     "behat/behat": "^3.13",
@@ -36,7 +36,7 @@
     "sebastian/phpcpd": "^6.0",
     "slevomat/coding-standard": "^8.13",
     "squizlabs/php_codesniffer": "^3.7.1",
-    "symfony/phpunit-bridge": "^5.4|^6.3"
+    "symfony/phpunit-bridge": "^6.4"
   },
   "scripts": {
     "test": [
