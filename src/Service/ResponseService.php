@@ -35,10 +35,10 @@ use Surfnet\SamlBundle\Entity\IdentityProvider;
 final class ResponseService implements ResponseServiceInterface
 {
     public function __construct(
-        private IdentityProvider $hostedIdentityProvider,
-        private ResponseContextInterface $responseContext,
-        private AssertionSigningServiceInterface $assertionSigningService,
-        private DateTimeService $dateTimeService
+        private readonly IdentityProvider $hostedIdentityProvider,
+        private readonly ResponseContextInterface $responseContext,
+        private readonly AssertionSigningServiceInterface $assertionSigningService,
+        private readonly DateTimeService $dateTimeService
     ) {
     }
 
