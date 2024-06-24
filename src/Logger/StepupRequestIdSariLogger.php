@@ -44,16 +44,13 @@ final class StepupRequestIdSariLogger extends AbstractLogger
         $this->sariLogger = $sariLogger;
     }
 
-    /**
-     * @SuppressWarnings(PHPMD.ElseExpression)
-     */
     public function log($level, $message, array $context = array())
     {
         if ($this->isRequiredToLogWithSari()) {
             $this->createSariLogger()->log($level, $message, $context);
-        } else {
-            $this->logger->log($level, $message, $context);
+            return;
         }
+        $this->logger->log($level, $message, $context);
     }
 
     private function isRequiredToLogWithSari()
