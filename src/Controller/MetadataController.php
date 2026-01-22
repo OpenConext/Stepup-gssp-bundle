@@ -22,7 +22,7 @@ namespace Surfnet\GsspBundle\Controller;
 
 use Surfnet\SamlBundle\Http\XMLResponse;
 use Surfnet\SamlBundle\Metadata\MetadataFactory;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 final readonly class MetadataController
 {

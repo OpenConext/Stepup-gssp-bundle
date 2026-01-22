@@ -1,12 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Method Surfnet\\GsspBundle\\Logger\\StepupRequestIdSariLogger\:\:log\(\) has parameter \$context with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../../src/Logger/StepupRequestIdSariLogger.php
-
-		-
 			message: '#^Method Surfnet\\GsspBundle\\Saml\\ResponseContext\:\:getErrorStatus\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
