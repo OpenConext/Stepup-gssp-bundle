@@ -32,13 +32,13 @@ use Surfnet\GsspBundle\Saml\AssertionSigningServiceInterface;
 use Surfnet\GsspBundle\Saml\ResponseContextInterface;
 use Surfnet\SamlBundle\Entity\IdentityProvider;
 
-final class ResponseService implements ResponseServiceInterface
+final readonly class ResponseService implements ResponseServiceInterface
 {
     public function __construct(
-        private readonly IdentityProvider $hostedIdentityProvider,
-        private readonly ResponseContextInterface $responseContext,
-        private readonly AssertionSigningServiceInterface $assertionSigningService,
-        private readonly DateTimeService $dateTimeService
+        private IdentityProvider $hostedIdentityProvider,
+        private ResponseContextInterface $responseContext,
+        private AssertionSigningServiceInterface $assertionSigningService,
+        private DateTimeService $dateTimeService
     ) {
     }
 

@@ -6,11 +6,7 @@ jobs:
     continue-on-error: ${{ matrix.experimental }}
     strategy:
       matrix:
-        php-versions: [ '8.2' ]
-        experimental: [ false ]
-        include:
-          - php-versions: '8.3'
-            experimental: true
+        php: ['8.2', '8.5']
     timeout-minutes: 30
     name: PHP ${{ matrix.php-versions }} on Ubuntu latest. Experimental == ${{ matrix.experimental }}
     steps:
@@ -24,7 +20,7 @@ jobs:
         run: composer install
         continue-on-error: ${{ matrix.experimental }}
       - name: Run CI tests
-        run: composer check
+        run: composer check-ci
         continue-on-error: ${{ matrix.experimental }}
       - name: Output log files on failure
         if: failure()

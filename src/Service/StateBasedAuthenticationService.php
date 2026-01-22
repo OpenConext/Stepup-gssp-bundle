@@ -32,12 +32,12 @@ use Symfony\Component\Routing\RouterInterface;
  *
  * @see AuthenticationService for an example
  */
-final class StateBasedAuthenticationService implements AuthenticationService
+final readonly class StateBasedAuthenticationService implements AuthenticationService
 {
     public function __construct(
-        private readonly StateHandlerInterface $stateHandler,
-        private readonly RouterInterface $router,
-        private readonly LoggerInterface $logger
+        private StateHandlerInterface $stateHandler,
+        private RouterInterface $router,
+        private LoggerInterface $logger
     ) {
     }
 
@@ -102,9 +102,6 @@ final class StateBasedAuthenticationService implements AuthenticationService
         return $this->router->generate('gssp_saml_sso_return');
     }
 
-    /**
-     * @return string
-     */
     public function getIssuer(): string
     {
         return $this->stateHandler->getRequestServiceProvider();

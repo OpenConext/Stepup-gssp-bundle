@@ -29,7 +29,7 @@ use TypeError;
 /**
  * Knows and preserves the integrity of the GSSP application state.
  */
-final class StateHandler implements StateHandlerInterface
+final readonly class StateHandler implements StateHandlerInterface
 {
     public const REQUEST_ID = 'request_id';
     public const REQUEST_SERVICE_PROVIDER = 'service_provider';

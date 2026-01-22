@@ -24,7 +24,7 @@ use Monolog\LogRecord;
 
 class RequestIdProcessor
 {
-    private string $requestId;
+    private readonly string $requestId;
 
     public function __construct()
     {

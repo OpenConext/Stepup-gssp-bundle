@@ -25,12 +25,12 @@ use Surfnet\SamlBundle\Entity\IdentityProvider;
 use Surfnet\SamlBundle\Entity\ServiceProvider;
 use Surfnet\SamlBundle\Entity\ServiceProviderRepository;
 
-final class ResponseContext implements ResponseContextInterface
+final readonly class ResponseContext implements ResponseContextInterface
 {
     public function __construct(
-        private readonly IdentityProvider $hostedIdentityProvider,
-        private readonly ServiceProviderRepository $serviceProviderRepository,
-        private readonly StateHandlerInterface $stateHandler
+        private IdentityProvider $hostedIdentityProvider,
+        private ServiceProviderRepository $serviceProviderRepository,
+        private StateHandlerInterface $stateHandler
     ) {
     }
 

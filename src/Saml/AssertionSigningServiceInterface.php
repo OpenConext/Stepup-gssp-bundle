@@ -25,7 +25,6 @@ use SAML2\Assertion;
 interface AssertionSigningServiceInterface
 {
     /**
-     * @param Assertion $assertion
      * @return Assertion
      */
     public function signAssertion(Assertion $assertion);
