@@ -38,8 +38,7 @@ class RequestIdProcessor
     public function __invoke(LogRecord $record): LogRecord
     {
         /** @see LogRecord::__construct */
-        assert(is_array($record['extra']));
-        $record['extra']['request_id'] = $this->requestId;
+        $record->extra['requestId'] = $this->requestId;
 
         return $record;
     }
