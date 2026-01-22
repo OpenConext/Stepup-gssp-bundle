@@ -39,7 +39,7 @@ final class StepupRequestIdSariLogger extends AbstractLogger
     }
 
     /**
-     * @SuppressWarnings(PHPMD.ElseExpression)
+     * @SuppressWarnings("PHPMD.ElseExpression")
      */
     public function log(mixed $level, string|Stringable $message, array $context = []): void
     {

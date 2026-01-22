@@ -38,7 +38,7 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * Handles the SAML AuthnRequest from the service provider.
  *
- * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings("PHPMD.CouplingBetweenObjects")
  */
 final class SSOController extends AbstractController
 {

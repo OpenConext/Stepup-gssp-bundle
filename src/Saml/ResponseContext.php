@@ -44,7 +44,7 @@ final class ResponseContext implements ResponseContextInterface
         return $this->hostedIdentityProvider->getEntityId();
     }
 
-    public function getInResponseTo(): ?string
+    public function getInResponseTo(): string
     {
         return $this->stateHandler->getRequestId();
     }

@@ -40,9 +40,6 @@ final class SystemDateTimeService extends AbstractDateTimeService
         $this->timezone = new DateTimeZone($timezone);
     }
 
-    /**
-     * @throws Exception
-     */
     public function getCurrent(): DateTimeImmutable
     {
         return new DateTimeImmutable('now', $this->timezone);

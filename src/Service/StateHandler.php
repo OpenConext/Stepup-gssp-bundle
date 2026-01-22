@@ -71,13 +71,8 @@ final class StateHandler implements StateHandlerInterface
             ->set(self::REQUEST_TYPE, self::REQUEST_TYPE_REGISTRATION)
         ;
 
-        if ($authnRequest->getExtensions()->getGsspUserAttributesChunk() instanceof GsspUserAttributesChunk) {
-            $chunk = $authnRequest->getExtensions()->getGsspUserAttributesChunk();
-            if (!$chunk instanceof GsspUserAttributesChunk) {
-                throw new RuntimeException(
-                    'Unable to store GsspUserAttributes in state, as no GSSP chunk found in AuthNRequest'
-                );
-            }
+        $chunk = $authnRequest->getExtensions()->getGsspUserAttributesChunk();
+        if ($chunk instanceof GsspUserAttributesChunk) {
             $this->setGsspUserAttributes($chunk);
         }
     }
