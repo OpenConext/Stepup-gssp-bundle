@@ -21,6 +21,7 @@ declare(strict_types = 1);
 namespace Tests\Surfnet\GsspBundle\Service\ValueStore;
 
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Surfnet\GsspBundle\Exception\NotFound;
 use Surfnet\GsspBundle\Service\ValueStore\SessionValueStore;
@@ -30,9 +31,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 class SessionValueStoreTest extends TestCase
 {
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canSetProperties()
     {
         /** @var \Mockery\MockInterface $session */
@@ -50,9 +49,7 @@ class SessionValueStoreTest extends TestCase
         $this->assertNull(Mockery::close());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canGetProperties()
     {
         /** @var \Mockery\MockInterface $session */
@@ -71,9 +68,7 @@ class SessionValueStoreTest extends TestCase
         $this->assertEquals(2, $valueStore->get('value2'));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldThrowExceptionWhenRequestingUnknownProperties()
     {
         $this->expectException(NotFound::class);
@@ -89,9 +84,7 @@ class SessionValueStoreTest extends TestCase
         $valueStore->get('test');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function knowsIfValueIsSet()
     {
         /** @var \Mockery\MockInterface $session */
@@ -107,9 +100,7 @@ class SessionValueStoreTest extends TestCase
         $this->assertFalse($valueStore->has('value2'));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function knowsIfValueMatches()
     {
         /** @var \Mockery\MockInterface $session */

@@ -21,6 +21,7 @@ declare(strict_types = 1);
 namespace Tests\Surfnet\GsspBundle\Service;
 
 use Mockery\MockInterface;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use SAML2\Compat\ContainerSingleton;
@@ -63,9 +64,7 @@ class ResponseServiceTest extends TestCase
         $this->assertionSigningService = \Mockery::spy(AssertionSigningServiceInterface::class);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canCreateResponse()
     {
         $datetimeService = new StaticDateTimeService(
@@ -107,9 +106,7 @@ class ResponseServiceTest extends TestCase
         $this->assertionSigningService->shouldHaveReceived('signAssertion');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function canCreateErrorResponse()
     {
         $datetimeService = new StaticDateTimeService(
