@@ -17,3 +17,4 @@
 composer.lock
 .phpunit.result.cache
 ci/qa/.phpunit.result.cache
+var/cache

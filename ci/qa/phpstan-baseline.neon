@@ -1,66 +1,67 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Method Surfnet\\\\GsspBundle\\\\Logger\\\\StepupRequestIdSariLogger\\:\\:log\\(\\) has parameter \\$context with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: ../../src/Logger/StepupRequestIdSariLogger.php
-
-		-
-			message: "#^Cannot access offset 'request_id' on array\\|DateTimeImmutable\\|int\\|string\\|null\\.$#"
-			count: 1
-			path: ../../src/Monolog/Processor/RequestIdProcessor.php
-
-		-
-			message: "#^Method Surfnet\\\\GsspBundle\\\\Saml\\\\ResponseContext\\:\\:getErrorStatus\\(\\) return type has no value type specified in iterable type array\\.$#"
+			message: '#^Method Surfnet\\GsspBundle\\Saml\\ResponseContext\:\:getErrorStatus\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: ../../src/Saml/ResponseContext.php
 
 		-
-			message: "#^Method Surfnet\\\\GsspBundle\\\\Saml\\\\ResponseContextInterface\\:\\:getErrorStatus\\(\\) return type has no value type specified in iterable type array\\.$#"
+			message: '#^Method Surfnet\\GsspBundle\\Saml\\ResponseContextInterface\:\:getErrorStatus\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: ../../src/Saml/ResponseContextInterface.php
 
 		-
-			message: "#^Method Surfnet\\\\GsspBundle\\\\Service\\\\StateHandler\\:\\:getErrorStatus\\(\\) return type has no value type specified in iterable type array\\.$#"
+			message: '#^Method Surfnet\\GsspBundle\\Service\\StateHandler\:\:getErrorStatus\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: ../../src/Service/StateHandler.php
 
 		-
-			message: "#^Method Surfnet\\\\GsspBundle\\\\Service\\\\StateHandler\\:\\:getScopingRequesterIds\\(\\) return type has no value type specified in iterable type array\\.$#"
+			message: '#^Method Surfnet\\GsspBundle\\Service\\StateHandler\:\:getScopingRequesterIds\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: ../../src/Service/StateHandler.php
 
 		-
-			message: "#^Parameter \\#1 \\$serviceProvider of method Surfnet\\\\GsspBundle\\\\Service\\\\StateHandler\\:\\:setRequestServiceProvider\\(\\) expects string, string\\|null given\\.$#"
+			message: '#^Parameter \#1 \$serviceProvider of method Surfnet\\GsspBundle\\Service\\StateHandler\:\:setRequestServiceProvider\(\) expects string, string\|null given\.$#'
+			identifier: argument.type
 			count: 2
 			path: ../../src/Service/StateHandler.php
 
 		-
-			message: "#^Method Surfnet\\\\GsspBundle\\\\Service\\\\StateHandlerInterface\\:\\:getErrorStatus\\(\\) return type has no value type specified in iterable type array\\.$#"
+			message: '#^Method Surfnet\\GsspBundle\\Service\\StateHandlerInterface\:\:getErrorStatus\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: ../../src/Service/StateHandlerInterface.php
 
 		-
-			message: "#^Method Surfnet\\\\GsspBundle\\\\Service\\\\StateHandlerInterface\\:\\:getScopingRequesterIds\\(\\) return type has no value type specified in iterable type array\\.$#"
+			message: '#^Method Surfnet\\GsspBundle\\Service\\StateHandlerInterface\:\:getScopingRequesterIds\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: ../../src/Service/StateHandlerInterface.php
 
 		-
-			message: "#^Cannot call method clear\\(\\) on Symfony\\\\Component\\\\HttpFoundation\\\\Session\\\\SessionInterface\\|null\\.$#"
+			message: '#^Cannot call method clear\(\) on Symfony\\Component\\HttpFoundation\\Session\\SessionInterface\|null\.$#'
+			identifier: method.nonObject
 			count: 1
 			path: ../../src/Service/ValueStore/SessionValueStore.php
 
 		-
-			message: "#^Cannot call method get\\(\\) on Symfony\\\\Component\\\\HttpFoundation\\\\Session\\\\SessionInterface\\|null\\.$#"
+			message: '#^Cannot call method get\(\) on Symfony\\Component\\HttpFoundation\\Session\\SessionInterface\|null\.$#'
+			identifier: method.nonObject
 			count: 1
 			path: ../../src/Service/ValueStore/SessionValueStore.php
 
 		-
-			message: "#^Cannot call method has\\(\\) on Symfony\\\\Component\\\\HttpFoundation\\\\Session\\\\SessionInterface\\|null\\.$#"
+			message: '#^Cannot call method has\(\) on Symfony\\Component\\HttpFoundation\\Session\\SessionInterface\|null\.$#'
+			identifier: method.nonObject
 			count: 1
 			path: ../../src/Service/ValueStore/SessionValueStore.php
 
 		-
-			message: "#^Cannot call method set\\(\\) on Symfony\\\\Component\\\\HttpFoundation\\\\Session\\\\SessionInterface\\|null\\.$#"
+			message: '#^Cannot call method set\(\) on Symfony\\Component\\HttpFoundation\\Session\\SessionInterface\|null\.$#'
+			identifier: method.nonObject
 			count: 1
 			path: ../../src/Service/ValueStore/SessionValueStore.php

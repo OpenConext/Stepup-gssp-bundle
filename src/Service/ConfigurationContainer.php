@@ -23,18 +23,18 @@ namespace Surfnet\GsspBundle\Service;
 use Assert\Assertion;
 use Assert\AssertionFailedException;
 
-final class ConfigurationContainer
+final readonly class ConfigurationContainer
 {
 
     /**
      * The gssp middleware route that does the actual registration.
      */
-    private readonly string $registrationRoute;
+    private string $registrationRoute;
 
     /**
      * The gssp middleware route that does the actual authentication.
      */
-    private readonly string $authenticationRoute;
+    private string $authenticationRoute;
 
     /**
      * @param string[] $configuration
@@ -54,8 +54,6 @@ final class ConfigurationContainer
 
     /**
      * Getter.
-     *
-     * @return string
      */
     public function getAuthenticationRoute(): string
     {
@@ -64,8 +62,6 @@ final class ConfigurationContainer
 
     /**
      * Getter.
-     *
-     * @return string
      */
     public function getRegistrationRoute(): string
     {

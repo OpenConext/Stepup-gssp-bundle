@@ -30,16 +30,12 @@ use SAML2\Configuration\PrivateKey;
 use Surfnet\GsspBundle\Exception\RuntimeException;
 use Surfnet\SamlBundle\Entity\IdentityProvider;
 
-final class AssertionSigningService implements AssertionSigningServiceInterface
+final readonly class AssertionSigningService implements AssertionSigningServiceInterface
 {
     public function __construct(private IdentityProvider $identityProvider)
     {
     }
 
-    /**
-     * @param Assertion $assertion
-     * @return Assertion
-     */
     public function signAssertion(Assertion $assertion): Assertion
     {
         $assertion->setSignatureKey($this->loadPrivateKey());
@@ -49,7 +45,6 @@ final class AssertionSigningService implements AssertionSigningServiceInterface
     }
 
     /**
-     * @return XMLSecurityKey
      * @throws Exception
      * @throws Exception
      */
@@ -68,9 +63,6 @@ final class AssertionSigningService implements AssertionSigningServiceInterface
         return $xmlSecurityKey;
     }
 
-    /**
-     * @return string
-     */
     private function getPublicCertificate(): string
     {
         $keyLoader = new KeyLoader();

@@ -68,7 +68,7 @@ final class SessionValueStore implements ValueStore
     }
 
     /**
-     * @SuppressWarnings(PHPMD.ShortMethodName)
+     * @SuppressWarnings("PHPMD.ShortMethodName")
      */
     public function is(string $key, mixed $value): bool
     {

@@ -24,7 +24,7 @@ use Monolog\LogRecord;
 
 class RequestIdProcessor
 {
-    private string $requestId;
+    private readonly string $requestId;
 
     public function __construct()
     {
@@ -37,7 +37,8 @@ class RequestIdProcessor
      */
     public function __invoke(LogRecord $record): LogRecord
     {
-        $record['extra']['request_id'] = $this->requestId;
+        /** @see LogRecord::__construct */
+        $record->extra['requestId'] = $this->requestId;
 
         return $record;
     }

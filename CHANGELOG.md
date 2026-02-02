@@ -1,3 +1,7 @@
+# 6.0.0
+
+Make Symfony 7.4 compatible
+
 # 5.0.1 .. 5.0.11
 Make the bundle SF6 proof. And upgrade code to be PHP 8.2 compatible
 All homestead and vagrant references have been removed.
