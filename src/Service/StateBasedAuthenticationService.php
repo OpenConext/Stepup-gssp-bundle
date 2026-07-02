@@ -24,6 +24,7 @@ use Psr\Log\LoggerInterface;
 use SAML2\Constants;
 use Surfnet\GsspBundle\Exception\RuntimeException;
 use Surfnet\SamlBundle\SAML2\Extensions\GsspUserAttributesChunk;
+use Surfnet\SamlBundle\SAML2\Extensions\MduiChunk;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -110,5 +111,10 @@ final readonly class StateBasedAuthenticationService implements AuthenticationSe
     public function getGsspUserAttributes(): ?GsspUserAttributesChunk
     {
         return $this->stateHandler->getGsspUserAttributes();
+    }
+
+    public function getMdui(): ?MduiChunk
+    {
+        return $this->stateHandler->getMdui();
     }
 }
