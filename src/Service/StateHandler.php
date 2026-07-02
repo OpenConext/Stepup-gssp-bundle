@@ -23,11 +23,14 @@ namespace Surfnet\GsspBundle\Service;
 use SAML2\Constants;
 use Surfnet\GsspBundle\Exception\RuntimeException;
 use Surfnet\SamlBundle\SAML2\Extensions\GsspUserAttributesChunk;
+use Surfnet\SamlBundle\SAML2\Extensions\MduiChunk;
 use Surfnet\SamlBundle\SAML2\ReceivedAuthnRequest;
 use TypeError;
 
 /**
  * Knows and preserves the integrity of the GSSP application state.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 final readonly class StateHandler implements StateHandlerInterface
 {
@@ -56,6 +59,8 @@ final readonly class StateHandler implements StateHandlerInterface
 
     public const GSSP_USERATTRIBUTES = 'gssp_userattributes';
 
+    public const GSSP_MDUI = 'gssp_mdui';
+
     public function __construct(private ValueStore $store)
     {
     }
@@ -71,10 +76,7 @@ final readonly class StateHandler implements StateHandlerInterface
             ->set(self::REQUEST_TYPE, self::REQUEST_TYPE_REGISTRATION)
         ;
 
-        $chunk = $authnRequest->getExtensions()->getGsspUserAttributesChunk();
-        if ($chunk instanceof GsspUserAttributesChunk) {
-            $this->setGsspUserAttributes($chunk);
-        }
+        $this->saveRequestExtensions($authnRequest);
     }
 
     public function saveAuthenticationRequest(ReceivedAuthnRequest $authnRequest, string $relayState): void
@@ -89,6 +91,8 @@ final readonly class StateHandler implements StateHandlerInterface
             ->set(self::SCOPING_REQUESTER_IDS, $authnRequest->getScopingRequesterIds())
             ->set(self::REQUEST_TYPE, self::REQUEST_TYPE_AUTHENTICATION)
         ;
+
+        $this->saveRequestExtensions($authnRequest);
     }
 
     public function saveSubjectNameId(string $nameId): StateHandlerInterface
@@ -156,13 +160,31 @@ final readonly class StateHandler implements StateHandlerInterface
 
     public function getGsspUserAttributes(): ?GsspUserAttributesChunk
     {
-        if (!is_string($this->store->get(self::GSSP_USERATTRIBUTES))) {
+        if (!$this->store->has(self::GSSP_USERATTRIBUTES)) {
+            return null;
+        }
+        $xml = $this->store->get(self::GSSP_USERATTRIBUTES);
+        if (!is_string($xml)) {
             throw new TypeError(sprintf('The "%s" must be of type string', self::GSSP_USERATTRIBUTES));
         }
-        if ($this->store->has(self::GSSP_USERATTRIBUTES)) {
-            return GsspUserAttributesChunk::fromXML($this->store->get(self::GSSP_USERATTRIBUTES));
+        return GsspUserAttributesChunk::fromXML($xml);
+    }
+
+    public function getMdui(): ?MduiChunk
+    {
+        if (!$this->store->has(self::GSSP_MDUI)) {
+            return null;
         }
-        return null;
+        $xml = $this->store->get(self::GSSP_MDUI);
+        if (!is_string($xml)) {
+            throw new TypeError(sprintf('The "%s" must be of type string', self::GSSP_MDUI));
+        }
+        return MduiChunk::fromXML($xml);
+    }
+
+    public function hasMdui(): bool
+    {
+        return $this->store->has(self::GSSP_MDUI);
     }
 
     public function hasSubjectNameId(): bool
@@ -237,9 +259,19 @@ final readonly class StateHandler implements StateHandlerInterface
         return $this->set(self::REQUEST_ID, $originalRequestId);
     }
 
-    private function setGsspUserAttributes(GsspUserAttributesChunk $chunk): self
+    private function saveRequestExtensions(ReceivedAuthnRequest $authnRequest): void
     {
-        return $this->set(self::GSSP_USERATTRIBUTES, $chunk->toXML());
+        $extensions = $authnRequest->getExtensions();
+
+        $chunk = $extensions->getGsspUserAttributesChunk();
+        if ($chunk instanceof GsspUserAttributesChunk) {
+            $this->set(self::GSSP_USERATTRIBUTES, $chunk->toXML());
+        }
+
+        $mduiChunk = $extensions->getMduiChunk();
+        if ($mduiChunk instanceof MduiChunk) {
+            $this->set(self::GSSP_MDUI, $mduiChunk->toXML());
+        }
     }
 
     private function set(string $key, mixed $value): self
@@ -250,9 +282,7 @@ final readonly class StateHandler implements StateHandlerInterface
 
     private function assertRequestTypeNotSet(): void
     {
-        // Request_type may not be set
         if ($this->store->has(self::REQUEST_TYPE)) {
-            // If it is set, it must be of type string.
             if (!is_string($this->store->get(self::REQUEST_TYPE))) {
                 throw new TypeError(sprintf('The "%s" must be of type string', self::REQUEST_TYPE));
             }

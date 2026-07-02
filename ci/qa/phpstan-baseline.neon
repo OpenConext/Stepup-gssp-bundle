@@ -1,6 +1,14 @@
 parameters:
 	ignoreErrors:
 		-
+			# phpstan cannot parse the dot in PHPMD annotation names (PHPMD.ExcessiveClassComplexity).
+			# This is a tool-compatibility issue, not a type error.
+			message: '#ExcessiveClassComplexity#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../../src/Service/StateHandler.php
+
+		-
 			message: '#^Method Surfnet\\GsspBundle\\Saml\\ResponseContext\:\:getErrorStatus\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1

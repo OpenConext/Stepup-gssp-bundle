@@ -47,6 +47,10 @@ use SAML2\XML\saml\Issuer;
 use SAML2\XML\saml\NameID;
 use Surfnet\GsspBundle\Controller\SSOController;
 use Surfnet\GsspBundle\Controller\SSOReturnController;
+use Surfnet\SamlBundle\SAML2\Extensions\Extensions;
+use Surfnet\SamlBundle\SAML2\Extensions\GsspUserAttributesChunk;
+use Surfnet\SamlBundle\SAML2\Extensions\MduiChunk;
+use SAML2\XML\Chunk as SAML2Chunk;
 use Surfnet\GsspBundle\Logger\StepupRequestIdSariLogger;
 use Surfnet\GsspBundle\Saml\AssertionSigningService;
 use Surfnet\GsspBundle\Saml\ResponseContext;
@@ -113,6 +117,8 @@ final class GsspContext implements Context
 
     private ?Exception $lastException = null;
 
+    private ?StateHandler $stateHandler = null;
+
     /**
      * Every scenario we start with a clean slate.
      *
@@ -129,7 +135,7 @@ final class GsspContext implements Context
         $this->twigTemplate = null;
 
         // Create required dependencies.
-        $stateHandler = new StateHandler(new InMemoryValueStore());
+        $this->stateHandler = $stateHandler = new StateHandler(new InMemoryValueStore());
         $this->logger = new BufferingLogger();
         $logger = new StepupRequestIdSariLogger(
             $this->logger,
@@ -625,6 +631,30 @@ final class GsspContext implements Context
         $this->registrationService->replyToServiceProvider();
     }
 
+    #[Given('the AuthnRequest contains service name :serviceName')]
+    public function setServiceNameOnAuthnRequest(string $serviceName): void
+    {
+        $chunk = new GsspUserAttributesChunk();
+        $chunk->addAttribute(
+            'urn:mace:surf.nl:stepup:service-name',
+            'urn:oasis:names:tc:SAML:2.0:attrname-format:uri',
+            $serviceName
+        );
+        $this->authnRequest->setExtensions([new SAML2Chunk($chunk->getValue())]);
+    }
+
+    #[Then('the service name :serviceName should be stored in state')]
+    public function assertServiceNameStoredInState(string $serviceName): void
+    {
+        $attributes = $this->stateHandler->getGsspUserAttributes();
+        Assertion::notNull($attributes, 'Expected GsspUserAttributesChunk to be present in state');
+        Assertion::eq(
+            $serviceName,
+            $attributes->getAttributeValue('urn:mace:surf.nl:stepup:service-name'),
+            sprintf('Expected service name "%s" in state', $serviceName)
+        );
+    }
+
     #[Given('set the subject nameId to :nameId')]
     public function setTheSubjectNameIdTo(string $nameId): void
     {
@@ -644,5 +674,38 @@ final class GsspContext implements Context
     public function theReturnEndpointShouldRaiseAnException($message): void
     {
         Assertion::eq($message, $this->lastException->getMessage());
+    }
+
+    #[Given('the AuthnRequest contains mdui display name :firstName for language :firstLang and :secondName for language :secondLang')]
+    public function setMduiDisplayNamesOnAuthnRequest(string $firstName, string $firstLang, string $secondName, string $secondLang): void
+    {
+        $chunk = new MduiChunk();
+        $doc = $chunk->getValue()->ownerDocument;
+        $ns = 'urn:oasis:names:tc:SAML:metadata:ui';
+
+        foreach ([[$firstLang, $firstName], [$secondLang, $secondName]] as [$lang, $name]) {
+            $el = $doc->createElementNS($ns, 'mdui:DisplayName');
+            $el->setAttribute('xml:lang', $lang);
+            $el->textContent = $name;
+            $chunk->getValue()->appendChild($el);
+        }
+
+        $this->authnRequest->setExtensions([new SAML2Chunk($chunk->getValue())]);
+    }
+
+    #[Then('the mdui display name for language :lang should be :expected in state')]
+    public function assertMduiDisplayNameInState(string $lang, string $expected): void
+    {
+        $mdui = $this->stateHandler->getMdui();
+        Assertion::notNull($mdui, 'Expected MduiChunk to be present in state');
+        $names = $mdui->getDisplayNames();
+        Assertion::keyExists($names, $lang, sprintf('Expected lang "%s" in mdui display names', $lang));
+        Assertion::eq($expected, $names[$lang], sprintf('Expected display name "%s" for lang "%s"', $expected, $lang));
+    }
+
+    #[Then('no mdui data should be stored in state')]
+    public function assertNoMduiInState(): void
+    {
+        Assertion::false($this->stateHandler->hasMdui(), 'Expected no mdui data in state');
     }
 }

@@ -72,3 +72,33 @@ Feature: When an user needs to be authenticated
 
     When the user is redirected to the identity provider sso return endpoint
     Then the return endpoint should raise an exception with "There is no request state present"
+
+  Scenario: Service name from SAML extension is preserved in state during authentication
+    Given a normal SAML 2.0 AuthnRequest
+    And the AuthnRequest contains service name 'My University Portal'
+    And AuthnRequest is signed with sha256
+    And set the subject nameId to 'unique-identifier-token'
+
+    When the service provider sends the AuthnRequest with HTTP-Redirect binding
+
+    Then the service name 'My University Portal' should be stored in state
+
+  Scenario: mdui:UIInfo display names are preserved in state during authentication
+    Given a normal SAML 2.0 AuthnRequest
+    And the AuthnRequest contains mdui display name "Online learning" for language "en" and "Leeromgeving" for language "nl"
+    And AuthnRequest is signed with sha256
+    And set the subject nameId to 'unique-identifier-token'
+
+    When the service provider sends the AuthnRequest with HTTP-Redirect binding
+
+    Then the mdui display name for language "en" should be "Online learning" in state
+    And the mdui display name for language "nl" should be "Leeromgeving" in state
+
+  Scenario: Authentication without mdui:UIInfo does not cause an error
+    Given a normal SAML 2.0 AuthnRequest
+    And AuthnRequest is signed with sha256
+    And set the subject nameId to 'unique-identifier-token'
+
+    When the service provider sends the AuthnRequest with HTTP-Redirect binding
+
+    Then no mdui data should be stored in state
