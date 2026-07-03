@@ -73,6 +73,9 @@ Feature: When an user needs to be authenticated
     When the user is redirected to the identity provider sso return endpoint
     Then the return endpoint should raise an exception with "There is no request state present"
 
+  # Pre-existing GsspUserAttributes service-name path (urn:mace:surf.nl:stepup:service-name),
+  # not the mdui:UIInfo mechanism added in this PR. Kept here as regression coverage for the
+  # saveRequestExtensions() refactor, which now handles both extension types from one call site.
   Scenario: Service name from SAML extension is preserved in state during authentication
     Given a normal SAML 2.0 AuthnRequest
     And the AuthnRequest contains service name 'My University Portal'
