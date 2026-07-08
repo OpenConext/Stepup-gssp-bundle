@@ -78,6 +78,12 @@
     "allow-plugins": {
       "dealerdirect/phpcodesniffer-composer-installer": true,
       "simplesamlphp/composer-xmlprovider-installer": false
+    },
+    "audit": {
+      "ignore": {
+        "PKSA-1fc7-xrz7-vw78": "GHSA-5cjr-mxj5-wmrx: DoS via XPath Transform in ds:Signature processing (transitive via surfnet/stepup-saml-bundle -> simplesamlphp/saml2). No patched simplesamlphp/saml2 4.x release exists or is planned. Mitigated in surfnet/stepup-saml-bundle by Surfnet\\SamlBundle\\Signing\\SignatureTransformGuard, called from PostBinding::processResponse() before every signature verification. See Stepup-saml-bundle PR #137.",
+        "PKSA-yk3g-3g3t-ts6q": "GHSA-6929-8p9f-26jx: TLS validator confusion in HTTP-Artifact binding resolution (transitive via surfnet/stepup-saml-bundle -> simplesamlphp/saml2). Neither this bundle nor surfnet/stepup-saml-bundle implement HTTP-Artifact binding; the affected code path is unreachable."
+      }
     }
   }
 }
