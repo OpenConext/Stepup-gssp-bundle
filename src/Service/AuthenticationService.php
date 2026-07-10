@@ -22,6 +22,7 @@ namespace Surfnet\GsspBundle\Service;
 
 use SAML2\Constants;
 use Surfnet\SamlBundle\SAML2\Extensions\GsspUserAttributesChunk;
+use Surfnet\SamlBundle\SAML2\Extensions\MduiChunk;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -89,4 +90,6 @@ interface AuthenticationService
     public function getScopingRequesterIds(): array;
 
     public function getGsspUserAttributes(): ?GsspUserAttributesChunk;
+
+    public function getMdui(): ?MduiChunk;
 }

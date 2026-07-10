@@ -20,9 +20,11 @@ declare(strict_types = 1);
 
 namespace Surfnet\GsspBundle\Service;
 
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Surfnet\GsspBundle\Exception\RuntimeException;
+use Surfnet\SamlBundle\SAML2\Extensions\MduiChunk;
 use Symfony\Component\Routing\RouterInterface;
 
 class StateBasedRegistrationServiceTest extends TestCase
@@ -72,5 +74,30 @@ class StateBasedRegistrationServiceTest extends TestCase
             $logger
         );
         $this->assertTrue($registrationService->isRegistered());
+    }
+
+    public function test_getMdui_returns_mdui_chunk_when_present()
+    {
+        $mduiChunk = m::mock(MduiChunk::class);
+        $stateHandler = m::mock(StateHandlerInterface::class);
+        $stateHandler->shouldReceive('getMdui')->andReturn($mduiChunk);
+        $registrationService = new StateBasedRegistrationService(
+            $stateHandler,
+            m::mock(RouterInterface::class),
+            m::mock(LoggerInterface::class)
+        );
+        $this->assertSame($mduiChunk, $registrationService->getMdui());
+    }
+
+    public function test_getMdui_returns_null_when_not_present()
+    {
+        $stateHandler = m::mock(StateHandlerInterface::class);
+        $stateHandler->shouldReceive('getMdui')->andReturnNull();
+        $registrationService = new StateBasedRegistrationService(
+            $stateHandler,
+            m::mock(RouterInterface::class),
+            m::mock(LoggerInterface::class)
+        );
+        $this->assertNull($registrationService->getMdui());
     }
 }

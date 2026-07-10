@@ -40,6 +40,24 @@ Feature: When an user needs to enroll for a new token
       | notice | /Saml response created with id ".+", request ID: ".+"/                                                                        | present |
       | notice | Invalidate current state and redirect user to service provider assertion consumer url "https://service_provider/saml/acu"     | present |
 
+  Scenario: mdui:UIInfo display names are preserved in state during registration
+    Given a normal SAML 2.0 AuthnRequest
+    And the AuthnRequest contains mdui display name "Online learning" for language "en" and "Leeromgeving" for language "nl"
+    And AuthnRequest is signed with sha256
+
+    When the service provider sends the AuthnRequest with HTTP-Redirect binding
+
+    Then the mdui display name for language "en" should be "Online learning" in state
+    And the mdui display name for language "nl" should be "Leeromgeving" in state
+
+  Scenario: Registration without mdui:UIInfo does not cause an error
+    Given a normal SAML 2.0 AuthnRequest
+    And AuthnRequest is signed with sha256
+
+    When the service provider sends the AuthnRequest with HTTP-Redirect binding
+
+    Then no mdui data should be stored in state
+
   Scenario: When an user request the sso return endpoint without being registered the user should be redirected to the application registration endpoint
     Given a normal SAML 2.0 AuthnRequest
     And AuthnRequest is signed with sha256

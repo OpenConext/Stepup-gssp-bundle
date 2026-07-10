@@ -23,6 +23,7 @@ namespace Surfnet\GsspBundle\Service;
 use Psr\Log\LoggerInterface;
 use SAML2\Constants;
 use Surfnet\GsspBundle\Exception\RuntimeException;
+use Surfnet\SamlBundle\SAML2\Extensions\MduiChunk;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -57,6 +58,11 @@ final readonly class StateBasedRegistrationService implements RegistrationServic
             throw RuntimeException::shouldNotRegister();
         }
         return $this->stateHandler->hasSubjectNameId();
+    }
+
+    public function getMdui(): ?MduiChunk
+    {
+        return $this->stateHandler->getMdui();
     }
 
     public function registrationRequired(): bool

@@ -24,6 +24,7 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Surfnet\GsspBundle\Exception\RuntimeException;
+use Surfnet\SamlBundle\SAML2\Extensions\MduiChunk;
 use Symfony\Component\Routing\RouterInterface;
 
 class StateBasedAuthenticationServiceTest extends TestCase
@@ -96,5 +97,30 @@ class StateBasedAuthenticationServiceTest extends TestCase
             m::mock(LoggerInterface::class)
         );
         $this->assertEquals(['a', 'b', 'c'], $authenticationService->getScopingRequesterIds());
+    }
+
+    public function test_getMdui_returns_mdui_chunk_when_present()
+    {
+        $mduiChunk = m::mock(MduiChunk::class);
+        $stateHandler = m::mock(StateHandlerInterface::class);
+        $stateHandler->shouldReceive('getMdui')->andReturn($mduiChunk);
+        $authenticationService = new StateBasedAuthenticationService(
+            $stateHandler,
+            m::mock(RouterInterface::class),
+            m::mock(LoggerInterface::class)
+        );
+        $this->assertSame($mduiChunk, $authenticationService->getMdui());
+    }
+
+    public function test_getMdui_returns_null_when_not_present()
+    {
+        $stateHandler = m::mock(StateHandlerInterface::class);
+        $stateHandler->shouldReceive('getMdui')->andReturnNull();
+        $authenticationService = new StateBasedAuthenticationService(
+            $stateHandler,
+            m::mock(RouterInterface::class),
+            m::mock(LoggerInterface::class)
+        );
+        $this->assertNull($authenticationService->getMdui());
     }
 }
