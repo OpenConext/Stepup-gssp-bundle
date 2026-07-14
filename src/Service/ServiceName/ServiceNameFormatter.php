@@ -27,9 +27,13 @@ final class ServiceNameFormatter
 
     public static function format(string $raw): string
     {
-        $stripped = preg_replace('/[\p{Cc}\p{Cf}]/u', '', $raw) ?? '';
-        $collapsed = preg_replace('/\s+/u', ' ', $stripped) ?? '';
-        $trimmed = trim($collapsed);
+        // Collapse whitespace (including tabs/newlines, which are control
+        // characters) into single spaces *before* stripping other control/format
+        // characters, so e.g. a tab between two words leaves a separating space
+        // instead of being deleted outright and concatenating the words.
+        $collapsed = preg_replace('/\s+/u', ' ', $raw) ?? '';
+        $stripped = preg_replace('/[\p{Cc}\p{Cf}]/u', '', $collapsed) ?? '';
+        $trimmed = trim($stripped);
         return mb_strlen($trimmed) > self::MAX_LENGTH
             ? mb_substr($trimmed, 0, self::MAX_LENGTH) . self::ELLIPSIS
             : $trimmed;

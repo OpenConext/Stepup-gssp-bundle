@@ -60,4 +60,14 @@ class ServiceNameFormatterTest extends TestCase
         $raw = "My\u{200B}Service\u{0007}";
         $this->assertSame('MyService', ServiceNameFormatter::format($raw));
     }
+
+    public function testTabBetweenWordsIsReplacedWithASingleSpaceNotConcatenated(): void
+    {
+        $this->assertSame('Name With', ServiceNameFormatter::format("Name\tWith"));
+    }
+
+    public function testNewlineBetweenWordsIsReplacedWithASingleSpaceNotConcatenated(): void
+    {
+        $this->assertSame('Name With', ServiceNameFormatter::format("Name\nWith"));
+    }
 }
