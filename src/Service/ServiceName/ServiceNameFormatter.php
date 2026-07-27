@@ -32,8 +32,11 @@ final class ServiceNameFormatter
         $collapsed = preg_replace('/\s+/u', ' ', $raw) ?? '';
         $stripped = preg_replace('/[\p{Cc}\p{Cf}]/u', '', $collapsed) ?? '';
         $trimmed = trim($stripped);
+        // Truncate to MAX_LENGTH - 1 so the appended ellipsis keeps the total at
+        // MAX_LENGTH, per the RFC (OpenConext/Stepup-Gateway#587): "truncated to
+        // MAX_CHARACTERS-1... append an ellipsis".
         return mb_strlen($trimmed) > self::MAX_LENGTH
-            ? mb_substr($trimmed, 0, self::MAX_LENGTH) . self::ELLIPSIS
+            ? mb_substr($trimmed, 0, self::MAX_LENGTH - 1) . self::ELLIPSIS
             : $trimmed;
     }
 }

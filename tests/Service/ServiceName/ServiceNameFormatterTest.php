@@ -34,8 +34,17 @@ class ServiceNameFormatterTest extends TestCase
         $raw = str_repeat('a', 45);
         $formatted = ServiceNameFormatter::format($raw);
 
-        $this->assertSame(str_repeat('a', 40) . "\u{2026}", $formatted);
-        $this->assertSame(41, mb_strlen($formatted));
+        $this->assertSame(str_repeat('a', 39) . "\u{2026}", $formatted);
+        $this->assertSame(40, mb_strlen($formatted));
+    }
+
+    public function testNameOfFortyOneCharactersIsTruncatedToThirtyNinePlusEllipsis(): void
+    {
+        $raw = str_repeat('b', 41);
+        $formatted = ServiceNameFormatter::format($raw);
+
+        $this->assertSame(str_repeat('b', 39) . "\u{2026}", $formatted);
+        $this->assertSame(40, mb_strlen($formatted));
     }
 
     public function testNameOfExactlyFortyCharactersIsNotTruncated(): void
