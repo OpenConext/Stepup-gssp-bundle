@@ -107,6 +107,6 @@ class ServiceNameResolverTest extends TestCase
             . '</mdui:UIInfo>'
         );
 
-        $this->assertSame(str_repeat('a', 40) . "\u{2026}", ServiceNameResolver::resolve($mdui, 'en_US'));
+        $this->assertSame(str_repeat('a', 39) . "\u{2026}", ServiceNameResolver::resolve($mdui, 'en_US'));
     }
 }
