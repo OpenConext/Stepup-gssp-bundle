@@ -21,6 +21,7 @@ declare(strict_types = 1);
 namespace Surfnet\GsspBundle\Service\ServiceName;
 
 use Surfnet\SamlBundle\SAML2\Extensions\MduiChunk;
+use Surfnet\SamlBundle\SAML2\Extensions\ServiceNameFormatter;
 
 final class ServiceNameResolver
 {
