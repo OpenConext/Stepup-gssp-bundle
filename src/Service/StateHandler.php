@@ -30,7 +30,7 @@ use TypeError;
 /**
  * Knows and preserves the integrity of the GSSP application state.
  *
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings("PHPMD.ExcessiveClassComplexity")
  */
 final readonly class StateHandler implements StateHandlerInterface
 {
