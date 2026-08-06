@@ -65,6 +65,8 @@ interface RegistrationService
 
     public function getMdui(): ?MduiChunk;
 
+    public function hasMdui(): bool;
+
     public function reject(string $message, string $subCode = Constants::STATUS_AUTHN_FAILED): void;
 
     /*

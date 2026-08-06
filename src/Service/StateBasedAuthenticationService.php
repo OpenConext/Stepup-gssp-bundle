@@ -117,4 +117,9 @@ final readonly class StateBasedAuthenticationService implements AuthenticationSe
     {
         return $this->stateHandler->getMdui();
     }
+
+    public function hasMdui(): bool
+    {
+        return $this->stateHandler->hasMdui();
+    }
 }

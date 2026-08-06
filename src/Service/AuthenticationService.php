@@ -92,4 +92,6 @@ interface AuthenticationService
     public function getGsspUserAttributes(): ?GsspUserAttributesChunk;
 
     public function getMdui(): ?MduiChunk;
+
+    public function hasMdui(): bool;
 }
