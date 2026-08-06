@@ -65,6 +65,11 @@ final readonly class StateBasedRegistrationService implements RegistrationServic
         return $this->stateHandler->getMdui();
     }
 
+    public function hasMdui(): bool
+    {
+        return $this->stateHandler->hasMdui();
+    }
+
     public function registrationRequired(): bool
     {
         return $this->stateHandler->isRequestTypeRegistration();

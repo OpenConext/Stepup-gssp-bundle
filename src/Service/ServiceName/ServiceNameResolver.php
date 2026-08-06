@@ -23,6 +23,13 @@ namespace Surfnet\GsspBundle\Service\ServiceName;
 use Surfnet\SamlBundle\SAML2\Extensions\MduiChunk;
 use Surfnet\SamlBundle\SAML2\Extensions\ServiceNameFormatter;
 
+/**
+ * Mandatory path for reading a service name out of an MduiChunk: this is the only place that
+ * runs the name through ServiceNameFormatter::format(), which sanitizes it (length cap,
+ * whitespace collapse, stripping of control/format characters). Calling
+ * $mdui->getDisplayNames() directly bypasses that sanitization — GSSPs must resolve display
+ * names through this class, never read MduiChunk's raw names for display.
+ */
 final class ServiceNameResolver
 {
     private const FALLBACK_LANGUAGE = 'en';
