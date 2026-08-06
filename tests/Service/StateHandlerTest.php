@@ -20,8 +20,10 @@ declare(strict_types = 1);
 
 namespace Surfnet\GsspBundle\Service;
 
+use DOMDocument;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Surfnet\SamlBundle\SAML2\Extensions\MduiChunk;
 
 class StateHandlerTest extends TestCase
 {
@@ -66,5 +68,64 @@ class StateHandlerTest extends TestCase
             ->with('scoping_requester_ids')
             ->andReturn(['a', 'b', 'c']);
         $this->assertEquals(['a', 'b', 'c'], $this->handler->getScopingRequesterIds());
+    }
+
+    public function test_has_mdui_returns_false_when_absent(): void
+    {
+        $this->valueStore
+            ->shouldReceive('has')
+            ->with('gssp_mdui')
+            ->andReturnFalse();
+        $this->assertFalse($this->handler->hasMdui());
+    }
+
+    public function test_has_mdui_returns_true_when_present(): void
+    {
+        $this->valueStore
+            ->shouldReceive('has')
+            ->with('gssp_mdui')
+            ->andReturnTrue();
+        $this->assertTrue($this->handler->hasMdui());
+    }
+
+    public function test_get_mdui_returns_null_when_absent(): void
+    {
+        $this->valueStore
+            ->shouldReceive('has')
+            ->with('gssp_mdui')
+            ->andReturnFalse();
+        $this->assertNull($this->handler->getMdui());
+    }
+
+    public function test_get_mdui_returns_chunk_with_display_names(): void
+    {
+        $chunk = $this->buildMduiChunk(['en' => 'My Service', 'nl' => 'Mijn Dienst']);
+
+        $this->valueStore
+            ->shouldReceive('has')
+            ->with('gssp_mdui')
+            ->andReturnTrue();
+        $this->valueStore
+            ->shouldReceive('get')
+            ->with('gssp_mdui')
+            ->andReturn($chunk->toXML());
+
+        $result = $this->handler->getMdui();
+        $this->assertInstanceOf(MduiChunk::class, $result);
+        $this->assertEquals(['en' => 'My Service', 'nl' => 'Mijn Dienst'], $result->getDisplayNames());
+    }
+
+    private function buildMduiChunk(array $displayNames): MduiChunk
+    {
+        $chunk = new MduiChunk();
+        $doc = $chunk->getValue()->ownerDocument;
+        $ns = 'urn:oasis:names:tc:SAML:metadata:ui';
+        foreach ($displayNames as $lang => $name) {
+            $el = $doc->createElementNS($ns, 'mdui:DisplayName');
+            $el->setAttribute('xml:lang', $lang);
+            $el->textContent = $name;
+            $chunk->getValue()->appendChild($el);
+        }
+        return $chunk;
     }
 }
