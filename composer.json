@@ -3,7 +3,6 @@
   "license": "Apache-2.0",
   "description": "A Symfony 6 bundle to aid the creation of GSSP (Generic SAML Step-up Provider) device support.",
   "type": "symfony-bundle",
-  "minimum-stability": "dev",
   "prefer-stable": true,
   "repositories": [
     {
