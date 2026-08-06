@@ -24,7 +24,7 @@
     "php": "^8.2",
     "ext-openssl": "*",
     "beberlei/assert": "^3",
-    "surfnet/stepup-saml-bundle": "7.1.0-beta1",
+    "surfnet/stepup-saml-bundle": "7.1.0-beta2",
     "symfony/dependency-injection": "^7.4",
     "symfony/framework-bundle": "^7.4",
     "symfony/monolog-bundle": "^4.0"
