@@ -36,7 +36,7 @@
     "phpstan/phpstan-symfony": "^2.0",
     "phpunit/phpcov": "^10.0",
     "phpunit/phpunit": "^11",
-    "rector/rector": "^2.3",
+    "rector/rector": "^2.4",
     "slevomat/coding-standard": "^8.26",
     "squizlabs/php_codesniffer": "^4.0",
     "symfony/phpunit-bridge": "^7.4"
