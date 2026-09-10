@@ -13,6 +13,9 @@
       "Tests\\Surfnet\\GsspBundle\\": "tests/"
     }
   },
+  "conflict": {
+    "simplesamlphp/saml2": ">=4.20.0 <4.21.0"
+  },
   "require": {
     "php": "^8.2",
     "ext-openssl": "*",
@@ -20,6 +23,7 @@
     "surfnet/stepup-saml-bundle": "^7.0",
     "symfony/dependency-injection": "^7.4",
     "symfony/framework-bundle": "^7.4",
+    "symfony/http-foundation": "^7.4",
     "symfony/monolog-bundle": "^4.0"
   },
   "require-dev": {
@@ -32,7 +36,7 @@
     "phpstan/phpstan-symfony": "^2.0",
     "phpunit/phpcov": "^10.0",
     "phpunit/phpunit": "^11",
-    "rector/rector": "^2.3",
+    "rector/rector": "^2.4",
     "slevomat/coding-standard": "^8.26",
     "squizlabs/php_codesniffer": "^4.0",
     "symfony/phpunit-bridge": "^7.4"
@@ -68,7 +72,8 @@
   "config": {
     "sort-packages": true,
     "allow-plugins": {
-      "dealerdirect/phpcodesniffer-composer-installer": true
+      "dealerdirect/phpcodesniffer-composer-installer": true,
+      "simplesamlphp/composer-xmlprovider-installer": false
     }
   }
 }

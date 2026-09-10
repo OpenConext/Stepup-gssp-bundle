@@ -1,3 +1,8 @@
+# Unreleased
+
+- Add support for PHP 8.5
+- Keep the minimum required PHP version at ^8.2
+
 # 6.0.0
 
 Make Symfony 7.4 compatible

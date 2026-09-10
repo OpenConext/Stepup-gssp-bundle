@@ -478,7 +478,6 @@ final class GsspContext implements Context
     }
 
     /**
-     * @return PrivateKey|XMLSecurityKey
      * @throws Exception
      */
     private function loadPrivateKey(PrivateKey $key): XMLSecurityKey
@@ -494,7 +493,6 @@ final class GsspContext implements Context
 
     /**
      * @param PrivateKey $publicKey
-     * @return PrivateKey|XMLSecurityKey
      *
      * @throws Exception
      */
@@ -517,9 +515,6 @@ final class GsspContext implements Context
         return $publicKey->getCertificate();
     }
 
-    /**
-     * @return mixed|\SAML2\Assertion|EncryptedAssertion
-     */
     private function getSsoAssertionResponse(): \SAML2\Assertion|EncryptedAssertion|bool
     {
         $assertions = $this->ssoReturnResponse->getAssertions();
@@ -555,7 +550,6 @@ final class GsspContext implements Context
     public function theResponseShouldBeAnRedirectTheApplicationRegistrationEndpoint(): void
     {
         Assertion::isInstanceOf($this->response, RedirectResponse::class);
-        /** @var RedirectResponse $response */
         $response = $this->response;
         Assertion::eq($response->getTargetUrl(), 'https://identity_provider/registration');
     }
@@ -567,7 +561,6 @@ final class GsspContext implements Context
     public function theResponseShouldBeAnRedirectTheApplicationAuthenticationEndpoint(): void
     {
         Assertion::isInstanceOf($this->response, RedirectResponse::class);
-        /** @var RedirectResponse $response */
         $response = $this->response;
         Assertion::eq($response->getTargetUrl(), 'https://identity_provider/authentication');
     }
