@@ -139,6 +139,7 @@ final class SSOReturnController extends AbstractController
             'response' => $this->getResponseAsXML($samlResponse),
             'relayState' => $this->responseContext->getRelayState(),
         ]);
+        $response->headers->set('Cache-Control', 'no-store');
 
         // We clear the state, because we don't need it anymore.
         $this->logger->notice(sprintf(

@@ -90,4 +90,5 @@ Feature: When invalid states are requested the IdP should respond properly
 
     When the user is redirected to the identity provider sso return endpoint
     Then Identity provider sso return endpoint should redirect client-side a saml response to the service provider
+    And the sso return response should not be stored by the browser
     And the saml response status code should be "urn:oasis:names:tc:SAML:2.0:status:Responder"

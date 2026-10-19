@@ -431,6 +431,12 @@ final class GsspContext implements Context
         Assertion::eq('@SurfnetGssp/StepupGssp/ssoReturn.html.twig-response', $this->response->getContent());
     }
 
+    #[Then('the sso return response should not be stored by the browser')]
+    public function theSsoReturnResponseShouldNotBeStored(): void
+    {
+        Assertion::true($this->response->headers->hasCacheControlDirective('no-store'));
+    }
+
     #[Then('the saml response status code should be :code')]
     public function theResponseStatusCodeShouldBe($code): void
     {

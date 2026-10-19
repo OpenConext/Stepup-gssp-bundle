@@ -2,6 +2,7 @@
 
 - Add support for PHP 8.5
 - Keep the minimum required PHP version at ^8.2
+- Send `Cache-Control: no-store` on the `/saml/sso_return` page so browsers do not store the signed SAML response
 
 # 6.0.0
 

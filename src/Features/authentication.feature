@@ -13,6 +13,7 @@ Feature: When an user needs to be authenticated
 
     When the user is redirected to the identity provider sso return endpoint
     Then Identity provider sso return endpoint should redirect client-side a saml response to the service provider
+    And the sso return response should not be stored by the browser
     And the saml response assertion should be signed
     And the saml response status code should be "urn:oasis:names:tc:SAML:2.0:status:Success"
     And the saml response should have an authenticating authority of the IdP EntityId with class ref 'urn:oasis:names:tc:SAML:2.0:ac:classes:MobileTwoFactorUnregistered'
