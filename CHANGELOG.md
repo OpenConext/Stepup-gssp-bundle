@@ -2,6 +2,14 @@
 
 - Add support for PHP 8.5
 - Keep the minimum required PHP version at ^8.2
+- New: preserve and expose the `mdui:UIInfo` SAML extension (service display name) from the AuthnRequest during
+  authentication and registration, via `StateHandlerInterface::getMdui()`/`hasMdui()` and
+  `AuthenticationService::getMdui()`/`RegistrationService::getMdui()`.
+- New: `Surfnet\GsspBundle\Service\ServiceName\ServiceNameFormatter` and `ServiceNameResolver` sanitize and
+  locale-match a resolved display name. Contract: truncated to 40 characters total (39 characters + ellipsis when
+  truncated), whitespace trimmed/collapsed, control/format characters stripped, locale fallback order is exact match
+  -> `en` -> first available `DisplayName`.
+- Not yet tagged/released.
 
 # 6.0.0
 

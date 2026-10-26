@@ -21,6 +21,7 @@ declare(strict_types = 1);
 namespace Surfnet\GsspBundle\Service;
 
 use SAML2\Constants;
+use Surfnet\SamlBundle\SAML2\Extensions\MduiChunk;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -61,6 +62,10 @@ interface RegistrationService
      * If the user is already registered.
      */
     public function isRegistered(): bool;
+
+    public function getMdui(): ?MduiChunk;
+
+    public function hasMdui(): bool;
 
     public function reject(string $message, string $subCode = Constants::STATUS_AUTHN_FAILED): void;
 

@@ -21,6 +21,7 @@ declare(strict_types = 1);
 namespace Surfnet\GsspBundle\Service;
 
 use Surfnet\SamlBundle\SAML2\Extensions\GsspUserAttributesChunk;
+use Surfnet\SamlBundle\SAML2\Extensions\MduiChunk;
 use Surfnet\SamlBundle\SAML2\ReceivedAuthnRequest;
 
 /**
@@ -55,6 +56,10 @@ interface StateHandlerInterface
     public function getScopingRequesterIds(): array;
 
     public function getGsspUserAttributes(): ?GsspUserAttributesChunk;
+
+    public function getMdui(): ?MduiChunk;
+
+    public function hasMdui(): bool;
 
     /*
      * Is the current request type registration flow?
