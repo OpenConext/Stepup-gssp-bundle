@@ -14,4 +14,8 @@ return RectorConfig::configure()
     ->withComposerBased(twig: true, phpunit: true, symfony: true)
     ->withPHPStanConfigs([__DIR__.'/phpstan.neon'])
     ->withPreparedSets(deadCode: true)
+    ->withSkip([
+        \Rector\Php84\Rector\MethodCall\NewMethodCallWithoutParenthesesRector::class,
+        \Rector\Php84\Rector\Class_\DeprecatedAnnotationToDeprecatedAttributeRector::class,
+    ])
 ;

@@ -1,5 +1,7 @@
 # Unreleased
 
+- Add support for PHP 8.5
+- Keep the minimum required PHP version at ^8.2
 - New: preserve and expose the `mdui:UIInfo` SAML extension (service display name) from the AuthnRequest during
   authentication and registration, via `StateHandlerInterface::getMdui()`/`hasMdui()` and
   `AuthenticationService::getMdui()`/`RegistrationService::getMdui()`.
